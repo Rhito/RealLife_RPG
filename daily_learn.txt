@@ -1,0 +1,47 @@
+day 01 - learn about git
+	-git init // init a git local
+	-git add .  // Add the entire directory unless it is in the .gitignore file
+	-git commit "#issue -  comment" // commit on local
+	-git push origin master // push commit to remote
+	-git --global ... // login to auth
+	-git checkout -b newBranch // create a new branch on local
+	-git push -u origin newBranch // push on remote
+	-git branch -d ten-branch // xoa nhanh phải merge trước
+	 git branch -D ten-branch // van la xoa nhung xoa ke ca ca khi chua merge
+	 git push origin --delete ten-branch // xoa tren remote
+
+	-git merge branchName // merge a diffirent branch with current branch
+	-git pull origin master // pull change on branch
+	-git log // log commit
+day 02 - learn about reactJS - TypeScript
+	 - @type/index.d.ts // file .ts declaration type
+	 - useMemo(()=>{//..}, []) // Tránh việc tính toán lại giá trị mỗi      	    lần component render lại, nếu dependencies không đổi.
+         - React.memo(<Component />) // not rerender when not necessary.
+	 - useCallback((e)=>{//..}, []) //Ghi nhớ function trash tạo mới mỗi. 	    lần render.
+	 - useReducer(initValues, reducer) // Quản lý state phức tạp.
+           reducer(state,action) là 1 callback nhận 2 giá trị
+	   const [state, dispatch] = useReducer(reducer, initialState);
+	   dispatch(action);		
+	 - useRef(initValues) + giữ giá trị khi component render (out scope)
+			      + lấy element DOM
+	   const ref = useRef(); ref.current = initValues;
+	   <Component ref={ref}/>; ref.current = <Component/>;
+day 03 - javascript concept
+	 - promise:
+	   3 state: Pending, Fulfilled, Reject
+	   Nhận 2 callback và trả về kết quả của 1 callback khi logic của 1 	    trong 2 đúng: 
+	   const myPromise = new Promise((resolve, reject) => 
+	    {logic ? resolve() : reject()}
+	   Sau sử dụng .then() và .catch() để xử lý Promise .finally() // 	    chạy finally khi .then() hoặc .catch() chạy.
+	   Promise Chain: ta có thể gọi nhiều .then() và .catch() nhưng tham 	    số truyền vào của hàm chạy sau được truyền từ hàm chạy trước kể 	    cả khi hàm chạy trước truyền ra một promise khác.
+	 - async/await phải có try/catch 
+	  async là từ khóa dùng để đánh dấu một hàm bất đồng bộ.
+	  Một hàm async luôn trả về Promise, kể cả khi bạn không trả Promise    	   rõ ràng.
+	  await là từ khóa chỉ được dùng bên trong async function.	
+	  Nó tạm dừng việc thực thi cho đến khi Promise được resolve → giúp    	   code nhìn giống như code đồng bộ.
+day 04 - test mail (laravel)
+Day05 - word base for Pj
+Day06 - write migration for db
+Day07 - Model
+DayWork1 - note: We should using gate, policy --tam thoi lam phan dashboard voi crud truoc -- Index of user controller
+	   		
