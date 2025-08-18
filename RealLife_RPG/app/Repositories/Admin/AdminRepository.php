@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Models\Admin;
 use App\Repositories\Contracts\AdminRepositoryInterface;
+use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminRepository implements AdminRepositoryInterface
@@ -31,9 +32,9 @@ class AdminRepository implements AdminRepositoryInterface
             if (is_numeric($search)) {
                 $q->where('id', $search);
             }
-            $q->where('name', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%')
-                ->orWhere('role', 'like', '%' . $search . '%');
+            $q->where('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('role', 'like', "%$search%");
         });
 
         // validate column name to prevent SQL injection
@@ -52,7 +53,7 @@ class AdminRepository implements AdminRepositoryInterface
         $query = Admin::query();
 
         if ($withTrashed) {
-            $query->withTrashed();
+            $query->onlyTrashed();
         }
 
         return $query->findOrFail($id);
@@ -69,19 +70,26 @@ class AdminRepository implements AdminRepositoryInterface
 
         return Admin::create($fields);
     }
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data): Admin
     {
         $admin = $this->findOrFail($id);
-        return $admin->update($data);
+        $admin->update($data);
+        return $admin;
     }
-    public function delete(int $id): bool
+    public function delete(int $id): Admin
     {
         $admin = $this->findOrFail($id);
-        return $admin->delete();
+        $admin->delete();
+        return $admin;
     }
-    public function restore(int $id): bool
+
+    public function restore(int $id): Admin
     {
         $admin = $this->findOrFail($id, true);
-        return $admin->restore();
+        if (!$admin->trashed()) {
+            throw new Exception('Admin is not deleted.');
+        }
+        $admin->restore();
+        return $admin;
     }
 }

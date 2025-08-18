@@ -92,8 +92,7 @@ class AdminController extends ApiController
     public function destroy(ApiFormRequest $request): JsonResponse
     {
         try {
-            $admin = $this->findOrFailWithTrash($request->id);
-            $this->adminRepo->delete($admin);
+            $admin = $this->adminRepo->delete($request->id);
             $this->logAction('destroy_admin', $admin);
             return $this->success("Admin deleted successfully.", ['admin' => $admin]);
         } catch (\Throwable $e) {
@@ -110,7 +109,7 @@ class AdminController extends ApiController
     public function show(ApiFormRequest $request): JsonResponse
     {
         try {
-            $admin = $this->findOrFailWithTrash($request->id);
+            $admin = $this->adminRepo->findOrFail($request->id, true);
             // $this->logAction('show_admin', $admin);
             return $this->success("Admin retrieved successfully", ['admin' => $admin]);
         } catch (\Throwable $e) {
@@ -127,11 +126,7 @@ class AdminController extends ApiController
     public function restore(ApiFormRequest $request): JsonResponse
     {
         try {
-            $admin = $this->findOrFailWithTrash($request->id, true);
-            if (!$admin->trashed()) {
-                return $this->error('Admin is not deleted.');
-            }
-            $this->adminRepo->restore($admin);
+            $admin = $this->adminRepo->restore($request->id);
             $this->logAction('restore_admin', $admin);
             return $this->success("Admin restore successfully.", ['admin' => $admin]);
         } catch (\Throwable $e) {

@@ -5,9 +5,8 @@ namespace App\Repositories\User;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -19,15 +18,20 @@ class UserRepository implements UserRepositoryInterface
      * Get list of users
      *
      * @param int $perPage
-     * @param mixed $search
-     * @param mixed $status
+     * @param string $search
+     * @param string $status
      * @param string $sortBy
      * @param string $sortDirection
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator: LengthAwarePaginator
      */
-    public function paginateWithQuery($perPage = 10, $search = null, $status = null, $sortBy = 'id', $sortDirection = 'desc'): LengthAwarePaginator
-    {
+    public function paginateWithQuery(
+        int $perPage = 10,
+        ?string $search = null,
+        ?string $status = null,
+        string $sortBy = 'id',
+        string $sortDirection = 'desc'
+    ): LengthAwarePaginator {
         $query = match ($status) {
             'trashed' => User::onlyTrashed(),
             'all'     => User::withTrashed(),
@@ -51,12 +55,12 @@ class UserRepository implements UserRepositoryInterface
         $sortDirection = strtolower($sortDirection) === "asc" ? "asc" : "desc";
         return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
-    public function findOrFailWithTrashed(int $id, bool $withTrashed = false): User
+    public function findOrFail(int $id, bool $withTrashed = false): User
     {
         $query = User::query();
 
         if ($withTrashed) {
-            $query->withTrashed();
+            $query->onlyTrashed();
         }
 
         return $query->findOrFail($id);
@@ -70,25 +74,30 @@ class UserRepository implements UserRepositoryInterface
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
-            //'avatar' => $data['avatar'],
         ];
 
         return User::create($fields);
     }
-    public function update(User $user, array $data): bool
+    public function update(int $id, array $data): User
     {
+        $user = $this->findOrFail($id);
         $this->gateAuthorize("update", $user);
         // call service
-        return $user->update($data);
+        $user->update($data);
+        return $user;
     }
-    public function delete(User $user): bool
+    public function delete(int $id): User
     {
+        $user = $this->findOrFail($id);
         $this->gateAuthorize("delete", $user);
-        return $user->delete();
+        $user->delete();
+        return $user;
     }
-    public function restore(User $user): bool
+    public function restore(int $id): User
     {
+        $user = $this->findOrFail($id);
         $this->gateAuthorize("restore", $user);
-        return $user->restore();
+        $user->restore();
+        return $user;
     }
 }
