@@ -12,7 +12,7 @@ class UpdateUserRequest extends ApiFormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() || $this->user("admin");
     }
 
     /**
@@ -24,8 +24,8 @@ class UpdateUserRequest extends ApiFormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:256'],
-            'email' => ['string', 'required', 'email', 'min:8', 'max:255', 'unique:users,email'],
-            'password' => ['string', 'required', 'confirmed', Password::default()],
+            'email' => ['string', 'required', 'email', 'min:8', 'max:255'],
+            'password' => ['nullable', 'required', 'confirmed', Password::default()],
             'avatar' => ['nullable', 'string'],
         ];
     }

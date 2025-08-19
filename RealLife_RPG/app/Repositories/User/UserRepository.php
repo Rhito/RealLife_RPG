@@ -2,11 +2,13 @@
 
 namespace App\Repositories\User;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -23,7 +25,7 @@ class UserRepository implements UserRepositoryInterface
      * @param string $sortBy
      * @param string $sortDirection
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator: LengthAwarePaginator
+     * @return UserResource
      */
     public function paginateWithQuery(
         int $perPage = 10,
@@ -31,7 +33,7 @@ class UserRepository implements UserRepositoryInterface
         ?string $status = null,
         string $sortBy = 'id',
         string $sortDirection = 'desc'
-    ): LengthAwarePaginator {
+    ) {
         $query = match ($status) {
             'trashed' => User::onlyTrashed(),
             'all'     => User::withTrashed(),
@@ -41,9 +43,10 @@ class UserRepository implements UserRepositoryInterface
         $query->where(function ($q) use ($search) {
             if (is_numeric($search)) {
                 $q->where('id', $search);
+            } else {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
             }
-            $q->where('name', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%");
         });
 
         // Validate column name to prevent SQL injection
@@ -53,7 +56,9 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $sortDirection = strtolower($sortDirection) === "asc" ? "asc" : "desc";
-        return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
+
+        $users = $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
+        return $users;
     }
     public function findOrFail(int $id, bool $withTrashed = false): User
     {
@@ -82,9 +87,21 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->findOrFail($id);
         $this->gateAuthorize("update", $user);
-        // call service
+
+        // Hash password
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        // Handle avatar if has file upload
+        if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+            $path = $data['avatar']->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
         $user->update($data);
-        return $user;
+
+        return $user->fresh();
     }
     public function delete(int $id): User
     {
@@ -96,6 +113,9 @@ class UserRepository implements UserRepositoryInterface
     public function restore(int $id): User
     {
         $user = $this->findOrFail($id);
+        if (!$user->trashed()) {
+            throw new Exception("User is not found or deleted");
+        }
         $this->gateAuthorize("restore", $user);
         $user->restore();
         return $user;

@@ -39,6 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verified_at',
     ];
 
     /**
@@ -60,22 +61,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Related to task
-    public function tasks() : HasMany
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    public function userItems() : HasMany
+    public function userItems(): HasMany
     {
         return $this->hasMany(UserItem::class);
     }
 
-    public function userAchievement() : HasMany
+    public function userAchievement(): HasMany
     {
         return $this->hasMany(UserAchievement::class);
     }
 
-    public function statLog () : HasMany
+    public function statLog(): HasMany
     {
         return $this->hasMany(StatLog::class);
     }

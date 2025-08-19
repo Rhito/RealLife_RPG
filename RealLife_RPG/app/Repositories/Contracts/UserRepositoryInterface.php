@@ -2,8 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use \Illuminate\Pagination\LengthAwarePaginator;
-
 interface UserRepositoryInterface
 {
     public function paginateWithQuery(
@@ -12,7 +10,7 @@ interface UserRepositoryInterface
         ?string $status,
         string $sortBy,
         string $sortDirection
-    ): LengthAwarePaginator;
+    );
     public function findOrFail(int $id, bool $withTrashed = false): mixed;
     public function create(array $data): mixed;
     public function update(int $id, array $data): mixed;

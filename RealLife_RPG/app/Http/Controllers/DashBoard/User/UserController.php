@@ -29,19 +29,6 @@ class UserController extends ApiController
         $this->userRepo = $userRepo;
     }
     /**
-     * Find a user, sorf-deleted user with authorize
-     * @param mixed $id
-     * @param bool $withTrash
-     *
-     * @return \App\Models\User
-     */
-    public function findOrFail(int $id, bool $withTrashed = false)
-    {
-        $user = $this->userRepo->findOrFailWithTrashed($id, $withTrashed);
-        // gate
-        return $user;
-    }
-    /**
      * Get list of users
      * @param ApiFormRequest $request
      *
@@ -87,9 +74,8 @@ class UserController extends ApiController
     public function update(UpdateUserRequest $request): JsonResponse
     {
         try {
-            $user = $this->findOrFail($request->id);
             $requestData = $request->only(['name', 'email', 'avatar']);
-            $this->userRepo->update($user, $requestData);
+            $user = $this->userRepo->update($request->id, $requestData);
             $this->logAction('update_user', $user);
             return $this->success("User updated successfully", ["user" => $user]);
         } catch (\Throwable $e) {
@@ -106,8 +92,7 @@ class UserController extends ApiController
     public function destroy(ApiFormRequest $request): JsonResponse
     {
         try {
-            $user = $this->findOrFail($request->id);
-            $this->userRepo->delete($user);
+            $user = $this->userRepo->delete($request->id);
             $this->logAction("deleted_user", $user);
             return $this->success('User deleted successfully.', ["user" => $user]);
         } catch (\Throwable $e) {
@@ -122,8 +107,8 @@ class UserController extends ApiController
     public function show(ApiFormRequest $request): JsonResponse
     {
         try {
-            $user = $this->userRepo->findOrFailWithTrashed($request->id);
-            return $this->success("User retrieved successfully.", ["user" => new UserResource($user)]);
+            $user = $this->userRepo->findOrFail($request->id);
+            return $this->success("User retrieved successfully.", ["user" => $user]);
         } catch (\Throwable $e) {
             return $this->handleException($e);
         }
@@ -139,11 +124,8 @@ class UserController extends ApiController
     public function restore(ApiFormRequest $request): JsonResponse
     {
         try {
-            $user = $this->findOrFail($request->id, true);
-            if (!$user->trashed()) {
-                return $this->error("User is not found or deleted", []);
-            }
-            $this->userRepo->restore($user);
+            $user = $this->userRepo->restore($request->id);
+            $this->logAction("restored_user", $user);
             return $this->success("User restore successfully.", ["user" => $user]);
         } catch (\Throwable $e) {
             return $this->handleException($e);
