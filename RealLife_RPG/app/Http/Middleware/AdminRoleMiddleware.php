@@ -18,8 +18,7 @@ class AdminRoleMiddleware
         $admin = $request->user('admin');
         if (!$admin) {
             return response()->json([
-                'message' => 'Unauthenticated.',
-                'admin' => $request->user('admin')
+                'message' => 'Unauthenticated.'
             ], 401);
         }
 

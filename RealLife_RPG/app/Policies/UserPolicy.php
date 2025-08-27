@@ -8,6 +8,14 @@ use App\Models\User;
 
 class UserPolicy
 {
+
+    public function before(Admin $admin, string $ability)
+    {
+        if ($admin->role === AdminRole::SUPER) {
+            return true;
+        }
+        return null;
+    }
     /**
      * Determine whether the user can view any models.
      */
@@ -21,7 +29,7 @@ class UserPolicy
      */
     public function view(Admin $user, User $model): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +45,7 @@ class UserPolicy
      */
     public function update(Admin $user, User $model): bool
     {
-        return false;
+        return $user->role === AdminRole::SUPER;
     }
 
     /**
@@ -53,14 +61,14 @@ class UserPolicy
      */
     public function restore(Admin $user, User $model): bool
     {
-        return false;
+        return $user->role === AdminRole::SUPER;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(Admin $user, User $model): bool
-    {
-        return false;
-    }
+    // public function forceDelete(Admin $user, User $model): bool
+    // {
+    //     return false;
+    // }
 }
