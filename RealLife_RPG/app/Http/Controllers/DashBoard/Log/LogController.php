@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\DashBoard\Admin;
+namespace App\Http\Controllers\DashBoard\Log;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\ApiFormRequest;
@@ -21,7 +21,10 @@ class LogController extends ApiController
     }
 
     /**
+     * take all log to the dashboard
+     * @param ApiFormRequest $request
      *
+     * @return JsonResponse
      */
     public function index(ApiFormRequest $request): JsonResponse
     {

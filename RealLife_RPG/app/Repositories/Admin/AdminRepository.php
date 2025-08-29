@@ -20,8 +20,13 @@ class AdminRepository implements AdminRepositoryInterface
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator: LengthAwarePaginator
      */
-    public function paginateWithQuery($perPage = 10, $search = null, $status = null, $sortBy = 'id', $sortDirection = 'desc'): LengthAwarePaginator
-    {
+    public function paginateWithQuery(
+        $perPage = 10,
+        $search = null,
+        $status = null,
+        $sortBy = 'id',
+        $sortDirection = 'desc'
+    ): LengthAwarePaginator {
         $query = match ($status) {
             "trashed" => Admin::onlyTrashed(),
             "all"     => Admin::withTrashed(),
@@ -30,11 +35,12 @@ class AdminRepository implements AdminRepositoryInterface
 
         $query->where(function ($q) use ($search) {
             if (is_numeric($search)) {
-                $q->where('id', $search);
+                $q->where('id', '=', $search);
+            } else {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('role', 'like', "%$search%");
             }
-            $q->where('name', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%")
-                ->orWhere('role', 'like', "%$search%");
         });
 
         // validate column name to prevent SQL injection

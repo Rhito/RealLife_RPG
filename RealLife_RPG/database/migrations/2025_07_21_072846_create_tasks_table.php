@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json('repeat_days')->nullable();
             $table->timestamp('due_date')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->index(['type', 'difficulty']);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -33,5 +34,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('tasks');
     }
-
 };

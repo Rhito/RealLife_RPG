@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\DashBoard\Admin\AdminController;
 use App\Http\Controllers\DashBoard\Admin\AuthController;
-use App\Http\Controllers\DashBoard\Admin\LogController;
+use App\Http\Controllers\DashBoard\Log\LogController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\DashBoard\Task\TaskController;
 use App\Http\Controllers\DashBoard\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,14 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::post('/', [UserController::class, 'store']);
+            Route::post('/{id}', [UserController::class, 'update']);
+            Route::delete('/{id}', [UserController::class, 'destroy']);
+            Route::post('/{id}/restore', [UserController::class, 'restore']);
+            Route::get('/{id}', [UserController::class, 'show']);
+        });
+        Route::prefix('tasks')->group(function () {
+            Route::get('/', [TaskController::class, 'index']);
             Route::post('/', [UserController::class, 'store']);
             Route::post('/{id}', [UserController::class, 'update']);
             Route::delete('/{id}', [UserController::class, 'destroy']);

@@ -6,7 +6,9 @@ use App\Repositories\Admin\AdminLogRepository;
 use App\Repositories\Admin\AdminRepository;
 use App\Repositories\Contracts\AdminLogRepositoryInterface;
 use App\Repositories\Contracts\AdminRepositoryInterface;
+use App\Repositories\Contracts\TaskRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Task\TaskRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +22,7 @@ class RepositoryProvider extends ServiceProvider
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(AdminRepositoryInterface::class, AdminRepository::class);
         $this->app->bind(AdminLogRepositoryInterface::class, AdminLogRepository::class);
+        $this->app->bind(TaskRepositoryInterface::class, TaskRepository::class);
     }
 
     /**
