@@ -63,7 +63,7 @@ Route::prefix('v1')->group(function () {
         });
         Route::prefix('tasks')->group(function () {
             Route::get('/', [TaskController::class, 'index']);
-            Route::post('/', [UserController::class, 'store']);
+            Route::post('/', [TaskController::class, 'store']);
             Route::post('/{id}', [UserController::class, 'update']);
             Route::delete('/{id}', [UserController::class, 'destroy']);
             Route::post('/{id}/restore', [UserController::class, 'restore']);

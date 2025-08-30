@@ -4,6 +4,7 @@ namespace App\Repositories\Task;
 
 use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TaskRepository implements TaskRepositoryInterface
 {
@@ -26,7 +27,7 @@ class TaskRepository implements TaskRepositoryInterface
         ?int $user_id = null,
         string $sortBy = 'id',
         string $sortDirection = 'desc'
-    ) {
+    ): LengthAwarePaginator {
         $query = match ($status) {
             "trashed" => Task::onlyTrashed(),
             "all" => Task::withTrashed(),
@@ -52,24 +53,46 @@ class TaskRepository implements TaskRepositoryInterface
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
         return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
-    public function findOrFail(int $id, bool $withTrashed = false): mixed
+    public function findOrFail(int $id, bool $withTrashed = false): Task
     {
-        return null;
+        $query = Task::query();
+        if ($withTrashed) {
+            $query->onlyTrashed();
+        }
+        return $query->findOrFail($id);
     }
-    public function create(array $data): mixed
+    public function create($data): Task
     {
-        return null;
+        $fields = [
+            'user_id' => $data['user_id'],
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'type' => $data['type'],
+            'difficulty' => $data['difficulty'],
+            'repeat_days' => $data['repeat_days'] ?? null,
+            'due_date' => $data['due_date'] ?? null,
+        ];
+        return Task::create($fields);
     }
-    public function update(int $id, array $data): mixed
+    public function update(int $id, array $data): Task
     {
-        return null;
+        $task = $this->findOrFail($id);
+        $task->update($data);
+        return $task;
     }
-    public function delete(int $id): mixed
+    public function delete(int $id): Task
     {
-        return null;
+        $task = $this->findOrFail($id);
+        $task->delete();
+        return $task;
     }
-    public function restore(int $id): mixed
+    public function restore(int $id): Task
     {
-        return null;
+        $task = $this->findOrFail($id);
+        if (!$task->trashed()) {
+            throw new \Exception('Task is not deleted.');
+        }
+        $task->restore();
+        return $task;
     }
 }
