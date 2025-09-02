@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TaskCompletion extends Model
 {
-     /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, SoftDeletes;
 
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -29,18 +29,19 @@ class TaskCompletion extends Model
      *
      * @return array<string, string>
      */
-    protected function casts() : array {
+    protected function casts(): array
+    {
         return [
             'completed_at' => 'datetime',
         ];
     }
 
-    public function task() : BelongsTo
+    public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

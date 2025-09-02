@@ -4,12 +4,19 @@ namespace App\Repositories\Task;
 
 use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 
 class TaskRepository implements TaskRepositoryInterface
 {
+    protected function gateAuthorize(string $ability, $task)
+    {
+        Gate::forUser(auth('admin')->user())->authorize($ability, $task);
+    }
+
     /**
-     * Get list of admins
+     * Get list of Task
      *
      * @param int    $perPage
      * @param mixed  $search
@@ -63,6 +70,10 @@ class TaskRepository implements TaskRepositoryInterface
     }
     public function create($data): Task
     {
+        if (Gate::forUser(auth('admin')->user())->denies('create', Task::class)) {
+            throw new AuthorizationException("You don't have permission to create task.");
+        }
+
         $fields = [
             'user_id' => $data['user_id'],
             'title' => $data['title'],
@@ -74,25 +85,53 @@ class TaskRepository implements TaskRepositoryInterface
         ];
         return Task::create($fields);
     }
+    /**
+     * update task
+     */
     public function update(int $id, array $data): Task
     {
         $task = $this->findOrFail($id);
+        $this->gateAuthorize("update", $task);
         $task->update($data);
         return $task;
     }
+    /**
+     * delete task
+     */
     public function delete(int $id): Task
     {
         $task = $this->findOrFail($id);
+        $this->gateAuthorize("delete", $task);
         $task->delete();
         return $task;
     }
+    /**
+     * restore task
+     */
     public function restore(int $id): Task
     {
-        $task = $this->findOrFail($id);
+        $task = $this->findOrFail($id, true);
+        $this->gateAuthorize("restore", $task);
         if (!$task->trashed()) {
             throw new \Exception('Task is not deleted.');
         }
         $task->restore();
         return $task;
+    }
+    /**
+     * show details of a task
+     */
+    public function show(int $id, bool $withTrashed = false): Task
+    {
+        $query = Task::with([
+            'user',
+            'completions'
+        ]);
+
+        if ($withTrashed) {
+            $query->withTrashed();
+        }
+
+        return $query->findOrFail($id);
     }
 }

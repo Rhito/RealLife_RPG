@@ -39,7 +39,7 @@ class ApiController extends Controller
      *
      * @return new AdminLogEvent
      */
-    protected function logAction($action, $target)
+    protected function logAction(string $action, $target)
     {
         /**
          * hide the password properties to secure

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('target_id');
             $table->string('target_type');
             $table->json('meta')->nullable();
-            $table->index(['target_id', 'target_type', 'action']);
+            $table->index(['target_id', 'target_type']);
             $table->timestamps();
         });
     }

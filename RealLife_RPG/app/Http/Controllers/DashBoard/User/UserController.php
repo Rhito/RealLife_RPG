@@ -106,7 +106,7 @@ class UserController extends ApiController
     public function show(ApiFormRequest $request): JsonResponse
     {
         try {
-            $user = $this->userRepo->findOrFail($request->id);
+            $user = $this->userRepo->show($request->id);
             return $this->success("User retrieved successfully.", ["user" => $user]);
         } catch (\Throwable $e) {
             return $this->handleException($e);

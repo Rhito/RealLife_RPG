@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamp('completed_at');
             $table->text('proof')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

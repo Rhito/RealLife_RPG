@@ -2,13 +2,14 @@
 
 namespace App\Repositories\Contracts;
 
-interface TaskRepositoryInterface
+interface TaskCompletionRepositoryInterface
 {
     public function paginateWithQuery(
         int $perPage,
         mixed $search,
         ?string $status,
         ?int $user_id,
+        ?int $task_id,
         string $sortBy,
         string $sortDirection
     );

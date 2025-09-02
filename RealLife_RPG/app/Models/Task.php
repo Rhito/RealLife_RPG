@@ -35,7 +35,7 @@ class Task extends Model
      *
      * @return array<string, string>
      */
-    protected function casts() : array
+    protected function casts(): array
     {
         return [
             'due_date' => 'datetime',
@@ -45,12 +45,12 @@ class Task extends Model
         ];
     }
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function completions() : HasMany
+    public function completions(): HasMany
     {
         return $this->hasMany(TaskCompletion::class);
     }

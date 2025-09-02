@@ -17,7 +17,7 @@ class UserRepository implements UserRepositoryInterface
         Gate::forUser(auth('admin')->user())->authorize($ability, $user);
     }
     /**
-     * Get list of users
+     * Get list of user
      *
      * @param int $perPage
      * @param string $search
@@ -65,7 +65,7 @@ class UserRepository implements UserRepositoryInterface
         $query = User::query();
 
         if ($withTrashed) {
-            $query->onlyTrashed();
+            $query->withTrashed();
         }
 
         return $query->findOrFail($id);
@@ -119,5 +119,11 @@ class UserRepository implements UserRepositoryInterface
         $this->gateAuthorize("restore", $user);
         $user->restore();
         return $user;
+    }
+    public function show(int $id): User
+    {
+        return User::with(['tasks', 'userItems', 'userAchievement', 'statLog'])
+            ->withTrashed()
+            ->findOrFail($id);
     }
 }

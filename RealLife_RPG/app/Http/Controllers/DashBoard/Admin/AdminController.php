@@ -111,7 +111,7 @@ class AdminController extends ApiController
         try {
             $admin = $this->adminRepo->findOrFail($request->id, true);
             // $this->logAction('show_admin', $admin);
-            return $this->success("Admin retrieved successfully", ['admin' => $admin]);
+            return $this->success("Admin retrieve successfully", ['admin' => $admin]);
         } catch (\Throwable $e) {
             return $this->handleException($e, "Admin retrieved failed");
         }
@@ -128,7 +128,7 @@ class AdminController extends ApiController
         try {
             $admin = $this->adminRepo->restore($request->id);
             $this->logAction('restore_admin', $admin);
-            return $this->success("Admin restore successfully.", ['admin' => $admin]);
+            return $this->success("Admin restored successfully.", ['admin' => $admin]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Admin restore failed.');
         }

@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use App\Enums\AdminRole;
-use App\Models\Admin;
+use App\Models\Task;
+use App\Models\TaskCompletion;
 use App\Models\User;
+use App\Policies\TaskCompletionPolicy;
+use App\Policies\TaskPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -14,6 +16,8 @@ class AuthenticatedProvider extends ServiceProvider
 
     protected $policies = [
         User::class => UserPolicy::class,
+        Task::class => TaskPolicy::class,
+        TaskCompletion::class => TaskCompletionPolicy::class,
     ];
 
     /**

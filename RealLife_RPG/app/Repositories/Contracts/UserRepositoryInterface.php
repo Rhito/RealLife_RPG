@@ -16,4 +16,5 @@ interface UserRepositoryInterface
     public function update(int $id, array $data): mixed;
     public function delete(int $id): mixed;
     public function restore(int $id): mixed;
+    public function show(int $id): mixed;
 }

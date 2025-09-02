@@ -5,9 +5,14 @@ function App() {
   const [todoList, setTodoList] = useState<string[]>([]);
   const [text, setText] = useState<string>("");
 
+  const handleDelete = (todo: string) => {
+    if (!confirm(`do you want to delete ${todo}`)) return;
+    setTodoList(todoList.filter((val) => todo !== val));
+  };
+
   const renderTodo = todoList?.map((todo, i) => {
     return (
-      <div key={i}>
+      <div key={i} onClick={() => handleDelete(todo)}>
         <h3>{todo}</h3>
       </div>
     );
@@ -18,7 +23,6 @@ function App() {
     setTodoList([text, ...todoList]);
     setText("");
   };
-  console.log(todoList);
   return (
     <>
       <div>
