@@ -7,6 +7,7 @@ use App\Repositories\Contracts\TaskCompletionRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class TaskCompletionRepository implements TaskCompletionRepositoryInterface
 {
@@ -63,10 +64,10 @@ class TaskCompletionRepository implements TaskCompletionRepositoryInterface
     /**
      * find task completion by id allow find onlyTrashed()
      */
-    public function findOrFail(int $id, bool $withTrashed = false): TaskCompletion
+    public function findOrFail(int $id, bool $onlyTrashed = false): TaskCompletion
     {
         $query = TaskCompletion::query();
-        if ($withTrashed) {
+        if ($onlyTrashed) {
             $query->onlyTrashed();
         }
         return $query->findOrFail($id);
@@ -79,6 +80,13 @@ class TaskCompletionRepository implements TaskCompletionRepositoryInterface
         if (Gate::forUser(auth('admin')->user())->denies('create', TaskCompletion::class)) {
             throw new AuthorizationException("You don't have permission to create task completion.");
         }
+        $data['completed_at'] = now();
+        if (isset($data['proof']) && $data['proof'] instanceof \Illuminate\Http\UploadedFile) {
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('s3');
+            $path = $data['proof']->store('proofs', 's3');
+            $data['proof'] = $disk->url($path);
+        }
         return TaskCompletion::create($data);
     }
     /**
@@ -88,8 +96,22 @@ class TaskCompletionRepository implements TaskCompletionRepositoryInterface
     {
         $taskCompletion = $this->findOrFail($id);
         $this->gateAuthorize("update", $taskCompletion);
+        // If has new proof file uploaded
+        if (isset($data['proof']) && $data['proof'] instanceof \Illuminate\Http\UploadedFile) {
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('s3');
+            // delete old proof if exists
+            if ($taskCompletion->proof) {
+                // parse path from URL
+                $oldPath = parse_url($taskCompletion->proof, PHP_URL_PATH);
+                $disk->delete($oldPath);
+            }
+            // Upload new proof
+            $path = $data['proof']->store('proofs', 's3');
+            $data['proof'] = $disk->url($path);
+        }
         $taskCompletion->update($data);
-        return $taskCompletion;
+        return $taskCompletion->fresh();
     }
     /**
      * delete task completion

@@ -129,7 +129,7 @@ class TaskRepository implements TaskRepositoryInterface
         ]);
 
         if ($withTrashed) {
-            $query->withTrashed();
+            $query->onlyTrashed();
         }
 
         return $query->findOrFail($id);

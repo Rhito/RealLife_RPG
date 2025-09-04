@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -92,11 +93,20 @@ class UserRepository implements UserRepositoryInterface
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
-
-        // Handle avatar if has file upload
+        // If has new avatar file uploaded
         if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
-            $path = $data['avatar']->store('avatars', 'public');
-            $data['avatar'] = $path;
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('s3');
+            // delete old avatar if exists
+            if ($user->avatar) {
+                // parse path from URL
+                $oldPath = parse_url($user->avatar, PHP_URL_PATH);
+                $disk->delete($oldPath);
+            }
+            // Upload new avatar
+            $path = $data['avatar']->store('avatars', 's3');
+
+            $data['avatar'] = $disk->url($path);
         }
 
         $user->update($data);

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamp('completed_at');
+            $table->timestamp('completed_at')->useCurrent();
             $table->text('proof')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -23,10 +23,17 @@ class UpdateUserRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:2', 'max:256'],
-            'email' => ['string', 'required', 'email', 'min:8', 'max:255'],
-            'password' => ['nullable', 'required', 'confirmed', Password::default()],
-            'avatar' => ['nullable', 'string'],
+            'name' => ['sometimes', 'string', 'min:2', 'max:256'],
+            'email' => ['string', 'prohibited', 'email', 'min:8', 'max:255'],
+            'password' => ['sometimes', 'required', 'confirmed', Password::default()],
+            'avatar' => [
+                'sometimes',
+                'file',          // phải là file
+                'image',         // là ảnh (jpeg, png, bmp, gif, svg, webp)
+                'mimes:jpeg,png,jpg,gif,webp', // cụ thể format cho chắc
+                'max:2048',      // dung lượng tối đa 2MB
+                'dimensions:min_width=100,min_height=100,max_width=3000,max_height=3000'
+            ],
         ];
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\DashBoard\Admin\AuthController;
 use App\Http\Controllers\DashBoard\Log\LogController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\DashBoard\Task\TaskCompletionController;
 use App\Http\Controllers\DashBoard\Task\TaskController;
 use App\Http\Controllers\DashBoard\User\UserController;
 use Illuminate\Http\Request;
@@ -68,6 +69,14 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [TaskController::class, 'destroy']);
             Route::post('/{id}/restore', [TaskController::class, 'restore']);
             Route::get('/{id}', [TaskController::class, 'show']);
+        });
+        Route::prefix('task-completions')->group(function () {
+            Route::get('/', [TaskCompletionController::class, 'index']);
+            Route::post('/', [TaskCompletionController::class, 'store']);
+            Route::post('/{id}', [TaskCompletionController::class, 'update']);
+            Route::delete('/{id}', [TaskCompletionController::class, 'destroy']);
+            Route::post('/{id}/restore', [TaskCompletionController::class, 'restore']);
+            Route::get('/{id}', [TaskCompletionController::class, 'show']);
         });
     });
 });

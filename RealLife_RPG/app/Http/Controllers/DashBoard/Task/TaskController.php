@@ -35,7 +35,7 @@ class TaskController extends ApiController
             $tasks = $this->taskRepository->paginateWithQuery($perPage, $search, $status, $user_id, $sortBy, $sortDirection);
             return $this->success("Get tasks successfully", ["tasks" => $tasks]);
         } catch (\Throwable $e) {
-            return $this->handleException($e);
+            return $this->handleException($e, 'Failed to get task.');
         }
     }
     /**
@@ -73,7 +73,7 @@ class TaskController extends ApiController
         }
     }
     /**
-     * Delete task
+     * Sorf delete task
      * @param ApiFormRequest $request
      * @return JsonResponse
      */

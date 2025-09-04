@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Item;
 use App\Models\Task;
 use App\Models\TaskCompletion;
 use App\Models\User;
+use App\Policies\ItemPolicy;
 use App\Policies\TaskCompletionPolicy;
 use App\Policies\TaskPolicy;
 use App\Policies\UserPolicy;
@@ -18,6 +20,7 @@ class AuthenticatedProvider extends ServiceProvider
         User::class => UserPolicy::class,
         Task::class => TaskPolicy::class,
         TaskCompletion::class => TaskCompletionPolicy::class,
+        Item::class => ItemPolicy::class,
     ];
 
     /**
