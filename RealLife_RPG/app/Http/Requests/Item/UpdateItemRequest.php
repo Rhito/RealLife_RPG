@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Item;
 
-use App\Http\Requests\ApiFormRequest;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateUserRequest extends ApiFormRequest
+class UpdateItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return $this->user() || $this->user('admin');
     }
 
     /**
@@ -23,17 +22,19 @@ class UpdateUserRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'min:2', 'max:256'],
-            'email' => ['string', 'prohibited', 'email', 'min:8', 'max:255'],
-            'password' => ['sometimes', 'required', 'confirmed', Password::default()],
-            'avatar' => [
+            'name' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'string'],
+            'icon' => [
                 'sometimes',
                 'file',
                 'image',
-                'mimes:jpeg,png,jpg,gif,webp',
+                'mimes:jepg,png,jpg,gif,webp',
                 'max:2048',
                 'dimensions:min_width=100,min_height=100,max_width=3000,max_height=3000',
             ],
+            'price' => ['sometimes', 'integer', 'min:0'],
+            'type' => ['sometimes', 'in:boost,cosmetic'],
+            'is_active' => ['sometimes', 'boolean']
         ];
     }
 }
