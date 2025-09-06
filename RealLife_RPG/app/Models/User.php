@@ -63,21 +63,21 @@ class User extends Authenticatable implements MustVerifyEmail
     // Related to task
     public function tasks(): HasMany
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class, 'user_id', 'id');
     }
 
     public function userItems(): HasMany
     {
-        return $this->hasMany(UserItem::class);
+        return $this->hasMany(UserItem::class, 'user_id', 'id');
     }
 
     public function userAchievement(): HasMany
     {
-        return $this->hasMany(UserAchievement::class);
+        return $this->hasMany(UserAchievement::class, 'user_id', 'id');
     }
 
     public function statLog(): HasMany
     {
-        return $this->hasMany(StatLog::class);
+        return $this->hasMany(StatLog::class, 'user_id', 'id');
     }
 }

@@ -28,13 +28,13 @@ class Item extends Model
         ];
     }
 
-    public function achievements() : HasMany
+    public function achievements(): HasMany
     {
-         return $this->hasMany(Achievement::class);
+        return $this->hasMany(Achievement::class, 'item_reward_id', 'id');
     }
 
-    public function userItems() : HasMany
+    public function userItems(): HasMany
     {
-        return $this->hasMany(Item::class);
+        return $this->hasMany(UserItem::class, 'item_id', 'id');
     }
 }

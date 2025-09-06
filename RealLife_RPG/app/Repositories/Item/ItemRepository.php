@@ -138,7 +138,7 @@ class ItemRepository implements ItemRepositoryInterface
         ]);
 
         if ($withTrashed) {
-            $query->onlyTrashed();
+            $query->withTrashed();
         }
 
         return $query->findOrFail($id);

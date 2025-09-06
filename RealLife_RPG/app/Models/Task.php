@@ -52,6 +52,6 @@ class Task extends Model
 
     public function completions(): HasMany
     {
-        return $this->hasMany(TaskCompletion::class);
+        return $this->hasMany(TaskCompletion::class, 'task_id', 'id');
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\DashBoard\Admin\AuthController;
 use App\Http\Controllers\DashBoard\Log\LogController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\DashBoard\Item\ItemController;
 use App\Http\Controllers\DashBoard\Task\TaskCompletionController;
 use App\Http\Controllers\DashBoard\Task\TaskController;
 use App\Http\Controllers\DashBoard\User\UserController;
@@ -77,6 +78,14 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [TaskCompletionController::class, 'destroy']);
             Route::post('/{id}/restore', [TaskCompletionController::class, 'restore']);
             Route::get('/{id}', [TaskCompletionController::class, 'show']);
+        });
+        Route::prefix('items')->group(function () {
+            Route::get('/', [ItemController::class, 'index']);
+            Route::post('/', [ItemController::class, 'store']);
+            Route::post('/{id}', [ItemController::class, 'update']);
+            Route::delete('/{id}', [ItemController::class, 'destroy']);
+            Route::post('/{id}/restore', [ItemController::class, 'restore']);
+            Route::get('/{id}', [ItemController::class, 'show']);
         });
     });
 });

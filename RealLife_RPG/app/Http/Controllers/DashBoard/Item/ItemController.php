@@ -71,11 +71,52 @@ class ItemController extends ApiController
     public function update(UpdateItemRequest $request): JsonResponse
     {
         try {
+            if (!$request->all()) return $this->error("Can't sent request null", [], 422);
             $item = $this->itemRepository->update($request->id, $request->validated());
             $this->logAction('Updated_items', $item);
             return $this->success('Update item successfully.', ['item' => $item]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Failed to update item.');
+        }
+    }
+    /**
+     * Soft delete an item
+     */
+    public function destroy(ApiFormRequest $request): JsonResponse
+    {
+        try {
+            $item = $this->itemRepository->delete($request->id);
+            $this->logAction('deleted_item', $item);
+            return $this->success('Delete item successfully.', ['item' => $item]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Failed to delete item.');
+        }
+    }
+    /**
+     * Restore an item
+     */
+    public function restore(ApiFormRequest $request): JsonResponse
+    {
+        try {
+            $item = $this->itemRepository->restore($request->id);
+            $this->logAction('restore_item', $item);
+            return $this->success('Restore item successfully.', ['item' => $item]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Failed to restore item.');
+        }
+    }
+    /**
+     * Show details of an item
+     */
+    public function show(ApiFormRequest $request): JsonResponse
+    {
+        try {
+            $request->validate(["withTrash" => ['boolean']]);
+            $withTrash = $request->input('withTrash', false);
+            $item = $this->itemRepository->show($request->id, $withTrash);
+            return $this->success('Item details retrieve successfully.', ['item' => $item]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Failed to see details item.');
         }
     }
 }

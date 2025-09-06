@@ -60,10 +60,10 @@ class TaskRepository implements TaskRepositoryInterface
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
         return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
-    public function findOrFail(int $id, bool $withTrashed = false): Task
+    public function findOrFail(int $id, bool $onlyTrashed = false): Task
     {
         $query = Task::query();
-        if ($withTrashed) {
+        if ($onlyTrashed) {
             $query->onlyTrashed();
         }
         return $query->findOrFail($id);

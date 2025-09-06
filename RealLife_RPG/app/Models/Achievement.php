@@ -22,13 +22,13 @@ class Achievement extends Model
         'is_active',
     ];
 
-    public function item() : BelongsTo
+    public function item(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class, 'item_reward_id', 'id');
     }
 
-    public function userAchivement() : HasMany
+    public function userAchivement(): HasMany
     {
-        return $this->hasMany(UserAchievement::class);
+        return $this->hasMany(UserAchievement::class, 'achievement_id', 'id');
     }
 }
