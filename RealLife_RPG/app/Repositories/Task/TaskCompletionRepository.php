@@ -42,6 +42,9 @@ class TaskCompletionRepository implements TaskCompletionRepositoryInterface
             "all" => TaskCompletion::withTrashed(),
             default => TaskCompletion::query()
         };
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         if ($user_id) {
             $query->where('user_id', '=', $user_id);
         }

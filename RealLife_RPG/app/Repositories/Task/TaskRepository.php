@@ -40,6 +40,9 @@ class TaskRepository implements TaskRepositoryInterface
             "all" => Task::withTrashed(),
             default => Task::query()
         };
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         if ($user_id) {
             $query->where('user_id', '=', $user_id);
         }

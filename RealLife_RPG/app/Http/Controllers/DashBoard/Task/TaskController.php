@@ -110,7 +110,7 @@ class TaskController extends ApiController
     public function show(ApiFormRequest $request): JsonResponse
     {
         try {
-            $trashed = $request->input('trashed', false);
+            $trashed = filter_var($request->input('trashed', false), FILTER_VALIDATE_BOOLEAN);
             $taskDetails = $this->taskRepository->show($request->id, $trashed);
             return $this->success("Task details retrieve successfully.", ['taskDetails' => $taskDetails]);
         } catch (\Throwable $e) {

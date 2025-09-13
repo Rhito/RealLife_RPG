@@ -49,7 +49,9 @@ class UserRepository implements UserRepositoryInterface
                     ->orWhere('email', 'like', "%$search%");
             }
         });
-
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         // Validate column name to prevent SQL injection
         $allowedSorts = ['id', 'name', 'email', 'exp', 'level', 'coins'];
         if (!in_array($sortBy, $allowedSorts)) {

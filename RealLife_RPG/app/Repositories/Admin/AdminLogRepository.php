@@ -60,6 +60,9 @@ class AdminLogRepository implements AdminLogRepositoryInterface
         if (!in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         $sortDirection = strtolower($sortDirection);
 
         if (!in_array($sortDirection, ['asc', 'desc'])) {

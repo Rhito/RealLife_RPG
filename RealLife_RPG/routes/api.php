@@ -5,10 +5,12 @@ use App\Http\Controllers\DashBoard\Admin\AuthController;
 use App\Http\Controllers\DashBoard\Log\LogController;
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\DashBoard\Achievement\AchievementController;
 use App\Http\Controllers\DashBoard\Item\ItemController;
 use App\Http\Controllers\DashBoard\Task\TaskCompletionController;
 use App\Http\Controllers\DashBoard\Task\TaskController;
 use App\Http\Controllers\DashBoard\User\UserController;
+use App\Http\Controllers\DashBoard\User\UserItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,7 +44,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Admin Site
-    Route::middleware(['admin.role:super,moderator'])->prefix('admin')->group(function () {
+    Route::middleware(['admin.role:super,moderator', 'throttle:100,1'])->prefix('admin')->group(function () {
         Route::middleware(['admin.role:super'])->group(function () {
             Route::get('/admins', [AdminController::class, 'index']);
             Route::post('/admins', [AdminController::class, 'store']);
@@ -86,6 +88,22 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [ItemController::class, 'destroy']);
             Route::post('/{id}/restore', [ItemController::class, 'restore']);
             Route::get('/{id}', [ItemController::class, 'show']);
+        });
+        Route::prefix('user-items')->group(function () {
+            Route::get('/', [UserItemController::class, 'index']);
+            Route::post('/', [UserItemController::class, 'store']);
+            Route::post('/{id}', [UserItemController::class, 'update']);
+            Route::delete('/{id}', [UserItemController::class, 'destroy']);
+            Route::post('/{id}/restore', [UserItemController::class, 'restore']);
+            Route::get('/{id}', [UserItemController::class, 'show']);
+        });
+        Route::prefix('achievements')->group(function () {
+            Route::get('/', [AchievementController::class, 'index']);
+            Route::post('/', [AchievementController::class, 'store']);
+            Route::post('/{id}', [AchievementController::class, 'update']);
+            Route::delete('/{id}', [AchievementController::class, 'destroy']);
+            Route::post('/{id}/restore', [AchievementController::class, 'restore']);
+            Route::get('/{id}', [AchievementController::class, 'show']);
         });
     });
 });

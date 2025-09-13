@@ -2,13 +2,17 @@
 
 namespace App\Providers;
 
+use App\Models\Achievement;
 use App\Models\Item;
 use App\Models\Task;
 use App\Models\TaskCompletion;
 use App\Models\User;
+use App\Models\UserItem;
+use App\Policies\AchievementPolicy;
 use App\Policies\ItemPolicy;
 use App\Policies\TaskCompletionPolicy;
 use App\Policies\TaskPolicy;
+use App\Policies\UserItemPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -21,6 +25,8 @@ class AuthenticatedProvider extends ServiceProvider
         Task::class => TaskPolicy::class,
         TaskCompletion::class => TaskCompletionPolicy::class,
         Item::class => ItemPolicy::class,
+        UserItem::class => UserItemPolicy::class,
+        Achievement::class => AchievementPolicy::class,
     ];
 
     /**

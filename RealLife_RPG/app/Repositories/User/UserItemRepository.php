@@ -42,11 +42,14 @@ class UserItemRepository implements UserItemRepositoryInterface
             "all" => UserItem::withTrashed(),
             default => UserItem::query()
         };
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         if ($user_id) {
             $query->where('user_id', '=', $user_id);
         }
         if ($item_id) {
-            $query->where('item$item_id', '=', $item_id);
+            $query->where('item_id', '=', $item_id);
         }
         $query->where(function ($q) use ($search) {
             if (is_numeric($search)) {
@@ -118,6 +121,9 @@ class UserItemRepository implements UserItemRepositoryInterface
     {
         $userItem = $this->findOrFail($id, true);
         $this->gateAuthorize('restore', $userItem);
+        if (!$userItem->trashed()) {
+            throw new \Exception('UserItem is not deleted.');
+        }
         $userItem->restore();
         return $userItem;
     }

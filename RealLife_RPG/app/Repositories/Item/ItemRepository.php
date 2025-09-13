@@ -48,7 +48,9 @@ class ItemRepository implements ItemRepositoryInterface
                     ->orWhere('type', 'like', "%$search%");
             }
         });
-
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
         // Filter theo price range
         if ($from > 0 && $to > 0) {
             $query->whereBetween('price', [$from, $to]);

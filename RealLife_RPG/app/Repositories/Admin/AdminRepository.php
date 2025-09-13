@@ -42,6 +42,9 @@ class AdminRepository implements AdminRepositoryInterface
                     ->orWhere('role', 'like', "%$search%");
             }
         });
+        if ($perPage < 10 || $perPage > 200) {
+            $perPage = 15;
+        }
 
         // validate column name to prevent SQL injection
         $allowedSorts = ['id', 'name', 'email', 'role', 'created_at', 'updated_at'];
