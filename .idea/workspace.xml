@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b32ea6ae-1294-48e4-a4b5-6ab84cb65d6e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Contracts/StatLogRepositoryInterface.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/StatLog/StatLogRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/User/UserItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/User/UserItemController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Models/UserAchievement.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Models/UserAchievement.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Providers/AuthenticatedProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Providers/AuthenticatedProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Providers/RepositoryProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Providers/RepositoryProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/bootstrap/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/bootstrap/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_072846_create_tasks_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_072846_create_tasks_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_075817_create_items_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_075817_create_items_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/real-life-rpg/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/real-life-rpg/src/index.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/RealLife_RPG/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 8.2">
+    <include_path>
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/hamcrest/hamcrest-php" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-uuid" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nunomaduro/termwind" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/mtdowling/jmespath.php" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nunomaduro/collision" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/php-invoker" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/theseer/tokenizer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/type" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/lines-of-code" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/object-enumerator" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/code-unit" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/cli-parser" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/graham-campbell/result-type" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/complexity" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psy/psysh" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/environment" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/global-state" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/code-unit-reverse-lookup" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/sebastian/object-reflector" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/friendsofphp/php-cs-fixer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/typo3/coding-standards" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/brianium/paratest" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nette/schema" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nette/utils" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/paragonie/sodium_compat" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/composer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/dflydev/dot-access-data" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/filp/whoops" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpstan/phpdoc-parser" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/egulias/email-validator" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/promise-timer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/child-process" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/aws/aws-crt-php" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/aws/aws-sdk-php" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/tijsverkoyen/css-to-inline-styles" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/fakerphp/faker" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pestphp/pest-plugin-mutate" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pestphp/pest-plugin" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/jean85/pretty-package-versions" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pestphp/pest" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pestphp/pest-plugin-laravel" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pestphp/pest-plugin-arch" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/predis/predis" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phar-io/version" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phar-io/manifest" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/brick/math" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/config" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/mime-type-detection" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/flysystem-aws-s3-v3" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/dragonmantank/cron-expression" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/uri" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/commonmark" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/flysystem" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/flysystem-local" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/league/uri-interfaces" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/voku/portable-ascii" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/ratchet/rfc6455" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/carbonphp/carbon-doctrine-types" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/mockery/mockery" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/lst/typo3-phpcsfixer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/guzzlehttp/uri-template" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/guzzlehttp/guzzle" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/guzzlehttp/promises" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/staabm/side-effects-detector" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/clock" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/http-factory" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/http-client" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/event-dispatcher" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/pusher/pusher-php-server" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/fidry/cpu-core-counter" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/doctrine/deprecations" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpdocumentor/reflection-docblock" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpdocumentor/type-resolver" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpdocumentor/reflection-common" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/clue/redis-react" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/clue/ndjson-react" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/clue/redis-protocol" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/phpoption/phpoption" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/clock" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/deprecation-contracts" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/routing" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-php83" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-intl-grapheme" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/css-selector" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-intl-normalizer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/mailer" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/mime" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/event-dispatcher-contracts" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/error-handler" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/fruitcake/php-cors" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-intl-idn" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/stopwatch" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/ramsey/collection" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/prompts" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/ramsey/uuid" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/sail" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/framework" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/reverb" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/http-foundation" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/sanctum" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/polyfill-php81" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/pail" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/uid" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/serializable-closure" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/http-kernel" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/ta-tikoma/phpunit-architecture-test" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/pint" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/laravel/tinker" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/RealLife_RPG/vendor/symfony/yaml" />
+    </include_path>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="32qv44kJ1o5xAJZ0syy1U01c3Ee" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Pest.Main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowPanel.toolwindow.highlight.mappings&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowPanel.toolwindow.highlight.symlinks&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowPanel.toolwindow.show.date&quot;: &quot;false&quot;,
+    &quot;WebServerToolWindowPanel.toolwindow.show.permissions&quot;: &quot;false&quot;,
+    &quot;WebServerToolWindowPanel.toolwindow.show.size&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;work&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Laravel\\real-life-rpg\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="Main" type="PestRunConfigurationType">
+      <PestRunner configuration_file="$PROJECT_DIR$/RealLife_RPG/phpunit.xml" scope="ConfigurationFile" use_alternative_configuration_file="true" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-PS-252.25557.128" />
+        <option value="bundled-php-predefined-a98d8de5180a-ce40d0652d34-com.jetbrains.php.sharedIndexes-PS-252.25557.128" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b32ea6ae-1294-48e4-a4b5-6ab84cb65d6e" name="Changes" comment="" />
+      <created>1758160724743</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758160724743</updated>
+      <workItem from="1758160726232" duration="81000" />
+      <workItem from="1758169887156" duration="18480000" />
+      <workItem from="1758243362362" duration="30408000" />
+      <workItem from="1758291785778" duration="1730000" />
+      <workItem from="1758330056283" duration="32234000" />
+      <workItem from="1758502777129" duration="31532000" />
+      <workItem from="1758588901124" duration="15314000" />
+      <workItem from="1758609616686" duration="13621000" />
+      <workItem from="1758676143052" duration="28698000" />
+      <workItem from="1758761643285" duration="14532000" />
+      <workItem from="1758793417105" duration="1166000" />
+      <workItem from="1758805823295" duration="1315000" />
+      <workItem from="1758848385279" duration="15317000" />
+      <workItem from="1758866663146" duration="15981000" />
+      <workItem from="1758886283595" duration="3040000" />
+      <workItem from="1758940875143" duration="8968000" />
+      <workItem from="1758961465720" duration="4192000" />
+      <workItem from="1758970699427" duration="6847000" />
+      <workItem from="1758984122623" duration="10510000" />
+      <workItem from="1758996184704" duration="54000" />
+      <workItem from="1759020283390" duration="4962000" />
+      <workItem from="1759038229161" duration="25339000" />
+      <workItem from="1759107178186" duration="30683000" />
+      <workItem from="1759148373806" duration="13776000" />
+      <workItem from="1759164505781" duration="154000" />
+      <workItem from="1759194560505" duration="20499000" />
+      <workItem from="1759234617420" duration="10859000" />
+      <workItem from="1759280428768" duration="1082000" />
+      <workItem from="1759282468905" duration="39153000" />
+      <workItem from="1759333664401" duration="142000" />
+      <workItem from="1759366704897" duration="31001000" />
+      <workItem from="1759452981645" duration="15214000" />
+      <workItem from="1759472929844" duration="9033000" />
+      <workItem from="1759482336836" duration="4362000" />
+      <workItem from="1759491883356" duration="1366000" />
+      <workItem from="1759501185490" duration="6059000" />
+      <workItem from="1759539266300" duration="6493000" />
+      <workItem from="1759546232685" duration="7353000" />
+      <workItem from="1759712359676" duration="9868000" />
+      <workItem from="1759732138591" duration="9189000" />
+      <workItem from="1759801005947" duration="57000" />
+      <workItem from="1759810045006" duration="406000" />
+      <workItem from="1763084011459" duration="351000" />
+      <workItem from="1763085814228" duration="8266000" />
+      <workItem from="1763119639110" duration="621000" />
+      <workItem from="1763132963516" duration="720000" />
+      <workItem from="1763174321660" duration="5434000" />
+      <workItem from="1763345373764" duration="2582000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="javascript:npm:react" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:tailwindcss" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:vite" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+  </component>
+</project>

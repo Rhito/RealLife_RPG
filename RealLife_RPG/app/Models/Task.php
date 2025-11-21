@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\TaskDifficulty;
-use App\Enums\TaskType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +24,8 @@ class Task extends Model
         'type',
         'difficulty',
         'repeat_days',
+        'reward_exp',
+        'reward_coins',
         'due_date',
         'is_active',
     ];
@@ -40,14 +40,19 @@ class Task extends Model
         return [
             'due_date' => 'datetime',
             'repeat_days' => 'array',
-            'type' => TaskType::class,
-            'difficulty' => TaskDifficulty::class,
+            'reward_exp' => 'integer',
+            'reward_coins' => 'integer',
         ];
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(TaskInstance::class);
     }
 
     public function completions(): HasMany

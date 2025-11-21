@@ -13,9 +13,11 @@ use App\Repositories\Contracts\UserItemRepositoryInterface;
 use App\Repositories\Admin\AdminLogRepository;
 use App\Repositories\Admin\AdminRepository;
 use App\Repositories\Contracts\AchievementRepositoryInterface;
+use App\Repositories\Contracts\UserAchievementRepositoryInterface;
 use App\Repositories\Item\ItemRepository;
 use App\Repositories\Task\TaskCompletionRepository;
 use App\Repositories\Task\TaskRepository;
+use App\Repositories\User\UserAchievementRepository;
 use App\Repositories\User\UserItemRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +37,7 @@ class RepositoryProvider extends ServiceProvider
         $this->app->bind(ItemRepositoryInterface::class, ItemRepository::class);
         $this->app->bind(UserItemRepositoryInterface::class, UserItemRepository::class);
         $this->app->bind(AchievementRepositoryInterface::class, AchievementRepository::class);
+        $this->app->bind(UserAchievementRepositoryInterface::class, UserAchievementRepository::class);
     }
 
     /**

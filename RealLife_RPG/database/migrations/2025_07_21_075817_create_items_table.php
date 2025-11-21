@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->text('icon');
-            $table->enum('type', ['boost', 'cosmetic']);
             $table->unsignedBigInteger('price');
             $table->boolean('is_active')->default(true);
             $table->softDeletes();

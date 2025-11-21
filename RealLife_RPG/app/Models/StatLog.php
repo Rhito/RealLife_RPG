@@ -18,14 +18,17 @@ class StatLog extends Model
         'coins_earned',
     ];
 
-    protected function casts() : array
+    protected function casts(): array
     {
         return [
             'date' => 'date',
+            'tasks_done' => 'integer',
+            'exp_earned' => 'integer',
+            'coins_earned' => 'integer',
         ];
     }
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

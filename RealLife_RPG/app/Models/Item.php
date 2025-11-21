@@ -16,7 +16,6 @@ class Item extends Model
         'name',
         'description',
         'icon',
-        'type',
         'price',
         'is_active',
     ];
@@ -24,8 +23,25 @@ class Item extends Model
     protected function casts(): array
     {
         return [
-            'type' => ItemType::class,
+            'is_active' => 'boolean',
+            'price' => 'integer',
         ];
+    }
+
+    // Relationships
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_items')
+            ->withPivot('acquired_at', 'used')
+            ->withTimestamp()
+            ->withTrash();
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(ItemCategory::class, 'item_category_item')
+            ->withTimestamps();
     }
 
     public function achievements(): HasMany

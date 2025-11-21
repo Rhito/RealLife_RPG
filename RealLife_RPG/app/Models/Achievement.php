@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Faker\Test\Provider\UserAgentTest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +21,22 @@ class Achievement extends Model
         'is_active',
     ];
 
-    public function item(): BelongsTo
+    protected $casts = [
+        'is_active' => 'boolean',
+        'reward_exp' => 'integer',
+        'reward_coins' => 'integer',
+    ];
+
+    // Relationships
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_achievenments')
+            ->withPivot('unlocked_at')
+            ->withTimestamps()
+            ->withTrash();
+    }
+
+    public function itemReward(): BelongsTo
     {
         return $this->belongsTo(Item::class, 'item_reward_id', 'id');
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('type', ['daily', 'once', 'habit']);
             $table->enum('difficulty', ['easy', 'medium', 'hard']);
-            $table->json('repeat_days')->nullable();
+//            $table->json('repeat_days')->nullable();
             $table->timestamp('due_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->index(['type', 'difficulty']);

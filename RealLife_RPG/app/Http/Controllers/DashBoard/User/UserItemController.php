@@ -64,6 +64,10 @@ class UserItemController extends ApiController
     public function update(UpdateUserItemRequest $request): JsonResponse
     {
         try {
+            $data = $request->validated();
+            if (empty($data)) {
+                return $this->error("No data provided to update.", [], 422);
+            }
             $userItem = $this->userItemRepository->update($request->id, $request->validated());
             $this->logAction('updated_userItem', $userItem);
             return $this->success('UserItem updated successfully.', ['userItem' => $userItem]);
@@ -103,7 +107,7 @@ class UserItemController extends ApiController
     public function show(ApiFormRequest $request): JsonResponse
     {
         try {
-            $trashed = $request->input('trashed', false);
+            $trashed = filter_var($request->input('trashed', false), FILTER_VALIDATE_BOOLEAN);
             $userItem = $this->userItemRepository->show($request->id, $trashed);
             return $this->success('UserItem details retrieve successfully.', ['userItem' => $userItem]);
         } catch (\Throwable $e) {

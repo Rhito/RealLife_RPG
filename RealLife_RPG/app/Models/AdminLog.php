@@ -26,4 +26,9 @@ class AdminLog extends Model
     {
         return $this->belongsTo(Admin::class);
     }
+
+    public function target()
+    {
+        return $this->morphTo();
+    }
 }

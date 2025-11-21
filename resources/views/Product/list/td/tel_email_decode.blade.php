@@ -1,0 +1,1 @@
+{!! base64_decode($item->{$field['name']}) !!}

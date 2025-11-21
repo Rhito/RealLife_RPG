@@ -27,15 +27,16 @@ class Admin extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts() : array
+    protected function casts(): array
     {
         return [
-            'role'=> AdminRole::class,
+            'role' => AdminRole::class,
             'password' => 'hashed',
+            'not_allowed' => 'boolean',
         ];
     }
 
-    public function adminLog() : HasMany
+    public function logs(): HasMany
     {
         return $this->hasMany(AdminLog::class);
     }

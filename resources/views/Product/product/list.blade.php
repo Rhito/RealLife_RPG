@@ -1,0 +1,303 @@
+@extends(config('core.admin_theme').'.template')
+<style>
+    th {
+        white-space: nowrap;
+        font-size: 12px;
+    }
+    tr{
+        font-size: 12px;
+    }
+    .tm{
+        height: 38.4px;
+        padding-top: 8px !important;
+
+    }
+    .tm i{
+        display: inline-block  !important;
+        vertical-align: middle;
+    }
+
+    .table thead th, .table thead tr, td {
+        vertical-align: bottom;
+        border: 2px solid #ebedf2;
+        /* border-bottom: 2px solid #ebedf2; */
+    }
+
+</style>
+@section('main')
+    <div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+			<span class="kt-portlet__head-icon">
+                <i class="kt-font-brand flaticon-interface-3"></i>
+			</span>
+                    <h3 class="kt-portlet__head-title">
+                        {!! trans(@$module['label']) !!}
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="" style="margin-right: 4px;">
+                            <input type="text" name="quick_search" value="{{ @$_GET['quick_search'] }}"
+                                   class="form-control" title="{{__("lang.Just_press_enter_to_perform_the_search")}}"
+                                   placeholder="{{__('lang.Quick_search_by')}} {{ __(@$quick_search['label']) }}">
+                        </div>
+                        <div class="kt-portlet__head-actions">
+                            <button style="height: 38.4px;" type="button" class="btn btn-default btn-icon-sm dropdown-toggle btn-closed-search"
+                                    onclick="$('.form-search').slideToggle(100); $('.kt-portlet-search').toggleClass('no-padding');">
+                                <i class="la la-search"></i> {{ __('lang.Search') }}
+                            </button>
+                            <div  class="dropdown dropdown-inline">
+                                <button style="height: 38.4px;" type="button" class="btn btn-default btn-icon-sm dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="la la-download"></i> {{__('lang.Action')}}
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end"
+                                     style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(114px, 38px, 0px);">
+                                    <ul class="kt-nav">
+                                        <li class="kt-nav__section kt-nav__section--first">
+                                            <span class="kt-nav__section-text">{{__('lang.Select_action')}}</span>
+                                        </li>
+                                        <li class="kt-nav__item">
+                                            <a class="kt-nav__link export-excel"
+                                               title="{{__('lang.Export the filtered records to an Excel file')}}"
+                                               onclick="$('input[name=export]').click();">
+                                                <i class="kt-nav__link-icon la la-file-excel-o"></i>
+                                                <span class="kt-nav__link-text">{{__('lang.Export_to_Excel')}}</span>
+                                            </a>
+                                        </li>
+                                        <li class="kt-nav__item">
+                                            <a href="/admin/import/add?table=products&amp;table_label=Sản phẩm" class="kt-nav__link" title="Nhập file excel lên để đẩy dữ liệu vào hệ thống">
+                                                <i class="kt-nav__link-icon la la-copy"></i>
+                                                <span class="kt-nav__link-text">{{__('lang.Import_excel')}}</span>
+                                            </a>
+                                        </li>
+{{--                                        @if(in_array($module['code'] . '_delete', $permissions))--}}
+                                            <li class="kt-nav__item">
+                                                <a href="#" class="kt-nav__link" onclick="multiDelete();"
+                                                   title="{{__('lang.Delete_all_selected_rows')}}">
+                                                    <i class="kt-nav__link-icon la la-copy"></i>
+                                                    <span class="kt-nav__link-text">{{__('lang.Delete_multiple')}}</span>
+                                                </a>
+                                            </li>
+                                        <li class="kt-nav__item">
+                                            <a href="javascript:void(0);" class="kt-nav__link" title="{{trans('lang.Delete_all_row')}}" onclick="deleteAllRecords()">
+                                                <i class="kt-nav__link-icon la la-copy"></i>
+                                                <span class="kt-nav__link-text">{{__('lang.Delete_all')}}</span>
+                                            </a>
+                                        </li>
+
+                                        <script>
+                                            function deleteAllRecords() {
+                                                if (confirm("{{__('lang.Are_you_sure_want_to_delete_all_the_row')}}")) {
+                                                    fetch("{{ route('product.delete-all') }}", {
+                                                        method: "POST",
+                                                        headers: {
+                                                            "Content-Type": "application/json",
+                                                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                                        },
+                                                        body: JSON.stringify({})
+                                                    })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            location.reload();
+                                                        })
+                                                        .catch(error => {
+                                                        });
+                                                }
+                                            }
+                                        </script>
+
+                                        {{--                                        @endif--}}
+                                    </ul>
+                                </div>
+                            </div>
+                                                        @if(in_array($module['code'] . '_add', $permissions))
+                            <a href="{{ url('/admin/'.$module['code'].'/add/') }}{{isset($_GET['harvest_id']) ? '?harvest_id='.$_GET['harvest_id'] : ''}}"
+                               class="btn btn-brand btn-elevate btn-icon-sm tm">
+                                <i class="la la-plus"></i>
+                                {{ __('lang.Create_new') }}
+                            </a>
+                                                        @endif
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body kt-portlet-search @if(!isset($_GET['search'])) no-padding @endif">
+                <!--begin: Search Form -->
+                <form class="kt-form kt-form--fit kt-margin-b-20 form-search" id="form-search" method="GET" action=""
+                      @if(!isset($_GET['search'])) style="display: none;" @endif>
+                    <input name="search" type="hidden" value="true">
+                    <input name="limit" type="hidden" value="{{ $limit }}"><input type="hidden" name="quick_search"
+                                                                                  value="{{ @$_GET['quick_search'] }}"
+                                                                                  id="quick_search_hidden"
+                                                                                  class="form-control"
+                                                                                  placeholder="{{__('lang.Quick_search_by')}} {{ __(@$quick_search['label']) }}">
+                    <input name="harvest_id" type="hidden" value="{{ @$_GET['harvest_id'] }}">
+                    <div class="row">
+
+                        @foreach($filter as $filter_name => $field)
+                            @if($field['type'] != 'custom')
+                                <div class="col-sm-6 col-lg-3 kt-margin-b-10-tablet-and-mobile list-filter-item">
+                                    <label>{{ __(@$field['label']) }}:</label>
+                                    @include(config('core.admin_theme').'.list.filter.' . $field['type'], ['name' => $filter_name, 'field'  => $field])
+                                </div>
+                            @else
+                                @include($field['field'], ['name' => $filter_name, 'field'  => $field])
+                            @endif
+                        @endforeach
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button  class="btn btn-primary btn-brand--icon" id="kt_search" type="submit">
+						<span>
+							<i class="la la-search"></i>
+							<span>{{ __('lang.filter') }}</span>
+						</span>
+                            </button>
+                            &nbsp;&nbsp;
+                            <a class="btn btn-secondary btn-secondary--icon" id="kt_reset" title="{{__('lang.Clear_filter')}}"
+                               href="/admin/{{ $module['code'] }}{{isset($_GET['harvest_id']) ? '?harvest_id='.$_GET['harvest_id'] : ''}}">
+						<span>
+							<i class="la la-close"></i>
+							<span>{{__('lang.Cai_lai')}}</span>
+						</span>
+                            </a>
+                        </div>
+                    </div>
+                    <input name="export" type="submit" value="export" style="display: none;">
+                    @foreach($module['list'] as $k => $field)
+                        <input name="sorts[]" value="{{ @$_GET['sorts'][$k] }}"
+                               class="sort sort-{{ $field['name'] }}" type="hidden">
+                    @endforeach
+                </form>
+                <!--end: Search Form -->
+            </div>
+            <div class="kt-separator kt-separator--md kt-separator--dashed" style="margin: 0;"></div>
+            <div class="kt-portlet__body kt-portlet__body--fit">
+                <!--begin: Datatable -->
+                <div class="kt-datatable kt-datatable--default kt-datatable--brand kt-datatable--scroll kt-datatable--loaded table-responsive"
+                     id="scrolling_vertical" style="padding: 17px;">
+                    <table class="table table-striped product-not-shop">
+                        <thead class="kt-datatable__head">
+                        <tr class="kt-datatable__row" style="left: 0px;">
+                            <th style="display: none;"></th>
+                            <th data-field="id"
+                                class="kt-datatable__cell--center kt-datatable__cell kt-datatable__cell--check"><span
+                                        style="width: 20px;"><label
+                                            class="kt-checkbox kt-checkbox--single kt-checkbox--all kt-checkbox--solid"><input
+                                                type="checkbox"
+                                                class="checkbox-master">&nbsp;<span></span></label></span></th>
+                            @php $count_sort = 0; @endphp
+
+                            @foreach($module['list'] as $field)
+                                <th data-field="{{ $field['name'] }}"
+                                    class="kt-datatable__cell kt-datatable__cell--sort {{ @$_GET['sorts'][$count_sort] != '' ? 'kt-datatable__cell--sorted' : '' }}"
+                                    onclick="sort('{{ $field['name'] }}')"
+                                    @if(isset($field['style'])) style="{{ $field['style'] }}" @endif>
+                                    {{ __($field['label']) }}
+
+                                    @if(@$_GET['sorts'][$count_sort] == $field['name'].'|asc')
+                                        <i class="flaticon2-arrow-up"></i>
+                                    @else
+                                        <i class="flaticon2-arrow-down"></i>
+                                    @endif
+                                </th>
+                                @php $count_sort++; @endphp
+                            @endforeach
+                            <th width="150px">{{__('lang.thao_tao')}}</th>
+                        </tr>
+                        </thead>
+                        <tbody class="kt-datatable__body ps ps--active-y" style="max-height: 496px;">
+                        @foreach($listItem as $item)
+                            <tr data-row="{{ $item->id }}" class="kt-datatable__row" style="left: 0px;">
+                                <td style="display: none;"
+                                    class="id id-{{ $item->id }}">{{ $item->id }}</td>
+                                <td class="kt-datatable__cell--center kt-datatable__cell kt-datatable__cell--check align-middle"
+                                    data-field="ID"><span style="width: 20px;"><label
+                                                class="kt-checkbox kt-checkbox--single kt-checkbox--solid"><input
+                                                    name="id[]"
+                                                    type="checkbox" class="ids"
+                                                    name="id[]"
+                                                    value="{{ $item->id }}">&nbsp;<span></span></label></span>
+                                </td>
+                                @foreach($module['list'] as $field)
+                                    <td data-field="{{ @$field['name'] }}"
+                                        class="kt-datatable__cell item-{{ @$field['name'] }} align-middle">
+                                        @if($field['type'] == 'custom')
+                                            @include($field['td'], ['field' => $field])
+                                        @else
+                                            @include(config('core.admin_theme').'.list.td.'.$field['type'])
+                                        @endif
+                                    </td>
+                                @endforeach
+                                <td class="align-middle">
+                                    <button type="button" class="btn btn-secondary product-add-shop my-2">{{__('lang.them_vao')}}</button>
+
+
+                                    @if(in_array($module['code'] . '_edit', $permissions))
+                                        <a class="btn btn-primary my-2" href="{{ url('/admin/'.$module['code'].'/edit',$item->id) }}">{{__('lang.edit')}}</a>
+
+                                        <a class="btn btn-danger my-2" href="{{ url('/admin/'.$module['code'].'/delete',$item->id) }}">{{__('lang.delete')}}</a>
+
+
+                                    @endif
+
+
+                                </td>
+
+                            </tr>
+                        @endforeach
+                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                            <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                        </div>
+                        <div class="ps__rail-y" style="top: 0px; height: 496px; right: 0px;">
+                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 207px;"></div>
+                        </div>
+                        </tbody>
+                    </table>
+                    <div class="kt-datatable__pager kt-datatable--paging-loaded">
+                        {!! $listItem->appends(isset($param_url) ? $param_url : '')->links() != '' ? $listItem->appends(isset($param_url) ? $param_url : '')->links() : '<ul class="pagination page-numbers nav-pagination links text-center"></ul>' !!}
+                        <div class="kt-datatable__pager-info">
+                            <div class="dropdown bootstrap-select kt-datatable__pager-size"
+                                 style="width: 60px;">
+                                <select class="selectpicker kt-datatable__pager-size select-page-size"
+                                        onchange="$('input[name=limit]').val($(this).val());$('#form-search').submit();"
+                                        title="{{__('lang.Select_the_number_of_records_to_display')}}" data-width="60px"
+                                        data-selected="20" tabindex="-98">
+                                    <option value="20" {{ $limit == 20 ? 'selected' : '' }}>20</option>
+                                    <option value="30" {{ $limit == 30 ? 'selected' : '' }}>30</option>
+                                    <option value="50" {{ $limit == 50 ? 'selected' : '' }}>50</option>
+                                    <option value="100" {{ $limit == 100 ? 'selected' : '' }}>100</option>
+                                </select>
+                            </div>
+                            <span class="kt-datatable__pager-detail">{{__('lang.Showing')}} {{ (($page - 1) * $limit) + 1 }} - {{ ($page * $limit) < $record_total ? ($page * $limit) : $record_total }} {{__('lang.of')}} {{ @number_format($record_total) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Datatable -->
+            </div>
+        </div>
+    </div>
+    <script src="{{asset(config('core.admin_asset').'/js/product.js')}}"></script>
+@endsection
+
+@section('custom_head')
+    <link type="text/css" rel="stylesheet" charset="UTF-8"
+          href="{{ asset(config('core.admin_asset').'/css/list.css') }}">
+@endsection
+@section('custom_footer')
+    <script src="{{ asset(config('core.admin_asset').'/js/pages/crud/metronic-datatable/advanced/vertical.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset(config('core.admin_asset').'/js/list.js') }}"></script>
+    <script src="{{asset(config('core.admin_asset').'/js/hang_quan_tam.js')}}"></script>
+
+    @include(config('core.admin_theme').'.partials.js_common')
+@endsection
+@push('scripts')
+    @include(config('core.admin_theme').'.partials.js_common_list')
+@endpush
+{{--<script src="{{ \URL::asset('backend/js/chon_id.js') }}"></script>--}}

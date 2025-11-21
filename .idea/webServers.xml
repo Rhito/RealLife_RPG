@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="89f8f4db-ba18-414e-bfe5-574e6b625bfc" name="tiktok">
+        <fileTransfer rootFolder="/home/banhang/domains/banhang.khoweb.top" accessType="SFTP" host="103.187.168.73" port="26266" sshConfigId="4ccfbe3e-c37e-4e72-a1f9-eaf316895b4e" sshConfig="root@103.187.168.73:26266 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

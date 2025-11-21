@@ -18,7 +18,7 @@ class TaskCompletion extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'task_id',
+        'task_instance_id',
         'user_id',
         'completed_at',
         'proof',
@@ -38,7 +38,7 @@ class TaskCompletion extends Model
 
     public function task(): BelongsTo
     {
-        return $this->belongsTo(Task::class);
+        return $this->belongsTo(TaskInstance::class);
     }
 
     public function user(): BelongsTo

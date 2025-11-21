@@ -9,6 +9,7 @@ use App\Http\Controllers\DashBoard\Achievement\AchievementController;
 use App\Http\Controllers\DashBoard\Item\ItemController;
 use App\Http\Controllers\DashBoard\Task\TaskCompletionController;
 use App\Http\Controllers\DashBoard\Task\TaskController;
+use App\Http\Controllers\DashBoard\User\UserAchievementController;
 use App\Http\Controllers\DashBoard\User\UserController;
 use App\Http\Controllers\DashBoard\User\UserItemController;
 use Illuminate\Http\Request;
@@ -20,17 +21,21 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->group(function () {
+    Route::middleware('throttle:8,1')->group(function () {
+        Route::post('/login', [AuthenticatedController::class, 'login'])->name('v1.login');
+        Route::post('/register', [AuthenticatedController::class, 'register'])->name('v1.register');
+        Route::post('/loginAdmin', [AuthController::class, 'login'])->name('v1.login');
 
-    Route::post('/login', [AuthenticatedController::class, 'login'])->name('v1.login');
-    Route::post('/register', [AuthenticatedController::class, 'register'])->name('v1.register');
+        // Xác thực email bằng link
+        Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'submitEmailVerification'])->middleware(['signed'])->name('verification.verify');
+    });
 
-    Route::post('/loginAdmin', [AuthController::class, 'login'])->name('v1.login');
+
+    // add auth profile
 
 
-    // Xác thực email bằng link
-    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'submitEmailVerification'])->middleware(['signed'])->name('verification.verify');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:20,1'])->group(function () {
         // Gửi email xác thực
         Route::post('/email/verify-notification', [EmailVerificationController::class, 'sendEmailVerification']);
 
@@ -104,6 +109,14 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [AchievementController::class, 'destroy']);
             Route::post('/{id}/restore', [AchievementController::class, 'restore']);
             Route::get('/{id}', [AchievementController::class, 'show']);
+        });
+        Route::prefix('user-achievements')->group(function () {
+            Route::get('/', [UserAchievementController::class, 'index']);
+            Route::post('/', [UserAchievementController::class, 'store']);
+            Route::post('/{id}', [UserAchievementController::class, 'update']);
+            Route::delete('/{id}', [UserAchievementController::class, 'destroy']);
+            Route::post('/{id}/restore', [UserAchievementController::class, 'restore']);
+            Route::get('/{id}', [UserAchievementController::class, 'show']);
         });
     });
 });

@@ -22,9 +22,11 @@ class UserItem extends Model
     {
         return [
             'acquired_at' => 'datetime',
+            'used' => 'boolean',
         ];
     }
 
+    //Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
