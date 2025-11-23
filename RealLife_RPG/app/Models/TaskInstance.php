@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,8 +20,10 @@ class TaskInstance extends Model
     ];
 
     protected $casts = [
-        'scheduled_date' => 'date',
+        'scheduled_date' => 'date:Y-m-d',
         'completed_at' => 'datetime',
+        'status' => TaskStatus::class,
+        'priority' => 'string'
     ];
 
     // Relationships

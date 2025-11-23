@@ -2,9 +2,10 @@
 
 namespace App\Enums;
 
-enum TaskType : string
+enum TaskType: string
 {
+    case GOOD_HABIT = 'good_habit';
+    case BAD_HABIT = 'bad_habit';
     case DAILY = 'daily';
-    case ONCE = 'once';
-    case HABIT = 'habit';
+    case TODO = 'todo';
 }

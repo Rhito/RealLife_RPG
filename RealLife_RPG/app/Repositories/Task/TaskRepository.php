@@ -3,16 +3,18 @@
 namespace App\Repositories\Task;
 
 use App\Models\Task;
+use App\Repositories\BaseRepository;
 use App\Repositories\Contracts\TaskRepositoryInterface;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Gate;
 
-class TaskRepository implements TaskRepositoryInterface
+
+class TaskRepository extends BaseRepository implements TaskRepositoryInterface
 {
-    protected function gateAuthorize(string $ability, $task)
+
+    // 1. Defined model to use
+    public function getModel()
     {
-        Gate::forUser(auth('admin')->user())->authorize($ability, $task);
+        return Task::class;
     }
 
     /**
@@ -29,16 +31,16 @@ class TaskRepository implements TaskRepositoryInterface
      */
     public function paginateWithQuery(
         int $perPage = 10,
-        mixed $search,
-        ?string $status,
+        mixed $search = null,
+        ?string $status = null,
         ?int $user_id = null,
         string $sortBy = 'id',
         string $sortDirection = 'desc'
     ): LengthAwarePaginator {
         $query = match ($status) {
-            "trashed" => Task::onlyTrashed(),
-            "all" => Task::withTrashed(),
-            default => Task::query()
+            "trashed" => $this->model->onlyTrashed(),
+            "all" => $this->model->withTrashed(),
+            default => $this->model->newQuery()
         };
         if ($perPage < 10 || $perPage > 200) {
             $perPage = 15;
@@ -62,79 +64,5 @@ class TaskRepository implements TaskRepositoryInterface
         }
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
         return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
-    }
-    public function findOrFail(int $id, bool $onlyTrashed = false): Task
-    {
-        $query = Task::query();
-        if ($onlyTrashed) {
-            $query->onlyTrashed();
-        }
-        return $query->findOrFail($id);
-    }
-    public function create($data): Task
-    {
-        if (Gate::forUser(auth('admin')->user())->denies('create', Task::class)) {
-            throw new AuthorizationException("You don't have permission to create task.");
-        }
-
-        $fields = [
-            'user_id' => $data['user_id'],
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'type' => $data['type'],
-            'difficulty' => $data['difficulty'],
-            'repeat_days' => $data['repeat_days'] ?? null,
-            'due_date' => $data['due_date'] ?? null,
-        ];
-        return Task::create($fields);
-    }
-    /**
-     * update task
-     */
-    public function update(int $id, array $data): Task
-    {
-        $task = $this->findOrFail($id);
-        $this->gateAuthorize("update", $task);
-        $task->update($data);
-        return $task;
-    }
-    /**
-     * delete task
-     */
-    public function delete(int $id): Task
-    {
-        $task = $this->findOrFail($id);
-        $this->gateAuthorize("delete", $task);
-        $task->delete();
-        return $task;
-    }
-    /**
-     * restore task
-     */
-    public function restore(int $id): Task
-    {
-        $task = $this->findOrFail($id, true);
-        $this->gateAuthorize("restore", $task);
-        if (!$task->trashed()) {
-            throw new \Exception('Task is not deleted.');
-        }
-        $task->restore();
-        return $task;
-    }
-    /**
-     * show details of a task
-     */
-    public function show(int $id, bool $withTrashed = false): Task
-    {
-        $query = Task::with([
-            'user',
-            'completions'
-        ]);
-
-        if ($withTrashed) {
-            $query->onlyTrashed();
-        }
-
-        return $query->findOrFail($id);
     }
 }

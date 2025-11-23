@@ -42,6 +42,10 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verifield_at',
+        'level' => 'integer',
+        'exp' => 'integer',
+        'coins' => 'integer',
     ];
 
     /**
@@ -54,7 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'last_streak_date' => 'datetime',
+            'last_streak_date' => 'date',
             'level' => 'integer',
             'coins' => 'integer',
             'exp' => 'integer',
@@ -111,7 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function activityFeed()
     {
-        return $this->hasMany(ActivityFeed::Class, 'user_id', 'id');
+        return $this->hasMany(ActivityFeed::class, 'user_id', 'id');
     }
 
     public function activityComments()

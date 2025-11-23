@@ -5,27 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PushSubsciption extends Model
+class NotificationPreference extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'endpoint',
-        'public_key',
-        'auth_token',
-        'device_name',
-        'user_agent',
-        'last_used_at',
+        'channel',
+        'notification_type',
+        'enabled',
     ];
 
     protected $casts = [
-        'last_used_at' => 'datetime',
+        'enabled' => 'boolean',
     ];
 
     // Relationships
     public function user()
     {
-        return $this->belongsTo(User::class);
+        $this->belongsTo(User::class);
     }
 }
