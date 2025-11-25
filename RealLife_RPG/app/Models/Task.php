@@ -42,6 +42,8 @@ class Task extends Model
             'repeat_days' => 'array',
             'reward_exp' => 'integer',
             'reward_coins' => 'integer',
+            'type' => \App\Enums\TaskType::class,
+            'difficulty' => \App\Enums\TaskDifficulty::class,
         ];
     }
 
@@ -58,5 +60,10 @@ class Task extends Model
     public function completions(): HasMany
     {
         return $this->hasMany(TaskCompletion::class, 'task_id', 'id');
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 }
