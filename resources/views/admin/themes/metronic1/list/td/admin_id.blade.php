@@ -1,1 +1,0 @@
-@include('admin.themes.metronic1.list.td.admins', ['admin_ids' => [$item->{$field['name']}]])

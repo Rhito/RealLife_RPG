@@ -1,1 +1,0 @@
-<a href="{!! asset('filemanager/userfiles/' . $item->{$field['name']}) !!}" title="Click để xem hoặc tải về">{!! explode('/', $item->{$field['name']})[count(explode('/', $item->{$field['name']})) - 1] !!}</a>

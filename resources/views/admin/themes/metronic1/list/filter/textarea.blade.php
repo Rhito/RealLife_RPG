@@ -1,2 +1,0 @@
-<textarea type="text" name="{{ $name }}" placeholder="{{ trans(@$field['label']) }}"
-       class="form-control kt-input {{ @$field['class'] }}">{{ isset($_GET[$name]) ? $_GET[$name] : @$field['value'] }}</textarea>

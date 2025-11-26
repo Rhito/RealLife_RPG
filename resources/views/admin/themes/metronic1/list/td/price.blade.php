@@ -1,1 +1,0 @@
-{{ number_format($item->{$field['name']}, 0, '.', '.') }}đ
