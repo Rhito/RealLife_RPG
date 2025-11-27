@@ -41,23 +41,36 @@ class ApiController extends Controller
      */
     protected function logAction(string $action, $target)
     {
+        // clone data to make sure it protected
+        $logData = $target;
+        if ($target instanceof \Illuminate\Database\Eloquent\Model) {
+            $logData = $target->toArray();
+        }
+
         /**
          * hide the password properties to secure
          */
-        if (isset($target?->password)) {
-            unset($target->password);
+        if (is_array($logData) && isset($logData['password'])) {
+            unset($logData['password']);
         }
+
+        // take email safe
+        $email = 'unknown';
+        if ($target instanceof \Illuminate\Database\Eloquent\Model) {
+            $email = $target->email ?? ($target->user->email ?? 'unknown');
+        }
+
         /**
          * call event to log action
          */
         return event(
             new AdminLogEvent(
-                auth('admin')->id(),
+                auth('admin')->id() ?? auth()->id,
                 $target,
                 $action,
                 [
-                    'email' => $target->email,
-                    $target
+                    'email' => $email,
+                    'data' => $logData,
                 ]
             )
         );

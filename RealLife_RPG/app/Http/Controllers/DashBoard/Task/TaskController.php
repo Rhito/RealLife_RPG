@@ -4,6 +4,8 @@ namespace App\Http\Controllers\DashBoard\Task;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\ApiFormRequest;
+use App\Http\Requests\BulkRestoreRequest;
+use App\Http\Requests\Task\BulkTaskDeleteRequest;
 use App\Http\Requests\Task\TaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Repositories\Contracts\TaskRepositoryInterface;
@@ -74,13 +76,16 @@ class TaskController extends ApiController
     }
     /**
      * Sorf delete task
-     * @param ApiFormRequest $request
+     * @param string $id
      * @return JsonResponse
      */
-    public function destroy(ApiFormRequest $request): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
         try {
-            $task = $this->taskRepository->delete($request->id);
+            $task = $this->taskRepository->findOrFail($id);
+
+            $this->taskRepository->delete($id);
+
             $this->logAction('destroyed_task', $task);
             return $this->success('Task deleted successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
@@ -89,13 +94,14 @@ class TaskController extends ApiController
     }
     /**
      * Restore Task
-     * @param ApiFormRequest $request
+     * @param string $id
      * @return JsonResponse
      */
-    public function restore(ApiFormRequest $request): JsonResponse
+    public function restore(string $id): JsonResponse
     {
         try {
-            $task = $this->taskRepository->restore($request->id);
+            $task = $this->taskRepository->findTrashed($id);
+            $this->taskRepository->restore($id);
             $this->logAction('restored_task', $task);
             return $this->success('Task restored successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
@@ -104,17 +110,67 @@ class TaskController extends ApiController
     }
     /**
      * Show more details of Task
-     * @param ApiFormRequest $request
+     * @param string $id
      * @return JsonResponse
      */
-    public function show(ApiFormRequest $request): JsonResponse
+    public function show(string $id): JsonResponse
     {
         try {
-            $trashed = filter_var($request->input('trashed', false), FILTER_VALIDATE_BOOLEAN);
-            $taskDetails = $this->taskRepository->show($request->id, $trashed);
+            $taskDetails = $this->taskRepository->findOrFail($id);
             return $this->success("Task details retrieve successfully.", ['taskDetails' => $taskDetails]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Task show failed.');
+        }
+    }
+
+    /**
+     * Multiple delete
+     *
+     * @param BulkTaskDeleteRequest
+     * @return JsonResponse
+     */
+    public function bulkDestroy(BulkTaskDeleteRequest $request): JsonResponse
+    {
+        try {
+            $ids = $request->validated()['ids'];
+
+            $count = $this->taskRepository->deleteMany($ids);
+
+            $this->logAction('bulk_destroyed_tasks', [
+                'count' => $count,
+                'ids'   => $ids,
+            ]);
+
+            return $this->success("Deleted {$count} task successfully.", [
+                'deleted_count' => $count
+            ]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Bulk delete failed.');
+        }
+    }
+
+    /**
+     * Multiple delete
+     *
+     * @param BulkTaskRestoreRequest
+     * @return JsonResponse
+     */
+    public function bulkRestore(BulkRestoreRequest $request)
+    {
+        try {
+            $ids = $request->validated()['ids'];
+            $count = $this->taskRepository->restoreMany($ids);
+
+            $this->logAction('bulk_restored_tasks', [
+                'count' => $count,
+                'ids'   => $ids,
+            ]);
+
+            return $this->success("Restored {$ids} tasks successfully.", [
+                'restored_count' => $count,
+            ]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Bulk restore failed.');
         }
     }
 }

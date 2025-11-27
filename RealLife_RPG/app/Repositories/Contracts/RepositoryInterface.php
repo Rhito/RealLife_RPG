@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use GuzzleHttp\Promise\Create;
 use Illuminate\Database\Eloquent\Model;
 
 interface RepositoryInterface
@@ -12,10 +11,17 @@ interface RepositoryInterface
     public function findOrFail(int|string $id): Model;
     public function create(array $data): Model;
     public function update(int|string $id, array $data): Model;
-    public function delete(int|string $id): bool;
 
     // method for SoftDelete
+    public function delete(int|string $id): bool;
     public function trashOnly();
+    public function findTrashed(string|int $id): Model;
     public function restore(int|string $id): bool;
+
+    // method for forceDelete
     public function forceDelete(int|string $id): bool;
+
+    // multiple action
+    public function deleteMany(array $ids): int;
+    public function restoreMany(array $ids): int;
 }

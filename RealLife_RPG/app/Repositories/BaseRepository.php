@@ -21,7 +21,12 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function setModel()
     {
-        $this->model = app()->make($this->getModel());
+        $modelClass = $this->getModel();
+        $this->model = app()->make($modelClass);
+
+        if (!$this->model instanceof Model) {
+            throw new \Exception("Class {$modelClass} must be an instance of Illuminate\\Database\\Eloquent\\Model");
+        }
     }
 
     public function all()
@@ -36,7 +41,7 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function findOrFail(int|string $id): Model
     {
-        return $this->findOrFail($id);
+        return $this->model->findOrFail($id);
     }
 
     public function create(array $data): Model
@@ -53,7 +58,7 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function delete(int|string $id): bool
     {
-        $record = $this->findOrFail($id);
+        $record = $this->model->findOrFail($id);
         return $record->delete();
     }
 
@@ -63,15 +68,45 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->model->onlyTrashed()->get();
     }
 
+    public function findTrashed(string|int $id): Model
+    {
+        return $this->model->onlyTrashed()->findOrFail($id);
+    }
+
     public function restore(int|string $id): bool
     {
         $record = $this->model->onlyTrashed()->findOrFail($id);
         return $record->restore();
     }
 
+    // Force Delete
     public function forceDelete(int|string $id): bool
     {
         $record = $this->model->withTrashed()->findOrFail($id);
         return $record->forceDelete();
+    }
+
+    /**
+     * Delete multiple record
+     *
+     * @param array $ids
+     * @return int  Number of records deleted
+     */
+    public function deleteMany(array $ids): int
+    {
+        return $this->model::destroy($ids);
+    }
+
+    /**
+     * Restore multiple record
+     *
+     * @param array $ids
+     * @return int Number of records restored
+     */
+    public function restoreMany(array $ids): int
+    {
+        return $this->model->onlyTrashed()
+            ->whereIn('id', $ids)
+            ->restore();
     }
 }

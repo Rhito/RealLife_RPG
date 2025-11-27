@@ -27,8 +27,6 @@ class UpdateTaskRequest extends ApiFormRequest
             'description' => ['sometimes', 'string'],
             'type' => ['sometimes', 'in:daily,once,habit'],
             'difficulty' => ['sometimes', 'in:easy,medium,hard'],
-            'repeat_days' => ['sometimes', 'array', 'required_if:type,daily', 'exclude_if:type,once'],
-            'repeat_days.*' => ['in:mon,tue,wed,thu,fri,sat,sun'],
             'due_date' => ['sometimes', 'date', 'required_if:type,once', 'after:now']
         ];
     }

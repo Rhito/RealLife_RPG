@@ -15,6 +15,21 @@ use App\Http\Controllers\DashBoard\User\UserItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| 1. DEFINITION: CUSTOM MACRO
+|--------------------------------------------------------------------------
+| Support fast create 6 routes: Index, Store, Show, Update, Destroy, Restore
+*/
+
+Route::macro('rpgResource', function ($uri, $controller) {
+    Route::post("{$uri}/{id}/restore", [$controller, 'restore']);
+    Route::post('{$uri}/bulk-delete', [$controller, 'bulkDestroy']);
+    Route::post('{$uri}/bulk-restore', [$controller, 'bulkRestore']);
+    // By default apiResource using put/patch for update
+    Route::apiResource($uri, $controller);
+});
+
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -70,14 +85,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/restore', [UserController::class, 'restore']);
             Route::get('/{id}', [UserController::class, 'show']);
         });
-        Route::prefix('tasks')->group(function () {
-            Route::get('/', [TaskController::class, 'index']);
-            Route::post('/', [TaskController::class, 'store']);
-            Route::patch('/{id}', [TaskController::class, 'update']);
-            Route::delete('/{id}', [TaskController::class, 'destroy']);
-            Route::post('/{id}/restore', [TaskController::class, 'restore']);
-            Route::get('/{id}', [TaskController::class, 'show']);
-        });
+        Route::rpgResource('tasks', TaskController::class);
+
         Route::prefix('task-completions')->group(function () {
             Route::get('/', [TaskCompletionController::class, 'index']);
             Route::post('/', [TaskCompletionController::class, 'store']);

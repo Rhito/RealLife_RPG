@@ -5,10 +5,11 @@ namespace App\Listeners;
 use App\Events\AdminLogEvent;
 use App\Repositories\Contracts\AdminLogRepositoryInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
-class AdminLogListener //implements ShouldQueue
+class AdminLogListener implements ShouldQueue
 {
-    protected $adminLog;
+    protected AdminLogRepositoryInterface $adminLog;
     /**
      * Create the event listener.
      */
@@ -23,17 +24,24 @@ class AdminLogListener //implements ShouldQueue
     public function handle(AdminLogEvent $event): void
     {
         try {
+            $targetId = $event->data['id'] ?? null;
+
+            // metadata
+            $payload = array_merge($event->meta, [
+                'snapshot_data' => $event->data
+            ]);
+
+            // call the log method of repository
             $this->adminLog->log(
                 $event->adminId,
                 $event->action,
-                $event->target->id,
-                $event->target ? get_class($event->target) : null,
-                $event->meta
+                $targetId,          // Id take from array
+                $event->targetType, // Target class take from property string
+                $payload            // meta data include snapshot
             );
         } catch (\Throwable $e) {
-            \dd('AdminLogListener failed', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+            Log::error('[AminLogListener Error]: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
             ]);
         }
     }

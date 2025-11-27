@@ -27,8 +27,8 @@ class TaskRequest extends ApiFormRequest
             'description' => ['nullable', 'string'],
             'type' => ['required', 'in:daily,once,habit'],
             'difficulty' => ['required', 'in:easy,medium,hard'],
-            'repeat_days' => ['nullable', 'array', 'required_if:type,daily', 'exclude_if:type,once'],
-            'repeat_days.*' => ['in:mon,tue,wed,thu,fri,sat,sun'],
+            'reward_exp' => ['nullable', 'integer'],
+            'reward_coins' => ['nullable', 'integer'],
             'due_date' => ['nullable', 'date', 'required_if:type,once', 'after:now'],
         ];
     }
