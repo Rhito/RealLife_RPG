@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::macro('rpgResource', function ($uri, $controller) {
     Route::post("{$uri}/{id}/restore", [$controller, 'restore']);
-    Route::post('{$uri}/bulk-delete', [$controller, 'bulkDestroy']);
-    Route::post('{$uri}/bulk-restore', [$controller, 'bulkRestore']);
+    Route::delete("{$uri}/bulk-delete", [$controller, 'bulkDestroy']);
+    Route::post("{$uri}/bulk-restore", [$controller, 'bulkRestore']);
     // By default apiResource using put/patch for update
     Route::apiResource($uri, $controller);
 });

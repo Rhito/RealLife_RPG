@@ -13,13 +13,13 @@ class AdminLogRepository implements AdminLogRepositoryInterface
      *
      * @param int $adminId
      * @param string $action
-     * @param $int $targetId
+     * @param ?int $targetId
      * @param string $targetType
      * @param array $meta = []
      *
      * @return void
      */
-    public function log(int $adminId, string $action, int $targetId, string $targetType, array $meta = []): void
+    public function log(int $adminId, string $action, ?int $targetId, string $targetType, array $meta = []): void
     {
         AdminLog::create([
             'admin_id' => $adminId,

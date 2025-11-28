@@ -13,7 +13,7 @@ class AdminLogEvent
     /**
      * Declare variable
      */
-    public int $adminId; // Updated by
+    public ?int $adminId; // Updated by
     public array $data; // Data snpashot (converted to array)
     public string $action; // Action(update, create, delete, restore,...)
     public array $meta; // Metadata (IP, UserAgent, etc.)
@@ -22,39 +22,51 @@ class AdminLogEvent
     /**
      * Create a new event instance.
      *
-     * @param int $adminId
-     * @param array $dataObject (Model or Array)
+     * @param int|null $adminId
+     * @param mixed $rawTarget (Model or Array)
      * @param string $action
+     * @param string $targetModel
      * @param array $meta
      */
-    public function __construct(int $adminId, $dataObject, string $action, array $meta = [])
+    public function __construct($adminId, $rawTarget, string $action, array $meta = [])
     {
-        $this->adminId = $adminId;
-        $this->action = $action;
-        $this->meta = $meta;
+        $this->adminId = $adminId ?? auth('admin')->id() ?? null;
 
-        // convert object to array safe (Snapshot data)
-        if ($dataObject instanceof Model) {
-            $this->data = $dataObject->toArray();
-        } elseif (is_array($dataObject)) {
-            $this->data = $dataObject;
-        } else {
-            // in case data null or bool (fallback)
-            $this->data = ['original_data' => $dataObject];
-        }
-        // remove token and password if exists
-        $this->sanitizeData();
+        $this->action = $action;
+
+        $this->targetType = is_object($rawTarget) ? get_class($rawTarget) : 'Data/Array';
+
+        $this->data = $this->prepareData($rawTarget);
+
+        $email = $this->extractEmail($rawTarget);
+        $this->meta = array_merge($meta, ['email' => $email]);
     }
 
-    protected function sanitizeData(): void
+    /**
+     * Logic covert to array and sanitize Data
+     */
+    protected function prepareData($target): array
     {
-        $sensitiveFields = ['password', 'remember_token', 'token', 'access_token'];
-
+        //covert to array
+        $data = ($target instanceof Model) ? $target->toArray() : (array) $target;
+        // sanitize
+        $sensitiveFields = ['password', 'token', 'access_token', 'remember_token'];
         foreach ($sensitiveFields as $field) {
-            if (isset($this->data[$field])) {
-                // $this->data[$field] = '[HIDDEN]';
-                unset($this->data[$field]);
+            if (isset($data[$field])) {
+                unset($data[$field]);
             }
         }
+        return $data;
+    }
+
+    /**
+     * Logic to extract email
+     */
+    protected function extractEmail($target): string
+    {
+        if ($target instanceof Model) {
+            return $target->email ?? ($target->user->email ?? 'unknown');
+        }
+        return is_array($target) && isset($target['email']) ? $target['email'] : 'unknown';
     }
 }

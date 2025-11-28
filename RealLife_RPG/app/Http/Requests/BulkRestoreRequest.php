@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 
 abstract class BulkRestoreRequest extends ApiFormRequest
 {
@@ -17,7 +18,7 @@ abstract class BulkRestoreRequest extends ApiFormRequest
     /**
      * Child class must be required this field
      */
-    abstract protected function tabble(): string;
+    abstract protected function table(): string;
 
     /**
      * Get the validation rules that apply to the request.
@@ -26,11 +27,11 @@ abstract class BulkRestoreRequest extends ApiFormRequest
      */
     public function rules(): array
     {
-        $tableName = $this->tabble();
+        $tableName = $this->table();
         return [
             'ids' => ['required', 'array', 'min:1'],
             // Validate ID must exists in the table and not
-            'ids.*' => ['integer', "exists:{$tableName},id,deleted_at,NOT NULL"]
+            'ids.*' => ['integer', Rule::exists($tableName, 'id')->whereNotNull('deleted_at')]
         ];
     }
 }

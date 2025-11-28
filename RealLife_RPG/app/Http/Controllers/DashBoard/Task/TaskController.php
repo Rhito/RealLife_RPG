@@ -4,7 +4,7 @@ namespace App\Http\Controllers\DashBoard\Task;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\ApiFormRequest;
-use App\Http\Requests\BulkRestoreRequest;
+use App\Http\Requests\Task\BulkTaskRestoreRequest;
 use App\Http\Requests\Task\BulkTaskDeleteRequest;
 use App\Http\Requests\Task\TaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
@@ -145,17 +145,17 @@ class TaskController extends ApiController
                 'deleted_count' => $count
             ]);
         } catch (\Throwable $e) {
-            return $this->handleException($e, 'Bulk delete failed.');
+            return $this->handleException($e, 'Bulk task delete failed.');
         }
     }
 
     /**
-     * Multiple delete
+     * Multiple restore
      *
      * @param BulkTaskRestoreRequest
      * @return JsonResponse
      */
-    public function bulkRestore(BulkRestoreRequest $request)
+    public function bulkRestore(BulkTaskRestoreRequest $request)
     {
         try {
             $ids = $request->validated()['ids'];
@@ -170,7 +170,7 @@ class TaskController extends ApiController
                 'restored_count' => $count,
             ]);
         } catch (\Throwable $e) {
-            return $this->handleException($e, 'Bulk restore failed.');
+            return $this->handleException($e, 'Bulk task restore failed.');
         }
     }
 }

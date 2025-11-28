@@ -21,7 +21,7 @@ abstract class BulkDeleteRequest extends ApiFormRequest
      */
     public function rules(): array
     {
-        $tableName = $this->tabble();
+        $tableName = $this->table();
         return [
             'ids' => ['required', 'array', 'min:1'],
             // Validate ID must exists in the table and not

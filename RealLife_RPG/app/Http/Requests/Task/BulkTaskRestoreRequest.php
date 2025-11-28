@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Task;
 
-use App\http\Requests\BulkDeleteRequest;
+use App\Http\Requests\BulkRestoreRequest;
 
-class BulkTaskRestoreRequest extends BulkDeleteRequest
+class BulkTaskRestoreRequest extends BulkRestoreRequest
 {
     protected function table(): string
     {

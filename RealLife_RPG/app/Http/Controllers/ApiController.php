@@ -39,40 +39,46 @@ class ApiController extends Controller
      *
      * @return new AdminLogEvent
      */
+    // protected function logAction(string $action, $target)
+    // {
+    //     // clone data to make sure it protected
+    //     $logData = $target;
+    //     if ($target instanceof \Illuminate\Database\Eloquent\Model) {
+    //         $logData = $target->toArray();
+    //     }
+
+    //     /**
+    //      * hide the password properties to secure
+    //      */
+    //     if (is_array($logData) && isset($logData['password'])) {
+    //         unset($logData['password']);
+    //     }
+
+    //     // take email safe
+    //     $email = 'unknown';
+    //     if ($target instanceof \Illuminate\Database\Eloquent\Model) {
+    //         $email = $target->email ?? ($target->user->email ?? 'unknown');
+    //     } elseif (is_array($target) && isset($target['email'])) {
+    //         $email = $target['email']
+    //     }
+
+    //     /**
+    //      * call event to log action
+    //      */
+    //     return event(
+    //         new AdminLogEvent(
+    //             auth('admin')->id() ?? auth()->id ?? 0,
+    //             $target,
+    //             $action,
+    //             [
+    //                 'email' => $email,
+    //                 'data' => $logData,
+    //             ]
+    //         )
+    //     );
+    // }
     protected function logAction(string $action, $target)
     {
-        // clone data to make sure it protected
-        $logData = $target;
-        if ($target instanceof \Illuminate\Database\Eloquent\Model) {
-            $logData = $target->toArray();
-        }
-
-        /**
-         * hide the password properties to secure
-         */
-        if (is_array($logData) && isset($logData['password'])) {
-            unset($logData['password']);
-        }
-
-        // take email safe
-        $email = 'unknown';
-        if ($target instanceof \Illuminate\Database\Eloquent\Model) {
-            $email = $target->email ?? ($target->user->email ?? 'unknown');
-        }
-
-        /**
-         * call event to log action
-         */
-        return event(
-            new AdminLogEvent(
-                auth('admin')->id() ?? auth()->id,
-                $target,
-                $action,
-                [
-                    'email' => $email,
-                    'data' => $logData,
-                ]
-            )
-        );
+        event(new AdminLogEvent(auth('admin')->user()->id, $target, $action));
     }
 }
