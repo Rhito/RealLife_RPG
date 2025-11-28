@@ -166,7 +166,7 @@ class TaskController extends ApiController
                 'ids'   => $ids,
             ]);
 
-            return $this->success("Restored {$ids} tasks successfully.", [
+            return $this->success("Restored {$count} tasks successfully.", [
                 'restored_count' => $count,
             ]);
         } catch (\Throwable $e) {
