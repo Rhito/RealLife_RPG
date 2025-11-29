@@ -8,16 +8,17 @@ use App\Http\Requests\Task\BulkTaskRestoreRequest;
 use App\Http\Requests\Task\BulkTaskDeleteRequest;
 use App\Http\Requests\Task\TaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
-use App\Repositories\Contracts\TaskRepositoryInterface;
+use App\Models\Task;
+use App\Services\Dashboard\TaskService;
 use Illuminate\Http\JsonResponse;
 
 
 class TaskController extends ApiController
 {
-    private TaskRepositoryInterface $taskRepository;
-    public function __construct(TaskRepositoryInterface $taskRepository)
+    protected TaskService $service;
+    public function __construct(TaskService $service)
     {
-        $this->taskRepository = $taskRepository;
+        $this->service = $service;
     }
     /**
      * Get list of Task
@@ -27,14 +28,15 @@ class TaskController extends ApiController
     public function index(ApiFormRequest $request): JsonResponse
     {
         try {
-            $search = $request->input('search', null); // ["id","title",  "type", "difficulty"]
-            $perPage = (int) $request->input('perPage', 15);
-            $status = $request->input('status', null); // ["trashed", "all"]
-            $user_id = (int) $request->input('user_id', null);
-            $sortBy = $request->input('sortBy', 'id'); // ['id', 'user_id', 'type', 'difficulty', 'repeat_days', 'due_date']
-            $sortDirection = $request->input("sortDirection", 'desc'); // ["asc", "desc"]
-
-            $tasks = $this->taskRepository->paginateWithQuery($perPage, $search, $status, $user_id, $sortBy, $sortDirection);
+            $this->authorize('viewAny', Task::class);
+            $fillters = [
+                'search'        => $request->input('search'),
+                'status'        => $request->input('status'),
+                'user_id'       => (int) $request->input('user_id'),
+                'sortBy'        => $request->input('sortBy'),
+                'sortDirection' => $request->input('sortDirection'),
+            ];
+            $tasks = $this->service->getTask($fillters, (int) $request->input('perPage', 15));
             return $this->success("Get tasks successfully", ["tasks" => $tasks]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Failed to get task.');
@@ -48,7 +50,8 @@ class TaskController extends ApiController
     public function store(TaskRequest $request): JsonResponse
     {
         try {
-            $newTask = $this->taskRepository->create($request->validated());
+            $this->authorize('create', Task::class);
+            $newTask = $this->service->createTask($request->validated());
             $this->logAction('created_task', $newTask);
             return $this->success('Task created successfully.', ['newTask' => $newTask]);
         } catch (\Throwable $e) {
@@ -67,7 +70,8 @@ class TaskController extends ApiController
             if (empty($data)) {
                 return $this->error("No data provided to update.", [], 422);
             }
-            $task = $this->taskRepository->update($request->id, $data);
+            $this->authorize('update', Task::class);
+            $task = $this->service->updateTask($request->id, $data);
             $this->logAction('updated_task', $task);
             return $this->success('Task updated successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
@@ -76,32 +80,47 @@ class TaskController extends ApiController
     }
     /**
      * Sorf delete task
-     * @param string $id
+     * @param string|int $id
      * @return JsonResponse
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string|int $id): JsonResponse
     {
         try {
-            $task = $this->taskRepository->findOrFail($id);
-
-            $this->taskRepository->delete($id);
-
-            $this->logAction('destroyed_task', $task);
+            $this->authorize('delete', Task::class);
+            $task = $this->service->deleteTask($id);
+            $this->logAction('deleted_task', $task);
             return $this->success('Task deleted successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Task delete failed.');
         }
     }
+
     /**
      * Restore Task
-     * @param string $id
+     * @param string|int $id
      * @return JsonResponse
      */
-    public function restore(string $id): JsonResponse
+    public function forceDestroy(string|int $id): JsonResponse
     {
         try {
-            $task = $this->taskRepository->findTrashed($id);
-            $this->taskRepository->restore($id);
+            $this->authorize('forceDelete', Task::class);
+            $task = $this->service->destroyTask($id);
+            $this->logAction('destroyed_task', $task);
+            return $this->success('Task destroy successfully.', ['task' => $task]);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'Failed to destroy task.');
+        }
+    }
+    /**
+     * Restore Task
+     * @param string|int $id
+     * @return JsonResponse
+     */
+    public function restore(string|int $id): JsonResponse
+    {
+        try {
+            $this->authorize('restore', Task::class);
+            $task = $this->service->restoreTask($id);
             $this->logAction('restored_task', $task);
             return $this->success('Task restored successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
@@ -110,13 +129,14 @@ class TaskController extends ApiController
     }
     /**
      * Show more details of Task
-     * @param string $id
+     * @param string|int $id
      * @return JsonResponse
      */
-    public function show(string $id): JsonResponse
+    public function show(string|int $id): JsonResponse
     {
         try {
-            $taskDetails = $this->taskRepository->findOrFail($id);
+            $this->authorize('view', Task::class);
+            $taskDetails = $this->service->show($id);
             return $this->success("Task details retrieve successfully.", ['taskDetails' => $taskDetails]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Task show failed.');
@@ -129,13 +149,13 @@ class TaskController extends ApiController
      * @param BulkTaskDeleteRequest
      * @return JsonResponse
      */
-    public function bulkDestroy(BulkTaskDeleteRequest $request): JsonResponse
+    public function bulkDelete(BulkTaskDeleteRequest $request): JsonResponse
     {
         try {
+
+            $this->authorize('deleteAny', Task::class);
             $ids = $request->validated()['ids'];
-
-            $count = $this->taskRepository->deleteMany($ids);
-
+            $count = $this->service->bulkDeleteTask($ids);
             $this->logAction('bulk_destroyed_tasks', [
                 'count' => $count,
                 'ids'   => $ids,
@@ -158,8 +178,9 @@ class TaskController extends ApiController
     public function bulkRestore(BulkTaskRestoreRequest $request)
     {
         try {
+            $this->authorize('restoreAny', Task::class);
             $ids = $request->validated()['ids'];
-            $count = $this->taskRepository->restoreMany($ids);
+            $count = $this->service->bulkRestoreTask($ids);
 
             $this->logAction('bulk_restored_tasks', [
                 'count' => $count,

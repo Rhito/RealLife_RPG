@@ -46,9 +46,9 @@ class TaskPolicy
     public function create($user): bool
     {
         if ($user instanceof Admin) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -56,7 +56,10 @@ class TaskPolicy
      */
     public function update($user, Task $task): bool
     {
-        return $admin === AdminRole::MODERATOR;
+        if ($user instanceof Admin) {
+            return false;
+        }
+        return $user->id === $task->user_id;
     }
 
     /**
@@ -64,7 +67,10 @@ class TaskPolicy
      */
     public function delete($user, Task $task): bool
     {
-        return $admin === AdminRole::MODERATOR;
+        if ($user instanceof Admin) {
+            return true;
+        }
+        return $user->id === $task->user_id;
     }
 
     /**
@@ -72,14 +78,39 @@ class TaskPolicy
      */
     public function restore($user, Task $task): bool
     {
-        return $admin === AdminRole::MODERATOR;
+        if ($user instanceof Admin) {
+            return true;
+        }
+        return $user->id === $task->user_id;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
-     *   public function forceDelete($user, Task $task): bool
-     *   {
-     *      return false;
-     *   }
      */
+    public function forceDelete($user, Task $task): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can multiple delete the models.
+     */
+    public function deleteAny($user, Task $task)
+    {
+        if ($user instanceof Admin) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Determine whether the user can multiple restore the models.
+     */
+    public function restoreAny($user, Task $task)
+    {
+        if ($user instanceof Admin) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -8,11 +8,27 @@ use App\Traits\HttpResposeTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ApiController extends Controller
 {
-    use HttpResposeTrait;
+    use HttpResposeTrait, DispatchesJobs, ValidatesRequests, AuthorizesRequests;
+
+    public function authorize($ability, $arguments = [])
+    {
+        $user = Auth::guard('admin')->user();
+
+        if (!$user) {
+            $user = Auth::user();
+        }
+
+        return $this->authorizeForUser($user, $ability, $arguments);
+    }
+
 
     // App\Http\Controllers\ApiController.php
     protected function handleException(\Throwable $e, string $customMessage = 'Server error'): JsonResponse
@@ -79,6 +95,6 @@ class ApiController extends Controller
     // }
     protected function logAction(string $action, $target)
     {
-        event(new AdminLogEvent(auth('admin')->user()->id, $target, $action));
+        event(new AdminLogEvent(auth('admin')->user()->id ?? 0, $target, $action));
     }
 }
