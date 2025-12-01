@@ -60,18 +60,22 @@ class TaskController extends ApiController
     }
     /**
      * Update Task
-     * @param pdateTaskRequest $request
+     * @param updateTaskRequest $request
+     * @param string $id
      * @return JsonResponse
      */
-    public function update(UpdateTaskRequest $request): JsonResponse
+    public function update(UpdateTaskRequest $request, string $id): JsonResponse
     {
         try {
             $data = $request->validated();
-            if (empty($data)) {
-                return $this->error("No data provided to update.", [], 422);
-            }
+
+            // check permisstion per task
             $this->authorize('update', Task::class);
-            $task = $this->service->updateTask($request->id, $data);
+
+            // call service to update
+            $task = $this->service->updateTask($id, $data);
+
+            // write a log
             $this->logAction('updated_task', $task);
             return $this->success('Task updated successfully.', ['task' => $task]);
         } catch (\Throwable $e) {
