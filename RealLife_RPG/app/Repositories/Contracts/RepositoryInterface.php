@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 interface RepositoryInterface
 {
+    public function getModel();
     public function all();
     public function find(int|string $id): ?Model;
     public function findOrFail(int|string $id): Model;

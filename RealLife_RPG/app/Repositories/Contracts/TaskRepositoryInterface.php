@@ -12,6 +12,4 @@ interface TaskRepositoryInterface extends RepositoryInterface
         string $sortBy,
         string $sortDirection
     );
-
-    // public function getDailyTasks(int $userId, string $date);
 }
