@@ -20,7 +20,7 @@ abstract class BaseService
         return $item;
     }
 
-    public function update(string|int $id, $data): Model
+    public function update(string|int $id, array $data): Model
     {
         $item = $this->repo->update($id, $data);
         return $item;

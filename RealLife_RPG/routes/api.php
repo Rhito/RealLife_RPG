@@ -101,14 +101,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/restore', [TaskCompletionController::class, 'restore']);
             Route::get('/{id}', [TaskCompletionController::class, 'show']);
         });
-        Route::prefix('items')->group(function () {
-            Route::get('/', [ItemController::class, 'index']);
-            Route::post('/', [ItemController::class, 'store']);
-            Route::post('/{id}', [ItemController::class, 'update']);
-            Route::delete('/{id}', [ItemController::class, 'destroy']);
-            Route::post('/{id}/restore', [ItemController::class, 'restore']);
-            Route::get('/{id}', [ItemController::class, 'show']);
-        });
+
+        Route::rpgResource('items', ItemController::class);
+
         Route::prefix('user-items')->group(function () {
             Route::get('/', [UserItemController::class, 'index']);
             Route::post('/', [UserItemController::class, 'store']);

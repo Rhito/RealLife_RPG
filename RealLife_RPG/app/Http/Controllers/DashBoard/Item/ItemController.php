@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers\DashBoard\Item;
 
-
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\BaseCrudController;
 use App\Http\Requests\ApiFormRequest;
 use App\Http\Requests\Item\ItemRequest;
 use App\Http\Requests\Item\UpdateItemRequest;
-use App\Repositories\Contracts\ItemRepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use App\Models\Item;
+use App\Services\Dashboard\Item\ItemService;
 
-class ItemController extends ApiController
+class ItemController extends BaseCrudController
 {
-    private ItemRepositoryInterface $itemRepository;
-    public function __construct(ItemRepositoryInterface $itemRepository)
+    public function getModelClass(): string
     {
-        $this->itemRepository = $itemRepository;
+        return Item::class;
+    }
+    public function __construct(ItemService $service)
+    {
+        parent::__construct($service);
     }
     /**
      * Get list of Item
@@ -25,22 +28,13 @@ class ItemController extends ApiController
     public function index(ApiFormRequest $request): JsonResponse
     {
         try {
-            $search = $request->input('search', null);
-            $perPage = $request->input('perPage', 10);
-            $status = $request->input('status', null);
-            $from = $request->input('from', 0);
-            $to = $request->input('to', 0);
-            $sortBy = $request->input('sortBy', 'id');
-            $sortDirection = $request->input('sortDirection', 'desc');
+            $this->authorize('viewAny', $this->getModelClass());
 
-            $items = $this->itemRepository->paginateWithQuery(
-                $perPage,
-                $search,
-                $status,
-                $from,
-                $to,
-                $sortBy,
-                $sortDirection
+            $filters = $request->validated();
+            $perPage = (int) $request->input('perPage', 15);
+            $items = $this->service->getList(
+                $filters,
+                $perPage
             );
             return $this->success('Get items successfully.', ['items' => $items]);
         } catch (\Throwable $e) {
@@ -56,7 +50,8 @@ class ItemController extends ApiController
     public function store(ItemRequest $request): JsonResponse
     {
         try {
-            $item = $this->itemRepository->create($request->validated());
+            $this->authorize('create', $this->getModelClass());
+            $item = $this->service->create($request->validated());
             $this->logAction('created_item', $item);
             return $this->success('Item created successfully.', ['item' => $item]);
         } catch (\Throwable $e) {
@@ -71,52 +66,14 @@ class ItemController extends ApiController
     public function update(UpdateItemRequest $request): JsonResponse
     {
         try {
+            $this->authorize('update', $this->getModelClass());
             if (!$request->all()) return $this->error("Can't sent request null", [], 422);
-            $item = $this->itemRepository->update($request->id, $request->validated());
-            $this->logAction('Updated_items', $item);
+            $item = $this->service->update($request->id, $request->validated());
+            $this->logAction('updated_items', $item);
+
             return $this->success('Update item successfully.', ['item' => $item]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Failed to update item.');
-        }
-    }
-    /**
-     * Soft delete an item
-     */
-    public function destroy(ApiFormRequest $request): JsonResponse
-    {
-        try {
-            $item = $this->itemRepository->delete($request->id);
-            $this->logAction('deleted_item', $item);
-            return $this->success('Delete item successfully.', ['item' => $item]);
-        } catch (\Throwable $e) {
-            return $this->handleException($e, 'Failed to delete item.');
-        }
-    }
-    /**
-     * Restore an item
-     */
-    public function restore(ApiFormRequest $request): JsonResponse
-    {
-        try {
-            $item = $this->itemRepository->restore($request->id);
-            $this->logAction('restore_item', $item);
-            return $this->success('Restore item successfully.', ['item' => $item]);
-        } catch (\Throwable $e) {
-            return $this->handleException($e, 'Failed to restore item.');
-        }
-    }
-    /**
-     * Show details of an item
-     */
-    public function show(ApiFormRequest $request): JsonResponse
-    {
-        try {
-            $request->validate(["withTrash" => ['boolean']]);
-            $withTrash = $request->input('withTrash', false);
-            $item = $this->itemRepository->show($request->id, $withTrash);
-            return $this->success('Item details retrieve successfully.', ['item' => $item]);
-        } catch (\Throwable $e) {
-            return $this->handleException($e, 'Failed to see details item.');
         }
     }
 }

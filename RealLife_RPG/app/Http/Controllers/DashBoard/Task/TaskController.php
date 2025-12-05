@@ -54,7 +54,7 @@ class TaskController extends BaseCrudController
     public function store(TaskRequest $request): JsonResponse
     {
         try {
-            $this->authorize('create', Task::class);
+            $this->authorize('create', $this->getModelClass());
             $newTask = $this->service->create($request->validated());
             $this->logAction('created_task', $newTask);
             return $this->success('Task created successfully.', ['newTask' => $newTask]);
@@ -75,7 +75,7 @@ class TaskController extends BaseCrudController
             $data = $request->validated();
 
             // check permisstion per task
-            $this->authorize('update', Task::class);
+            $this->authorize('update', $this->getModelClass());
 
             // call service to update
             $task = $this->service->update($id, $data);
