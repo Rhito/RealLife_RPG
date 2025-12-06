@@ -33,14 +33,18 @@ class Item extends Model
     {
         return $this->belongsToMany(User::class, 'user_items')
             ->withPivot('acquired_at', 'used')
-            ->withTimestamp()
-            ->withTrash();
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     public function categories()
     {
         return $this->belongsToMany(ItemCategory::class, 'item_category_item')
             ->withTimestamps();
+    }
+    public function itemCategoriesItems()
+    {
+        return $this->hasMany(ItemCategoryItem::class);
     }
 
     public function achievements(): HasMany

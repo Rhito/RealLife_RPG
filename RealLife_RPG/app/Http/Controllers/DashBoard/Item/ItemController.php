@@ -63,12 +63,11 @@ class ItemController extends BaseCrudController
      * @param UpdateItemRequest $request
      * @return JsonResponse
      */
-    public function update(UpdateItemRequest $request): JsonResponse
+    public function update(UpdateItemRequest $request, string|int $id): JsonResponse
     {
         try {
             $this->authorize('update', $this->getModelClass());
-            if (!$request->all()) return $this->error("Can't sent request null", [], 422);
-            $item = $this->service->update($request->id, $request->validated());
+            $item = $this->service->update($id, $request->validated());
             $this->logAction('updated_items', $item);
 
             return $this->success('Update item successfully.', ['item' => $item]);

@@ -3,12 +3,16 @@
 namespace App\Repositories;
 
 use App\Repositories\Contracts\RepositoryInterface;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseRepository implements RepositoryInterface
 {
     protected Model $model;
 
+    /**
+     * @throws BindingResolutionException
+     */
     public function __construct()
     {
         $this->setModel();
@@ -19,6 +23,9 @@ abstract class BaseRepository implements RepositoryInterface
      */
     abstract public function getModel();
 
+    /**
+     * @throws BindingResolutionException
+     */
     public function setModel()
     {
         $modelClass = $this->getModel();

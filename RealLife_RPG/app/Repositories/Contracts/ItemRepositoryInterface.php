@@ -8,9 +8,9 @@ interface ItemRepositoryInterface extends RepositoryInterface
         int $perPage,
         mixed $search,
         ?string $status,
-        int $from = 0,
-        int $to = 0,
-        array $categories = [],
+        int $from,
+        int $to,
+        array $categories,
         string $sortBy,
         string $sortDirection
     );

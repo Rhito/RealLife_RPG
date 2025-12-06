@@ -54,8 +54,6 @@ Route::prefix('v1')->group(function () {
 
     // add auth profile
 
-
-
     Route::middleware(['auth:sanctum', 'throttle:20,1'])->group(function () {
         // Gửi email xác thực
         Route::post('/email/verify-notification', [EmailVerificationController::class, 'sendEmailVerification']);

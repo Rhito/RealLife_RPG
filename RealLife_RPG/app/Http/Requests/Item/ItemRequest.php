@@ -34,7 +34,6 @@ class ItemRequest extends ApiFormRequest
                 'dimensions:min_width=100,min_height=100,max_width=3000,max_height=3000',
             ],
             'price' => ['required', 'integer', 'min:0'],
-            'type' => ['required', 'in:boost,cosmetic'],
             'is_active' => ['boolean'],
         ];
     }

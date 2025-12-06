@@ -5,20 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b32ea6ae-1294-48e4-a4b5-6ab84cb65d6e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Contracts/StatLogRepositoryInterface.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/StatLog/StatLogRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/User/UserItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/User/UserItemController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Models/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Models/UserAchievement.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Models/UserAchievement.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Providers/AuthenticatedProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Providers/AuthenticatedProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Providers/RepositoryProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Providers/RepositoryProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/bootstrap/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/bootstrap/app.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_072846_create_tasks_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_072846_create_tasks_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_075817_create_items_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/database/migrations/2025_07_21_075817_create_items_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/App.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/real-life-rpg/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/real-life-rpg/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/real-life-rpg/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/Item/ItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/Item/ItemController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Requests/Item/ItemRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Requests/Item/ItemRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Policies/TaskPolicy.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Policies/TaskPolicy.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Item/ItemRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Item/ItemRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Services/Dashboard/Item/ItemService.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Services/Dashboard/Item/ItemService.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -294,6 +285,7 @@
       <workItem from="1763132963516" duration="720000" />
       <workItem from="1763174321660" duration="5434000" />
       <workItem from="1763345373764" duration="2582000" />
+      <workItem from="1764907007193" duration="9000" />
     </task>
     <servers />
   </component>

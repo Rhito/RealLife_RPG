@@ -30,7 +30,7 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
      * @return \Illuminate\Pagination\LengthAwarePaginator: LengthAwarePaginator
      */
     public function paginateWithQuery(
-        int $perPage = 10,
+        int $perPage,
         mixed $search,
         ?string $status,
         int $from = 0,
@@ -39,45 +39,47 @@ class ItemRepository extends BaseRepository implements ItemRepositoryInterface
         string $sortBy = 'id',
         string $sortDirection = 'desc'
     ): LengthAwarePaginator {
-        $query = match ($status) {
-            "trashed" => Item::onlyTrashed(),
-            "all" => Item::withTrashed(),
-            default => Item::query()
-        };
-        $query->where(function ($q) use ($search) {
-            if (is_numeric($search)) {
-                $q->where('id', '=', $search);
-            } else {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhereHas('item_categories', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%$search%");
-                    });
-            }
-        });
-        if ($perPage < 10 || $perPage > 200) {
-            $perPage = 15;
-        }
-        // Filter theo price range
-        if ($from > 0 && $to > 0) {
-            $query->whereBetween('price', [$from, $to]);
-        } elseif ($from > 0) {
-            $query->where('price', '>=', $from);
-        } elseif ($to > 0) {
-            $query->where('price', '<=', $to);
-        }
 
-        $query->when(!empty($categories), function ($q) use ($categories) {
-            foreach ($categories as $catId) {
-                $q->whereHas('categories', fn($q2) => $q2->where('id', $catId));
-            }
+        $query = match ($status) {
+            "trashed" => $this->model->onlyTrashed(),
+            "all" => $this->model->withTrashed(),
+            default => $this->model->query()
+        };
+
+        // Eager loading
+        $query->with('categories');
+
+        // Search logic
+        $query->when($search, function ($q) use ($search) {
+            $q->where(function ($subQ) use ($search) {
+                if (is_numeric($search)) {
+                    $subQ->where('id', $search);
+                } else {
+                        $subQ->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('categories', function ($catQ) use ($search) {
+                                $catQ->where('name', 'like', "%{$search}%");
+                            });
+                }
+            });
         });
+
+        // Filter price range
+        $query->when($from > 0, fn($q) => $q->where('price', '>=', $from))
+              ->when($to > 0, fn($q) => $q->where('price', '<=', $to));
+
+        if (!empty($categories)) {
+            $query->whereHas('categories', function ($q) use ($categories) {
+                $q->whereIn('item_categories.id', $categories);
+            });
+        }
 
         // validate column name to prevent SQL injection
         $allowedSorts = ['id', 'name', 'price'];
-        if (!in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
+        $sortBy = in_array($sortBy, $allowedSorts) ? $sortBy : 'id';
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        // PAGINATE
+        $perPage = ($perPage < 1 || $perPage > 115) ? 15 : $perPage;
         return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
 }

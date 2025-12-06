@@ -37,7 +37,7 @@ class TaskPolicy
         if ($user instanceof Admin) {
             return true;
         }
-        return false;
+        return $user->id === $task->user_id;
     }
 
     /**
@@ -57,7 +57,7 @@ class TaskPolicy
     public function update($user, Task $task): bool
     {
         if ($user instanceof Admin) {
-            return false;
+            return true;
         }
         return $user->id === $task->user_id;
     }
@@ -111,6 +111,6 @@ class TaskPolicy
         if ($user instanceof Admin) {
             return true;
         }
-        return false;
+        return true;
     }
 }

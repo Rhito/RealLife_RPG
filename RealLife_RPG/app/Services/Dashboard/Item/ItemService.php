@@ -26,6 +26,7 @@ class ItemService extends BaseService
             $fillters['status'] ?? null,
             (int) ($fillters['from'] ?? 0),
             (int) ($fillters['to'] ?? 0),
+            $fillters['categories'] ?? [],
             $fillters['sortBy'] ?? 'id',
             $fillters['sortDirection'] ?? 'desc'
         );
