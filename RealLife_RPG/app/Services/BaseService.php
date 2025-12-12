@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 abstract class BaseService
 {
     protected RepositoryInterface $repo;
+    abstract function getList($fillters, $perPage);
 
     public function __construct(RepositoryInterface $repo)
     {
@@ -48,7 +49,9 @@ abstract class BaseService
 
     public function destroy(string|int $id): Model
     {
-        $item = $this->repo->getModel()->withTrashed()->findOrFail($id);
+        $itemModel = $this->repo->getModel();
+
+        $item = app($itemModel)->withTrashed()->findOrFail($id);
         $this->repo->forceDelete($id);
         return $item;
     }

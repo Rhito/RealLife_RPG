@@ -23,17 +23,10 @@ abstract class BaseRepository implements RepositoryInterface
      */
     abstract public function getModel();
 
-    /**
-     * @throws BindingResolutionException
-     */
     public function setModel()
     {
         $modelClass = $this->getModel();
         $this->model = app()->make($modelClass);
-
-        if (!$this->model instanceof Model) {
-            throw new \Exception("Class {$modelClass} must be an instance of Illuminate\\Database\\Eloquent\\Model");
-        }
     }
 
     public function all()
@@ -89,7 +82,9 @@ abstract class BaseRepository implements RepositoryInterface
     // Force Delete
     public function forceDelete(int|string $id): bool
     {
-        $record = $this->model->withTrashed()->findOrFail($id);
+        $record = $this->model
+            ->withTrashed()
+            ->findOrFail($id);
         return $record->forceDelete();
     }
 

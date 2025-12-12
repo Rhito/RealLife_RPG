@@ -4,10 +4,12 @@ namespace App\Policies;
 
 use App\Enums\AdminRole;
 use App\Models\Admin;
-use App\Models\Item;
+use App\Models\ItemCategory;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ItemPolicy
+class ItemCategoryPolicy
 {
+    use HandlesAuthorization;
     public function before($user, string $ability): bool|null
     {
         if ($user instanceof Admin && $user->role === AdminRole::SUPER) {
@@ -16,7 +18,7 @@ class ItemPolicy
         return null;
     }
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the can view any models.
      */
     public function viewAny($user): bool
     {
@@ -27,16 +29,15 @@ class ItemPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the can view the model.
      */
-    public function view($user, Item $item): bool
+    public function view($user, ItemCategory $itemCategory): bool
     {
-
         return $user instanceof Admin;
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the can create models.
      */
     public function create($user): bool
     {
@@ -44,41 +45,41 @@ class ItemPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the can update the model.
      */
-    public function update($user, Item $item): bool
+    public function update($user, ItemCategory $itemCategory): bool
     {
         return $user instanceof Admin;
     }
 
     /**
-     * Determine whether the user can sorf delete the model.
+     * Determine whether the can delete the model.
      */
-    public function delete($user, Item $item): bool
+    public function delete($user, ItemCategory $itemCategory): bool
     {
-        return $user->role === AdminRole::MODERATOR;
+        return $user instanceof Admin;
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the can restore the model.
      */
-    public function restore($user, Item $item): bool
+    public function restore($user, ItemCategory $itemCategory): bool
     {
-        return $user->role === AdminRole::MODERATOR;
+        return $user instanceof Admin;
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the can permanently delete the model.
      */
-    public function forceDelete($user, Item $item): bool
+    public function forceDelete($user, ItemCategory $itemCategory): bool
     {
-       return false;
+        return false;
     }
 
     /**
      * Determine whether the user can multiple delete the models.
      */
-    public function deleteAny($user, Item $item)
+    public function deleteAny($user, ItemCategory $item)
     {
         if ($user instanceof Admin) {
             return true;
@@ -89,7 +90,7 @@ class ItemPolicy
     /**
      * Determine whether the user can multiple restore the models.
      */
-    public function restoreAny($user, Item $item)
+    public function restoreAny($user, ItemCategory $item)
     {
         if ($user instanceof Admin) {
             return true;

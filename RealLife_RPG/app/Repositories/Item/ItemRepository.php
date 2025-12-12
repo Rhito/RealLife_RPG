@@ -10,11 +10,15 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ItemRepository extends BaseRepository implements ItemRepositoryInterface
 {
-
+    public function __construct(Item $model)
+    {
+        parent::__construct($model);
+    }
     public function getModel()
     {
         return Item::class;
     }
+
     /**
      * Get list of Task
      *

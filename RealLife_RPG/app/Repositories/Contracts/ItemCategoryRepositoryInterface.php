@@ -1,7 +1,7 @@
 <?php
 namespace App\Repositories\Contracts;
 
-interface ItemCategoryInterface extends RepositoryInterface
+interface ItemCategoryRepositoryInterface extends RepositoryInterface
 {
     public function paginateWithQuery(
         int $perPage,

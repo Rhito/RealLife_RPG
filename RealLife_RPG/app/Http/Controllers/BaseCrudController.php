@@ -28,6 +28,13 @@ abstract class BaseCrudController extends ApiController
     public function __construct($service)
     {
         $this->service = $service;
+
+        if (!method_exists($this, 'store')) {
+            throw new \Exception(static::class . ' must implement method store(Request $request)');
+        }
+        if (!method_exists($this, 'update')) {
+            throw new \Exception(static::class . ' must implement method update(Request $request, $id)');
+        }
     }
 
     public function index(ApiFormRequest $request): JsonResponse
@@ -46,7 +53,6 @@ abstract class BaseCrudController extends ApiController
             return $this->handleException($e, 'Failed to get Index of ' . $this->getModelClass());
         }
     }
-
     public function show(string|int $id): JsonResponse
     {
         try {
@@ -90,7 +96,7 @@ abstract class BaseCrudController extends ApiController
             $this->authorize('forceDelete', $this->getModelClass());
             $item = $this->service->destroy($id);
             $this->logAction('destroy_' . $this->getModelKey(), $item);
-            return $this->success('Restroy successfully.', ['item' => $item]);
+            return $this->success('Destroy successfully.', ['item' => $item]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Failed to destroy ' . $this->getModelClass());
         }
@@ -100,7 +106,7 @@ abstract class BaseCrudController extends ApiController
     {
         try {
             $modelClass = $this->getModelClass();
-            $model =  app($modelClass)->getTable();
+            $model = new $modelClass;
             $tableName = $model->getTable();
 
             $existsRule = Rule::exists($tableName, 'id');

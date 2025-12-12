@@ -32,14 +32,14 @@ class TaskController extends BaseCrudController
     {
         try {
             $this->authorize('viewAny', Task::class);
-            $fillters = [
+            $filters = [
                 'search'        => $request->input('search'),
                 'status'        => $request->input('status'),
                 'user_id'       => (int) $request->input('user_id'),
                 'sortBy'        => $request->input('sortBy'),
                 'sortDirection' => $request->input('sortDirection'),
             ];
-            $tasks = $this->service->getList($fillters, (int) $request->input('perPage', 15));
+            $tasks = $this->service->getList($filters, (int) $request->input('perPage', 15));
             return $this->success("Get tasks successfully", ["tasks" => $tasks]);
         } catch (\Throwable $e) {
             return $this->handleException($e, 'Failed to get task.');

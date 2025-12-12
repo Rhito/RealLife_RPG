@@ -7,14 +7,11 @@ use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\DashBoard\Achievement\AchievementController;
 use App\Http\Controllers\DashBoard\Item\ItemController;
-use App\Http\Controllers\DashBoard\Task\TaskCompletionController;
 use App\Http\Controllers\DashBoard\Task\TaskController;
-use App\Http\Controllers\DashBoard\User\UserAchievementController;
 use App\Http\Controllers\DashBoard\User\UserController;
-use App\Http\Controllers\DashBoard\User\UserItemController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashBoard\ItemCategory\ItemCategoryController;
 
+use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
 | 1. DEFINITION: CUSTOM MACRO
@@ -90,26 +87,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [UserController::class, 'show']);
         });
         Route::rpgResource('tasks', TaskController::class);
-
-        Route::prefix('task-completions')->group(function () {
-            Route::get('/', [TaskCompletionController::class, 'index']);
-            Route::post('/', [TaskCompletionController::class, 'store']);
-            Route::post('/{id}', [TaskCompletionController::class, 'update']);
-            Route::delete('/{id}', [TaskCompletionController::class, 'destroy']);
-            Route::post('/{id}/restore', [TaskCompletionController::class, 'restore']);
-            Route::get('/{id}', [TaskCompletionController::class, 'show']);
-        });
-
         Route::rpgResource('items', ItemController::class);
+        Route::rpgResource('item-categories', ItemCategoryController::class);
 
-        Route::prefix('user-items')->group(function () {
-            Route::get('/', [UserItemController::class, 'index']);
-            Route::post('/', [UserItemController::class, 'store']);
-            Route::post('/{id}', [UserItemController::class, 'update']);
-            Route::delete('/{id}', [UserItemController::class, 'destroy']);
-            Route::post('/{id}/restore', [UserItemController::class, 'restore']);
-            Route::get('/{id}', [UserItemController::class, 'show']);
-        });
+
         Route::prefix('achievements')->group(function () {
             Route::get('/', [AchievementController::class, 'index']);
             Route::post('/', [AchievementController::class, 'store']);
@@ -117,14 +98,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [AchievementController::class, 'destroy']);
             Route::post('/{id}/restore', [AchievementController::class, 'restore']);
             Route::get('/{id}', [AchievementController::class, 'show']);
-        });
-        Route::prefix('user-achievements')->group(function () {
-            Route::get('/', [UserAchievementController::class, 'index']);
-            Route::post('/', [UserAchievementController::class, 'store']);
-            Route::post('/{id}', [UserAchievementController::class, 'update']);
-            Route::delete('/{id}', [UserAchievementController::class, 'destroy']);
-            Route::post('/{id}/restore', [UserAchievementController::class, 'restore']);
-            Route::get('/{id}', [UserAchievementController::class, 'show']);
         });
     });
 });
