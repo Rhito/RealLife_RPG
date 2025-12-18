@@ -7,6 +7,7 @@ use App\Services\BaseService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 /**
  * @property ItemRepositoryInterface $repo
@@ -70,6 +71,7 @@ class ItemService extends BaseService
     private function deleteFromS3(string $url): void
     {
         $path = parse_url($url, PHP_URL_PATH);
-        Storage::disk('s3')->delete($path);
+        $cleanPath = ltrim($path, '/');
+        Storage::disk('s3')->delete($cleanPath);
     }
 }

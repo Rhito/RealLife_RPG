@@ -7,12 +7,13 @@ use App\Services\BaseService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
 
+/**
+ * @property ItemCategoryRepositoryInterface $repo
+ */
 class ItemCategoryService extends BaseService
 {
-    /**
-     * @property ItemCategoryRepositoryInterface $repo
-     */
     public function __construct(ItemCategoryRepositoryInterface $repo)
     {
         parent::__construct($repo);
@@ -30,7 +31,7 @@ class ItemCategoryService extends BaseService
     }
 
     /**
-     * @override
+     * Override BaseService::create
      */
     public function create(array $data) : Model
     {
@@ -40,7 +41,7 @@ class ItemCategoryService extends BaseService
     }
 
     /**
-     * @override
+     * Override BaseService::create
      */
     public function update(string|int $id, array $data): Model
     {
@@ -63,13 +64,13 @@ class ItemCategoryService extends BaseService
         /** @var FileSystemAdapter $disk */
         $disk = Storage::disk('s3');
         $path = $file->store('item-categories', 's3');
-        $path = $file->storePublicly('item-categories', 's3');
         return $disk->url($path);
     }
 
     private function deleteFromS3(string $url): void
     {
         $path = parse_url($url, PHP_URL_PATH);
-        Storage::disk('s3')->delete($path);
+        $cleanPath = ltrim($path, '/');
+        Storage::disk('s3')->delete($cleanPath);
     }
 }
