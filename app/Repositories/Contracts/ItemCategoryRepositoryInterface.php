@@ -1,0 +1,13 @@
+<?php
+namespace App\Repositories\Contracts;
+
+interface ItemCategoryRepositoryInterface extends RepositoryInterface
+{
+    public function paginateWithQuery(
+        int $perPage,
+        mixed $search,
+        ?string $status,
+        string $sortBy,
+        string $sortDirection
+    );
+}
