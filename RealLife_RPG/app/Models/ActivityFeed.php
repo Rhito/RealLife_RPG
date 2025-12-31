@@ -9,9 +9,15 @@ class ActivityFeed extends Model
 {
     use HasFactory;
 
-    protected $table = 'activity_feed';
-
-    public $timestamps = false;
+    protected $table = 'activity_feeds';
+    
+    // Migration has timestamps() so strictly speaking we should allow them, 
+    // but migration default is created_at/updated_at. 
+    // The model had timestamps=false. The new migration has $table->timestamps().
+    // So we should remove timestamps=false or set it to true. Default is true.
+    // Also migration has created_at/updated_at.
+    
+    // removed public $timestamps = false;
 
     protected $fillable = [
         'user_id',

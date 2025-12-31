@@ -16,6 +16,7 @@ class UserItem extends Model
         'item_id',
         'acquired_at',
         'used',
+        'quantity',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class UserItem extends Model
         return [
             'acquired_at' => 'datetime',
             'used' => 'boolean',
+            'quantity' => 'integer',
         ];
     }
 

@@ -13,12 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(100)->create();
-
-        User::factory()->create([
-            'name' => 'Test User1',
-            'email' => 'test1@example.com',
-            'password' => bcrypt('password'),
-        ]);
+        // Seed items first (no dependencies)
+        $this->call(ItemSeeder::class);
+        
+        // Seed test users with known credentials for manual testing
+        $this->call(UserSeeder::class);
+        
+        // Optionally create some random users for testing with larger datasets
+        // User::factory(10)->create();
     }
 }

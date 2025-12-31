@@ -1,13 +1,18 @@
 <?php
 
 test('new users can register', function () {
-    $response = $this->post('/register', [
+    $response = $this->post('/api/v1/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertNoContent();
+    $response->assertStatus(200);
+    $response->assertJsonStructure([
+        'data' => [
+            'user',
+            'token',
+        ],
+    ]);
 });

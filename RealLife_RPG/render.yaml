@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: reallife-rpg-api
+    env: php
+    region: oregon
+    plan: free
+    buildCommand: |
+      composer install --optimize-autoloader --no-dev
+      php artisan config:cache
+      php artisan route:cache
+    startCommand: |
+      php artisan migrate --force
+      php artisan db:seed --force
+      php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+databases:
+  - name: reallife-rpg-db
+    databaseName: realliferpg
+    plan: free

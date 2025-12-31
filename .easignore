@@ -1,0 +1,6 @@
+RealLife_RPG/
+RealLife_RPG/storage/app/public
+**/*.php
+**/storage/app/public
+node_modules/
+.git/

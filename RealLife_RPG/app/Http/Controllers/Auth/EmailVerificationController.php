@@ -25,20 +25,35 @@ class EmailVerificationController extends ApiController
         $user = Auth::loginUsingId($id);
 
         if (! $user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->view('verification-error', ['message' => 'User not found'], 404);
         }
 
         if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
-            return response()->json(['message' => 'Invalid verification link'], 403);
+            return response()->view('verification-error', ['message' => 'Invalid verification link'], 403);
         }
 
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified']);
+        $alreadyVerified = $user->hasVerifiedEmail();
+
+        if (!$alreadyVerified) {
+            $user->markEmailAsVerified();
+            event(new \Illuminate\Auth\Events\Verified($user));
         }
 
-        $user->markEmailAsVerified();
+        // Check if request is from mobile app (has user agent or specific header)
+        $isMobile = $request->header('X-Mobile-App') || 
+                    str_contains($request->header('User-Agent', ''), 'Expo');
 
-        return response()->json(['message' => 'Email verified successfully']);
+        if ($isMobile || config('app.mobile_url')) {
+            // Redirect to mobile app deep link
+            $mobileUrl = config('app.mobile_url', 'realliferpg://');
+            return redirect($mobileUrl . 'verification-success?verified=1');
+        }
+
+        // Fallback: Show success page
+        return response()->view('verification-success', [
+            'userName' => $user->name,
+            'alreadyVerified' => $alreadyVerified
+        ]);
     }
 
     public function checkEmailVerified (Request $request)

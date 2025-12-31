@@ -16,6 +16,7 @@ class StatLog extends Model
         'tasks_done',
         'exp_earned',
         'coins_earned',
+        'details',
     ];
 
     protected function casts(): array
@@ -25,6 +26,7 @@ class StatLog extends Model
             'tasks_done' => 'integer',
             'exp_earned' => 'integer',
             'coins_earned' => 'integer',
+            'details' => 'array',
         ];
     }
 

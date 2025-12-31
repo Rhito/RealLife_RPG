@@ -17,10 +17,11 @@ class TaskInstance extends Model
         'scheduled_date',
         'status',
         'completed_at',
+        'generated_by',
     ];
 
     protected $casts = [
-        'scheduled_date' => 'date:Y-m-d',
+        'scheduled_date' => 'datetime',
         'completed_at' => 'datetime',
         'status' => TaskStatus::class,
         'priority' => 'string'
@@ -37,7 +38,7 @@ class TaskInstance extends Model
         return $this->belongsTO(User::class);
     }
 
-    public function recurrnce()
+    public function recurrence()
     {
         return $this->belongsTo(TaskRecurrence::class, 'generated_by_recurrence_id');
     }

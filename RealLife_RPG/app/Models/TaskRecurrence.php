@@ -11,18 +11,15 @@ class TaskRecurrence extends Model
 
     protected $fillable = [
         'task_id',
-        'rule_type',
-        'weekday',
-        'month_day',
-        'interval_days',
+        'rule',
+        'ex_dates',
+        'rule_type', // Keep this if we still want to categorize, though rule string has it
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'weekday' => 'integer',
-        'month_day' => 'integer',
-        'interval_days' => 'integer'
+        'ex_dates' => 'array',
     ];
 
     // Relationship

@@ -1,0 +1,50 @@
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
+// Use environment variable for API base URL
+// Fallback to local development URL if not set
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:8000/api/v1'; 
+
+console.log('[API Config] Base URL:', BASE_URL);
+console.log('[API Config] EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL); 
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
+
+import { Platform } from 'react-native';
+
+api.interceptors.request.use(async (config) => {
+  let token;
+  if (Platform.OS === 'web') {
+      token = localStorage.getItem('token');
+  } else {
+      token = await SecureStore.getItemAsync('token');
+  }
+  
+  console.log(`[API] Requesting: ${config.baseURL}${config.url}`);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    /* console.error('[API Error]', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    }); */
+    return Promise.reject(error);
+  }
+);
+
+export default api;

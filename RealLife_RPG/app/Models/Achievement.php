@@ -25,15 +25,16 @@ class Achievement extends Model
         'is_active' => 'boolean',
         'reward_exp' => 'integer',
         'reward_coins' => 'integer',
+        'condition' => 'array',
     ];
 
     // Relationships
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_achievenments')
+        return $this->belongsToMany(User::class, 'user_achievements')
             ->withPivot('unlocked_at')
             ->withTimestamps()
-            ->withTrash();
+            ->withTrashed();
     }
 
     public function itemReward(): BelongsTo

@@ -36,15 +36,28 @@ class AuthenticatedController extends ApiController
     {
         DB::beginTransaction();
         try {
-            // Create User
+            // Create User (Starter Kit: 500 Coins/XP, 50 HP)
             $newUser = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => $request->password,
+                'coins' => 500,
+                'exp' => 500,
+                'level' => 1,
+                'hp' => 50,
+                'max_hp' => 100,
             ]);
 
-            // Send an email to verifi the user
-            $newUser->sendEmailVerificationNotification();
+            // Try to send email, but don't block registration if it fails (e.g. no SMTP)
+            try {
+                $newUser->sendEmailVerificationNotification();
+            } catch (\Exception $e) {
+                // Log error but allow proceeding. In dev, we might want to auto-verify?
+                // For now, just log.
+                // Log::error('Email sending failed: ' . $e->getMessage());
+                // Optional: Auto-verify if local? 
+                // $newUser->markEmailAsVerified();
+            }
 
             // Create token
             $token = $newUser->createToken('API Token of ' . $newUser->email, ['*'], now()->addWeek())->plainTextToken;
@@ -54,7 +67,8 @@ class AuthenticatedController extends ApiController
             return $this->success('User created successfuly', ['user' => $newUser, 'token' => $token]);
         } catch (\Exception $error) {
             DB::rollBack();
-            return $this->error('Failed register', ['error' => $error->getMessage()]);
+            // Return actual error for debugging
+            return $this->error('Failed register: ' . $error->getMessage());
         }
     }
 

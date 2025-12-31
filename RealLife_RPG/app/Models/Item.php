@@ -14,16 +14,18 @@ class Item extends Model
     protected $fillable = [
         'name',
         'description',
-        'icon',
-        'price',
-        'is_active',
+        'image_url', // Migration has image_url, not icon
+        'cost',      // Migration has cost, not price
+        'type',      // default 'consumable'
+        'effects',   // json
+        'is_active', // Not in migration but maybe logical?
     ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
-            'price' => 'integer',
+            'effects' => 'array',
+            'cost' => 'integer',
         ];
     }
 

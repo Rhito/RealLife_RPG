@@ -5,31 +5,40 @@ use App\Models\User;
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
-    $response = $this->post('/login', [
+    $response = $this->post('/api/v1/login', [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertNoContent();
+    $response->assertStatus(200);
+    $response->assertJsonStructure([
+        'data' => [
+            'user',
+            'token',
+        ],
+    ]);
 });
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $this->post('/login', [
+    $response = $this->post('/api/v1/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ]);
 
-    $this->assertGuest();
+    $response->assertStatus(401);
 });
 
 test('users can logout', function () {
     $user = User::factory()->create();
+    $token = $user->createToken('test-token')->plainTextToken;
 
-    $response = $this->actingAs($user)->post('/logout');
+    $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        ->get('/api/v1/logout');
 
-    $this->assertGuest();
-    $response->assertNoContent();
+    $response->assertStatus(200);
+    
+    // Verify token was deleted
+    expect($user->tokens()->count())->toBe(0);
 });

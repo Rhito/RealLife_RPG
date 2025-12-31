@@ -9,9 +9,9 @@ use App\Models\User;
 class UserPolicy
 {
 
-    public function before(Admin $admin, string $ability)
+    public function before($user, string $ability)
     {
-        if ($admin->role === AdminRole::SUPER) {
+        if ($user->role === AdminRole::SUPER) {
             return true;
         }
         return null;
@@ -19,7 +19,7 @@ class UserPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(Admin $user): bool
+    public function viewAny($user): bool
     {
         return true;
     }
@@ -27,7 +27,7 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(Admin $user, User $model): bool
+    public function view($user, User $model): bool
     {
         return true;
     }
@@ -35,7 +35,7 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(Admin $user): bool
+    public function create($user): bool
     {
         return $user->role === AdminRole::SUPER;
     }
@@ -43,7 +43,7 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Admin $user, User $model): bool
+    public function update($user, User $model): bool
     {
         return $user->role === AdminRole::SUPER;
     }
@@ -51,7 +51,7 @@ class UserPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(Admin $user, User $model): bool
+    public function delete($user, User $model): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class UserPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(Admin $user, User $model): bool
+    public function restore($user, User $model): bool
     {
         return $user->role === AdminRole::SUPER;
     }
@@ -67,7 +67,7 @@ class UserPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    // public function forceDelete(Admin $user, User $model): bool
+    // public function forceDelete($user, User $model): bool
     // {
     //     return false;
     // }
