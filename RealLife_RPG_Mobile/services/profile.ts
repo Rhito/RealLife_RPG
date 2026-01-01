@@ -12,6 +12,8 @@ export interface FeedItem {
     badge_name?: string;
     damage?: number;
     reason?: string;
+    effect?: string;
+    item_name?: string;
   };
   created_at: string;
 }

@@ -4,6 +4,9 @@ services:
     env: php
     region: oregon
     plan: free
+    envVars:
+      - key: PHP_VERSION
+        value: 8.4
     buildCommand: |
       composer install --optimize-autoloader --no-dev
       php artisan config:cache
