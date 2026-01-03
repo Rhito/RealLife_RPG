@@ -100,6 +100,10 @@ Route::prefix('v1')->group(function () {
         Route::put('/friends/{id}', [\App\Http\Controllers\User\FriendController::class, 'update']);
         Route::delete('/friends/{id}', [\App\Http\Controllers\User\FriendController::class, 'destroy']);
         
+        // Messages
+        Route::get('/messages/{id}', [\App\Http\Controllers\User\MessageController::class, 'index']);
+        Route::post('/messages/{id}', [\App\Http\Controllers\User\MessageController::class, 'store']);
+        
         Route::get('/logout', [AuthenticatedController::class, 'logout'])->name('v1.logout');
 
         // Leaderboard

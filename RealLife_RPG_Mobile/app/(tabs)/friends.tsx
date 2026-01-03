@@ -84,14 +84,18 @@ export default function SocialScreen() {
     }
 
     const renderFriend = ({ item }: { item: User }) => (
-        <TouchableOpacity style={styles.card} onPress={() => router.push({ pathname: '/users/[id]', params: { id: item.id } })}>
-             <Ionicons name="person-circle" size={40} color="#ccc" />
-             <View style={{ flex: 1, marginLeft: 10 }}>
-                 <Text style={styles.name}>{item.name}</Text>
-                 <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
-             </View>
-             <Ionicons name="chevron-forward" size={20} color="#ccc" />
-        </TouchableOpacity>
+        <View style={styles.card}>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => router.push({ pathname: '/users/[id]', params: { id: item.id } })}>
+                <Ionicons name="person-circle" size={40} color="#ccc" />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={styles.name}>{item.name}</Text>
+                    <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/chat/[id]' as any, params: { id: item.id } })}>
+                <Ionicons name="chatbubble-ellipses" size={24} color="#007AFF" />
+            </TouchableOpacity>
+        </View>
     );
 
     const renderRequest = ({ item }: { item: Friendship }) => (
@@ -313,6 +317,10 @@ const styles = StyleSheet.create({
       color: 'white',
       fontWeight: 'bold',
       fontSize: 12,
+  },
+  iconButton: {
+      padding: 5,
+      marginLeft: 10,
   },
   searchBox: {
       flexDirection: 'row',
