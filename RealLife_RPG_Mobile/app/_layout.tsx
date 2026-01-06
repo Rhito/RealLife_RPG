@@ -30,8 +30,11 @@ const InitialLayout = () => {
     } else if (user && inTabsGroup && !user.email_verified_at) {
         // If they are inside tabs but unverified (e.g. state refresh), kick them out
         router.replace('/verify-email');
-    } else if (!user && inTabsGroup) {
-      router.replace('/login');
+    } else if (!user) {
+        const isPublicRoute = ['login', 'register', 'index', ''].includes(segments[0] || '');
+        if (!isPublicRoute) {
+            router.replace('/login');
+        }
     }
   }, [user, isLoading, segments]);
 

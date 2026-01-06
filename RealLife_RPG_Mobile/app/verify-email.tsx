@@ -10,7 +10,7 @@ export default function VerifyEmailScreen() {
   const [checking, setChecking] = useState(true);
   const [verified, setVerified] = useState(false);
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
 
   const checkStatus = async () => {
     try {
@@ -112,7 +112,7 @@ export default function VerifyEmailScreen() {
       </TouchableOpacity>
 
       {/* Mandatory Verification: Skip button removed */}
-      <TouchableOpacity onPress={() => { useAuth().logout(); }} style={styles.skipButton}>
+      <TouchableOpacity onPress={logout} style={styles.skipButton}>
         <Text style={styles.skipText}>Sign Out</Text>
       </TouchableOpacity>
     </View>
