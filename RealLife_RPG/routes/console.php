@@ -9,7 +9,3 @@ Artisan::command('inspire', function () {
 
 Illuminate\Support\Facades\Schedule::job(new App\Jobs\DailyTaskGeneratorJob)->daily();
 
-
-
-
-

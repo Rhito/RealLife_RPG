@@ -16,7 +16,7 @@ class WelcomeEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public \App\Models\User $user)
+    public function __construct()
     {
         //
     }
@@ -27,7 +27,7 @@ class WelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to RealLife RPG',
+            subject: 'Welcome Email',
         );
     }
 
@@ -37,7 +37,7 @@ class WelcomeEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.welcome',
+            view: 'view.name',
         );
     }
 

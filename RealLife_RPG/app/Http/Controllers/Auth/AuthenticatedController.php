@@ -48,12 +48,15 @@ class AuthenticatedController extends ApiController
                 'max_hp' => 100,
             ]);
 
-            // Send Welcome Email
+            // Try to send email, but don't block registration if it fails (e.g. no SMTP)
             try {
-                \Illuminate\Support\Facades\Mail::to($newUser)->send(new \App\Mail\WelcomeEmail($newUser));
+                $newUser->sendEmailVerificationNotification();
             } catch (\Exception $e) {
-                // Log error but don't block registration
-                // \Illuminate\Support\Facades\Log::error('Welcome email failed: ' . $e->getMessage());
+                // Log error but allow proceeding. In dev, we might want to auto-verify?
+                // For now, just log.
+                // Log::error('Email sending failed: ' . $e->getMessage());
+                // Optional: Auto-verify if local? 
+                // $newUser->markEmailAsVerified();
             }
 
             // Create token
