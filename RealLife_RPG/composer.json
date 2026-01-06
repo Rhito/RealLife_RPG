@@ -18,6 +18,7 @@
         "league/flysystem-aws-s3-v3": "^3.30",
         "lst/typo3-phpcsfixer": "^0.1.0",
         "pusher/pusher-php-server": "*",
+        "resend/resend-laravel": "^1.1",
         "rlanvin/php-rrule": "^2.6",
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/github": "^4.1"
