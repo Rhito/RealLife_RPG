@@ -50,8 +50,7 @@ class AuthenticatedController extends ApiController
 
             // Send Welcome Email
             try {
-                // TEMPORARY DEBUG: Commented out to rule out timeout issues
-                // \Illuminate\Support\Facades\Mail::to($newUser)->send(new \App\Mail\WelcomeEmail($newUser));
+                \Illuminate\Support\Facades\Mail::to($newUser)->send(new \App\Mail\WelcomeEmail($newUser));
             } catch (\Exception $e) {
                 // Log error but don't block registration
                 // \Illuminate\Support\Facades\Log::error('Welcome email failed: ' . $e->getMessage());
