@@ -20,34 +20,34 @@ class AdminSeeder extends Seeder
         ]);
         //
 
-        $faker = Faker::create();
+        // $faker = Faker::create();
 
-        $total = 10000;       // Số lượng bạn muốn seed
-        $batchSize = 1000;    // Tùy vào máy, có thể nâng lên 5000
+        // $total = 10000;       // Số lượng bạn muốn seed
+        // $batchSize = 1000;    // Tùy vào máy, có thể nâng lên 5000
 
-        $hashedPassword = bcrypt('password'); // Hash 1 lần thay vì 10k lần
+        // $hashedPassword = bcrypt('password'); // Hash 1 lần thay vì 10k lần
 
-        for ($i = 1; $i < $total / $batchSize; $i++) {
-            $data = [];
+        // for ($i = 1; $i < $total / $batchSize; $i++) {
+        //     $data = [];
 
-            for ($j = 0; $j < $batchSize; $j++) {
-                $index = $i * $batchSize + $j;
+        //     for ($j = 0; $j < $batchSize; $j++) {
+        //         $index = $i * $batchSize + $j;
 
-                $data[] = [
-                    'name' => $faker->name(),
-                    'email' => "admin{$index}@example.com", // đảm bảo duy nhất
-                    'password' => $hashedPassword,
-                    'role' => 'moderator',
-                    'remember_token' => Str::random(10),
-                    'not_allowed' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
+        //         $data[] = [
+        //             'name' => $faker->name(),
+        //             'email' => "admin{$index}@example.com", // đảm bảo duy nhất
+        //             'password' => $hashedPassword,
+        //             'role' => 'moderator',
+        //             'remember_token' => Str::random(10),
+        //             'not_allowed' => false,
+        //             'created_at' => now(),
+        //             'updated_at' => now(),
+        //         ];
+        //     }
 
 
-            DB::table('admins')->insert($data);
-        }
+        //     DB::table('admins')->insert($data);
+        // }
 
         //Admin::factory(10000)->create();
 

@@ -15,10 +15,11 @@ class DatabaseSeeder extends Seeder
     {
         // Seed items first (no dependencies)
         $this->call(ItemSeeder::class);
-        
+
         // Seed test users with known credentials for manual testing
         $this->call(UserSeeder::class);
-        
+        $this->call(TaskSeeder::class);
+        $this->call(AchievementSeeder::class);
         // Optionally create some random users for testing with larger datasets
         // User::factory(10)->create();
     }
