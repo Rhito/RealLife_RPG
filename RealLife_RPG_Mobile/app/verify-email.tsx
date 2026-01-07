@@ -38,7 +38,36 @@ export default function VerifyEmailScreen() {
 
   useEffect(() => {
     checkStatus();
-  }, []);
+
+    // Limit listening scope
+    if (user?.id) {
+        console.log(`Listening on App.Models.User.${user.id}`);
+        // @ts-ignore
+        import('../services/echo').then(({ default: echo }) => {
+            echo.private(`App.Models.User.${user.id}`)
+                .listen('UserVerified', (e: any) => {
+                    console.log('UserVerified Event:', e);
+                    setVerified(true);
+                    
+                    if (user) {
+                         setUser({ ...user, email_verified_at: new Date().toISOString() });
+                    }
+                    
+                    Alert.alert(
+                        '✅ Email Verified!',
+                         'Your account is now fully activated.',
+                        [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
+                    );
+                });
+        });
+        
+        return () => {
+             import('../services/echo').then(({ default: echo }) => {
+                 echo.leave(`App.Models.User.${user?.id}`);
+             });
+        }
+    }
+  }, [user?.id]);
 
   const handleResend = async () => {
     setLoading(true);

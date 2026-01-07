@@ -36,7 +36,7 @@ class EmailVerificationController extends ApiController
 
         if (!$alreadyVerified) {
             $user->markEmailAsVerified();
-            event(new \Illuminate\Auth\Events\Verified($user));
+            event(new \App\Events\UserVerified($user));
         }
 
         // Check if request is from mobile app (has user agent or specific header)
