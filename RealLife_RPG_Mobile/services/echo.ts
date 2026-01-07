@@ -1,5 +1,18 @@
+// Polyfill for Pusher Worker Build in React Native
+if (!global.crypto) {
+  // @ts-ignore
+  global.crypto = {
+    getRandomValues: (arr: any) => {
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = Math.floor(Math.random() * 256);
+      }
+      return arr;
+    },
+  };
+}
+
 import Echo from 'laravel-echo';
-import Pusher from 'pusher-js/dist/worker/pusher';
+import Pusher from 'pusher-js/dist/worker/pusher.worker';
 
 // @ts-ignore
 window.Pusher = Pusher;
