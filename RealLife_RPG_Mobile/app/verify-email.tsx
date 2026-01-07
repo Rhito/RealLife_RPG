@@ -11,6 +11,8 @@ export default function VerifyEmailScreen() {
   const [verified, setVerified] = useState(false);
   const router = useRouter();
   const { user, setUser, logout } = useAuth();
+  
+  console.log('VerifyEmailScreen rendering. User ID:', user?.id);
 
   const checkStatus = async () => {
     try {
