@@ -27,6 +27,9 @@ const InitialLayout = () => {
                router.replace('/(tabs)');
           }
       }
+    } else if (!user && !['login', 'register', 'index', 'forgot-password', 'reset-password'].includes(segments[0] || '')) {
+         // If user is not logged in and tries to access a protected route (like verify-email), redirect to login
+         router.replace('/login');
     } else if (user && inTabsGroup && !user.email_verified_at) {
         // If they are inside tabs but unverified (e.g. state refresh), kick them out
         router.replace('/verify-email');
