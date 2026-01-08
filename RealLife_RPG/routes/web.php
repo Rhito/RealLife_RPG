@@ -11,4 +11,6 @@ Route::get('/logError', function () {
 });
 
 // Password reset web redirect (for clicking email links in browser)
-Route::get('/password-reset-web', [\App\Http\Controllers\Auth\PasswordResetWebController::class, 'showResetRedirect']);
+// Password reset web interface
+Route::get('/password-reset-web', [\App\Http\Controllers\Auth\PasswordResetWebController::class, 'showResetForm'])->name('password.reset.web');
+Route::post('/password-reset-web', [\App\Http\Controllers\Auth\PasswordResetWebController::class, 'reset'])->name('password.update.web');

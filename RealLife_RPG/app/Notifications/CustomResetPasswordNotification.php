@@ -20,9 +20,8 @@ class CustomResetPasswordNotification extends ResetPasswordNotification
         return (new MailMessage)
             ->subject('Reset Your Password')
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->line('Tap the button below to reset your password in the app:')
-            ->action('Reset Password', $appDeepLink)
-            ->line('If the button doesn\'t work, copy and paste this link into your browser:')
+            ->action('Reset Password', $resetUrl)
+            ->line('If the link above does not work, copy and paste this link into your browser:')
             ->line($resetUrl)
             ->line('This password reset link will expire in ' . config('auth.passwords.'.config('auth.defaults.passwords').'.expire') . ' minutes.')
             ->line('If you did not request a password reset, no further action is required.');
