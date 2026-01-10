@@ -7,23 +7,42 @@ use Illuminate\Http\Request;
 
 class PasswordResetWebController extends Controller
 {
-    public function showResetRedirect(Request $request)
+    public function showResetForm(Request $request)
     {
         $token = $request->query('token');
         $email = $request->query('email');
         
-        if (!$token || !$email) {
-            return response()->view('verification-error', [
-                'message' => 'Invalid password reset link'
-            ], 400);
-        }
-        
-        // Create deep link for mobile app
-        $deepLink = config('app.mobile_url', 'realliferpg://') . 'reset-password?token=' . $token . '&email=' . urlencode($email);
-        
-        return view('reset-password-redirect', [
-            'deepLink' => $deepLink,
+        return view('auth.reset-password', [
+            'token' => $token,
             'email' => $email
         ]);
+    }
+
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $status = \Illuminate\Support\Facades\Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => \Illuminate\Support\Facades\Hash::make($password)
+                ])->setRememberToken(\Illuminate\Support\Str::random(60));
+
+                $user->save();
+
+                event(new \Illuminate\Auth\Events\PasswordReset($user));
+            }
+        );
+
+        if ($status == \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            return view('auth.reset-success');
+        }
+
+        return back()->withErrors(['email' => __($status)]);
     }
 }
