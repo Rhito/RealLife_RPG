@@ -43,6 +43,7 @@ export default function ForgotPasswordScreen() {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#64748b"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -77,39 +78,52 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0f172a', // Slate 900
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    color: '#333',
+    color: '#f8fafc', // Slate 50
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#94a3b8', // Slate 400
     textAlign: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
+    lineHeight: 20,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1e293b', // Slate 800
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#334155', // Slate 700
+    color: '#f8fafc',
+    fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#6366f1', // Indigo 500
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 10,
+    shadowColor: '#6366f1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#475569', // Slate 600
+    shadowOpacity: 0,
+    elevation: 0,
   },
   buttonText: {
     color: '#fff',
@@ -121,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: {
-    color: '#007AFF',
+    color: '#94a3b8', // Slate 400
     fontSize: 14,
   },
 });

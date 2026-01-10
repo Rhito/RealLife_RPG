@@ -44,6 +44,7 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor="#64748b"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -52,6 +53,7 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor="#64748b"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -94,31 +96,42 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0f172a', // Slate 900
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 40,
     textAlign: 'center',
-    color: '#333',
+    color: '#f8fafc', // Slate 50
+    letterSpacing: 1,
   },
   inputContainer: {
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1e293b', // Slate 800
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 12,
+    marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#334155', // Slate 700
+    color: '#f8fafc', // White text
+    fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#6366f1', // Indigo 500
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
+    shadowColor: '#6366f1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   buttonText: {
     color: '#fff',
@@ -128,37 +141,37 @@ const styles = StyleSheet.create({
   forgotButton: {
     padding: 10,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 15,
   },
   forgotText: {
-    color: '#007AFF',
+    color: '#94a3b8', // Slate 400
     fontSize: 14,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 30,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: '#334155', // Slate 700
   },
   dividerText: {
     marginHorizontal: 10,
-    color: '#999',
+    color: '#64748b', // Slate 500
     fontSize: 14,
   },
   signupButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: '#6366f1', // Indigo 500
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
   },
   signupText: {
-    color: '#007AFF',
+    color: '#6366f1', // Indigo 500
     fontWeight: 'bold',
     fontSize: 16,
   },

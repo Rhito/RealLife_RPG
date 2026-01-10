@@ -77,7 +77,7 @@ export default function RegisterScreen() {
           <TextInput
             style={styles.input}
             placeholder="Enter your name"
-            placeholderTextColor="#999"
+            placeholderTextColor="#64748b"
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
@@ -89,7 +89,7 @@ export default function RegisterScreen() {
           <TextInput
             style={styles.input}
             placeholder="your@email.com"
-            placeholderTextColor="#999"
+            placeholderTextColor="#64748b"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -102,7 +102,7 @@ export default function RegisterScreen() {
           <TextInput
             style={styles.input}
             placeholder="Min. 8 characters"
-            placeholderTextColor="#999"
+            placeholderTextColor="#64748b"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -114,7 +114,7 @@ export default function RegisterScreen() {
           <TextInput
             style={styles.input}
             placeholder="Re-enter password"
-            placeholderTextColor="#999"
+            placeholderTextColor="#64748b"
             value={passwordConfirmation}
             onChangeText={setPasswordConfirmation}
             secureTextEntry
@@ -147,7 +147,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#342056',
+    backgroundColor: '#0f172a', // Slate 900
   },
   scrollContent: {
     flexGrow: 1,
@@ -156,9 +156,14 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 24,
     paddingBottom: 30,
-    backgroundColor: '#432874',
+    backgroundColor: '#1e293b', // Slate 800
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   backButton: {
     marginBottom: 16,
@@ -168,8 +173,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#f8fafc', // Slate 50
     textAlign: 'center',
+    letterSpacing: 1,
   },
   formContainer: {
     padding: 24,
@@ -178,45 +184,58 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: '#BBAADD',
+    color: '#94a3b8', // Slate 400
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 8,
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: '#1e293b', // Slate 800
     padding: 15,
     borderRadius: 12,
     fontSize: 16,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#334155', // Slate 700
+    color: '#f8fafc', // White
   },
   button: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#6366f1', // Indigo 500
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'center',
-    elevation: 4,
+    shadowColor: '#6366f1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    backgroundColor: '#475569',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   linkButton: {
     marginTop: 20,
     alignItems: 'center',
+    padding: 10,
   },
   linkText: {
-    color: '#BBAADD',
+    color: '#94a3b8', // Slate 400
     fontSize: 14,
   },
 });
