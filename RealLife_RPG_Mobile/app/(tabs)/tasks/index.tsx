@@ -63,7 +63,13 @@ export default function TasksScreen() {
       try {
           const res = await scoreHabit(id);
           updateUserStats(res.rewards);
-          showAlert('Good Job!', `+${res.rewards.exp} XP, +${res.rewards.coins} Coins, +1 HP!`);
+          
+          let message = `+${res.rewards.exp} XP, +${res.rewards.coins} Coins`;
+          if (res.rewards.achievements && res.rewards.achievements.length > 0) {
+              message += `\n\n🏆 ${res.rewards.achievements.join('\n🏆 ')}`;
+          }
+          
+          showAlert(res.rewards.achievements?.length ? 'Great Work!' : 'Good Job!', message);
           loadTasks();
       } catch (e: any) {
           showAlert('Error', e.message || 'Failed to score habit');
@@ -78,9 +84,22 @@ export default function TasksScreen() {
       try {
           const res = await completeTask(id);
           updateUserStats(res.rewards);
+          
+          // Check for Level Up
            if (res.rewards.level > (user?.level || 1)) {
               showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
           }
+          
+          // Check for Achievements
+          if (res.rewards.achievements && res.rewards.achievements.length > 0) {
+              // Show first achievement or summary
+              // If multiple, join them
+              const message = res.rewards.achievements.join('\n');
+              setTimeout(() => {
+                  showAlert('🏆 Achievement Unlocked!', message);
+              }, 500); // Slight delay so it doesn't clash with Level Up if both happen (though alert context might handle one at a time)
+          }
+
           loadTasks(); // Reload to remove from list
       } catch (e: any) {
           showAlert('Error', e.message || 'Failed to complete task');

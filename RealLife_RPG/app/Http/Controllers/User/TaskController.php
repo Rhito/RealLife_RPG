@@ -29,9 +29,9 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'type' => 'required|string', // habit, daily, todo/once
             'difficulty' => 'required|in:easy,medium,hard',
-            // repeat_days required only if NOT 'once'
-            'repeat_days' => 'required_unless:type,once|array',
-            'due_date' => 'required_if:type,once|date',
+            // repeat_days required only if NOT 'once' or 'todo'
+            'repeat_days' => 'required_unless:type,once,todo|array',
+            'due_date' => 'required_if:type,once,todo|date',
         ]);
 
         $user = Auth::user();

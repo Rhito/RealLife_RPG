@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { useAlert } from '../../../context/AlertContext';
+import { Avatar } from '../../../components/Avatar';
 
 type Tab = 'friends' | 'requests' | 'search' | 'ranking';
 type RankingType = 'global' | 'friends';
@@ -88,7 +89,7 @@ export default function SocialScreen() {
 const renderFriend = ({ item }: { item: User }) => (
         <View style={styles.card}>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => router.push({ pathname: '/users/[id]', params: { id: item.id } })}>
-                <Ionicons name="person-circle" size={40} color="#BBAADD" />
+                <Avatar name={item.name} size={40} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={styles.name}>{item.name}</Text>
                     <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
@@ -102,7 +103,7 @@ const renderFriend = ({ item }: { item: User }) => (
 
     const renderRequest = ({ item }: { item: Friendship }) => (
         <View style={styles.card}>
-             <Ionicons name="person-circle" size={40} color="#BBAADD" />
+             <Avatar name={item.user?.name} size={40} />
              <View style={{ flex: 1, marginLeft: 10 }}>
                  <Text style={styles.name}>{item.user?.name}</Text>
                  <Text style={styles.level}>Sent you a request</Text>
@@ -115,7 +116,7 @@ const renderFriend = ({ item }: { item: User }) => (
 
     const renderSearchUser = ({ item }: { item: User }) => (
         <View style={styles.card}>
-             <Ionicons name="person-circle" size={40} color="#BBAADD" />
+             <Avatar name={item.name} size={40} />
              <View style={{ flex: 1, marginLeft: 10 }}>
                  <Text style={styles.name}>{item.name}</Text>
                  <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
@@ -131,7 +132,7 @@ const renderFriend = ({ item }: { item: User }) => (
         return (
             <View style={[styles.card, isMe && styles.myRankCard]}>
                 <Text style={styles.rank}>#{index + 1}</Text>
-                <Ionicons name="person-circle" size={36} color={isMe ? "#FF9800" : "#BBAADD"} />
+                <Avatar name={item.name} size={36} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={[styles.name, isMe && { color: '#FF9800' }]}>{item.name}</Text>
                     <Text style={styles.level}>Lvl {item.level ?? 1}</Text>

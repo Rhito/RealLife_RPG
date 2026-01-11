@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { useAlert } from '../context/AlertContext';
-import { useTranslation } from 'react-i18next';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -12,11 +11,10 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const router = useRouter();
   const { showAlert } = useAlert();
-  const { t } = useTranslation();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      showAlert(t('common.error'), t('auth.error_missing_creds'));
+      showAlert('Error', 'Please enter email and password');
       return;
     }
 
@@ -34,7 +32,7 @@ export default function LoginScreen() {
       } else {
           errorMessage = JSON.stringify(e);
       }
-      showAlert(t('auth.login_failed'), errorMessage);
+      showAlert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -47,7 +45,7 @@ export default function LoginScreen() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder={t('auth.email')}
+          placeholder="Email"
           placeholderTextColor="#64748b"
           value={email}
           onChangeText={setEmail}
@@ -56,7 +54,7 @@ export default function LoginScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder={t('auth.password')}
+          placeholder="Password"
           placeholderTextColor="#64748b"
           value={password}
           onChangeText={setPassword}
@@ -68,7 +66,7 @@ export default function LoginScreen() {
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>{t('auth.login')}</Text>
+          <Text style={styles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
 
@@ -76,12 +74,12 @@ export default function LoginScreen() {
         style={styles.forgotButton} 
         onPress={() => router.push('/forgot-password')}
       >
-        <Text style={styles.forgotText}>{t('auth.forgot_password')}</Text>
+        <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
 
       <View style={styles.divider}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>{t('common.or')}</Text>
+        <Text style={styles.dividerText}>OR</Text>
         <View style={styles.dividerLine} />
       </View>
 
@@ -89,7 +87,7 @@ export default function LoginScreen() {
         style={styles.signupButton} 
         onPress={() => router.push('/register')}
       >
-        <Text style={styles.signupText}>{t('auth.create_account')}</Text>
+        <Text style={styles.signupText}>Create New Account</Text>
       </TouchableOpacity>
     </View>
   );
