@@ -12,7 +12,7 @@ if (!global.crypto) {
 }
 
 import Echo from 'laravel-echo';
-import Pusher from 'pusher-js/dist/worker/pusher.worker';
+import Pusher from 'pusher-js';
 
 // @ts-ignore
 window.Pusher = Pusher;

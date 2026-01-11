@@ -72,44 +72,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f5f5f5',
-    paddingTop: Platform.OS === 'android' ? 40 : 60, // Safe Area
+    backgroundColor: '#342056', // Update to Dark Theme while we are at it
   },
   card: {
-    backgroundColor: 'white',
+    backgroundColor: '#432874', // Darker card background
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
+    // elevation: 2, // remove elevation for flat dark look or keep
+    borderWidth: 1,
+    borderColor: '#5B4290'
   },
   lockedCard: {
-      backgroundColor: '#e0e0e0',
-      opacity: 0.8,
+      backgroundColor: '#2D1B4E',
+      opacity: 0.6,
+      borderColor: '#333'
   },
   iconContainer: {
       width: 50,
       height: 50,
-      backgroundColor: '#fffbe6',
+      backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold tint
       borderRadius: 25,
       justifyContent: 'center',
       alignItems: 'center',
   },
   lockedIcon: {
-      backgroundColor: '#ccc',
+      backgroundColor: '#1E1E1E',
   },
   name: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#fff',
   },
   condition: {
-      color: '#666',
+      color: '#E0E7FF', // Lighter text (was #BBAADD)
       fontSize: 14,
       marginBottom: 5,
   },
   lockedText: {
-      color: '#888',
+      color: '#9CA3AF', // Lighter gray (was #666)
   },
   rewards: {
       flexDirection: 'row',
@@ -117,16 +120,16 @@ const styles = StyleSheet.create({
   rewardText: {
       fontSize: 12,
       fontWeight: 'bold',
-      color: '#007AFF',
+      color: '#FFD700', // Brighter Gold
   },
   unlockedAt: {
       fontSize: 10,
-      color: 'green',
+      color: '#4ADE80', // Brighter Green
       marginTop: 5,
   },
   empty: {
       textAlign: 'center',
       marginTop: 20,
-      color: '#666',
+      color: '#E0E7FF', // Lighter empty text
   }
 });

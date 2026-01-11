@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { checkEmailVerificationStatus, resendVerificationEmail } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 export default function VerifyEmailScreen() {
   const [loading, setLoading] = useState(false);
@@ -11,6 +12,7 @@ export default function VerifyEmailScreen() {
   const [verified, setVerified] = useState(false);
   const router = useRouter();
   const { user, setUser, logout } = useAuth();
+  const { showAlert } = useAlert();
   
   console.log('VerifyEmailScreen rendering. User ID:', user?.id);
 
@@ -25,7 +27,7 @@ export default function VerifyEmailScreen() {
             setUser({ ...user, email_verified_at: new Date().toISOString() });
         }
         
-        Alert.alert(
+        showAlert(
           '✅ Email Verified!',
           'Your account is now fully activated.',
           [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
@@ -55,7 +57,7 @@ export default function VerifyEmailScreen() {
                          setUser({ ...user, email_verified_at: new Date().toISOString() });
                     }
                     
-                    Alert.alert(
+                    showAlert(
                         '✅ Email Verified!',
                          'Your account is now fully activated.',
                         [{ text: 'Continue', onPress: () => router.replace('/(tabs)') }]
@@ -75,23 +77,12 @@ export default function VerifyEmailScreen() {
     setLoading(true);
     try {
       await resendVerificationEmail();
-      Alert.alert('Success', 'Verification email sent! Please check your inbox.');
+      showAlert('Success', 'Verification email sent! Please check your inbox.');
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to resend email');
+      showAlert('Error', e.message || 'Failed to resend email');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSkip = () => {
-    Alert.alert(
-      'Limited Access',
-      'Without email verification, some features may be restricted. Continue anyway?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Continue', onPress: () => router.replace('/(tabs)') }
-      ]
-    );
   };
 
   if (checking) {

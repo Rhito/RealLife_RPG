@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs screenOptions={{ 
         tabBarActiveTintColor: '#FF9800', // Gold for active
@@ -35,7 +38,7 @@ export default function TabLayout() {
         name="index"
         options={{
           headerShown: false,
-          title: 'Hero', // More RPG-like than Dashboard
+          title: t('tabs.hero'), // More RPG-like than Dashboard
           tabBarIcon: ({ color }) => <Ionicons name="shield" size={24} color={color} />,
         }}
       />
@@ -43,7 +46,7 @@ export default function TabLayout() {
         name="tasks"
         options={{
           headerShown: false, // Tasks screen has its own custom header/tabs
-          title: 'Quests',
+          title: t('tabs.quests'),
           tabBarIcon: ({ color }) => <Ionicons name="document-text" size={24} color={color} />,
         }}
       />
@@ -51,7 +54,7 @@ export default function TabLayout() {
         name="shop"
         options={{
           headerShown: false,
-          title: 'Market',
+          title: t('tabs.market'),
           tabBarIcon: ({ color }) => <Ionicons name="basket" size={24} color={color} />,
         }}
       />
@@ -65,7 +68,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="adventure-log"
         options={{
-          title: 'Codex',
+          title: t('tabs.codex'),
           headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="journal" size={24} color={color} />,
         }}
@@ -81,15 +84,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="achievements"
         options={{
-          headerShown: false,
-          title: 'Awards',
+          title: t('tabs.awards'),
           tabBarIcon: ({ color }) => <Ionicons name="trophy" size={24} color={color} />,
         }}
       />
        <Tabs.Screen
         name="friends"
         options={{
-          title: 'Guild', // Social -> Guild
+          title: t('tabs.guild'), // Social -> Guild
+          headerShown: false, // Let Stack handle header
           tabBarIcon: ({ color }) => <Ionicons name="people" size={24} color={color} />,
         }}
       />

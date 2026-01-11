@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "back": "Back",
+    "or": "OR"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "create_account": "Create New Account",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "dont_have_account": "Don't have an account? Sign up",
+    "already_have_account": "Already have an account? Log in",
+    "error_missing_creds": "Please enter email and password",
+    "login_failed": "Login Failed"
+  },
+  "tabs": {
+    "hero": "Hero",
+    "quests": "Quests",
+    "market": "Market",
+    "guild": "Guild",
+    "awards": "Awards",
+    "codex": "Codex"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "language": "Language",
+    "logout": "Logout",
+    "theme": "Theme"
+  }
+}

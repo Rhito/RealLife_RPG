@@ -5,11 +5,13 @@ import { createTask, TaskType, TaskDifficulty } from '../../../services/tasks';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useAlert } from '../../../context/AlertContext';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function CreateTaskScreen() {
     const router = useRouter();
+    const { showAlert } = useAlert();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     
@@ -48,7 +50,7 @@ export default function CreateTaskScreen() {
 
     const handleCreate = async () => {
         if (!title) {
-            Alert.alert('Error', 'Title is required');
+            showAlert('Error', 'Title is required');
             return;
         }
 
@@ -63,10 +65,10 @@ export default function CreateTaskScreen() {
                 due_date: type === TaskType.TODO ? date.toISOString() : undefined, // send full ISO string
             } as any); // cast as any because interface might mismatch slightly with partial helpers
             
-            Alert.alert('Success', 'Task created!');
+            showAlert('Success', 'Task created!');
             router.back();
         } catch (e: any) {
-            Alert.alert('Error', e.message || 'Failed to create task');
+            showAlert('Error', e.message || 'Failed to create task');
         } finally {
             setLoading(false);
         }

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAlert } from '../context/AlertContext';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -12,27 +13,28 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const handleRegister = async () => {
     if (!name || !email || !password || !passwordConfirmation) {
-      Alert.alert('Error', 'Please fill in all fields');
+      showAlert('Error', 'Please fill in all fields');
       return;
     }
 
     if (password !== passwordConfirmation) {
-      Alert.alert('Error', 'Passwords do not match');
+      showAlert('Error', 'Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
+      showAlert('Error', 'Password must be at least 8 characters');
       return;
     }
 
     setLoading(true);
     try {
       await register(name, email, password, passwordConfirmation);
-      Alert.alert(
+      showAlert(
         'Success!', 
         'Account created! Please check your email to verify your account.',
         [{ text: 'OK', onPress: () => router.replace('/verify-email') }]
@@ -56,7 +58,7 @@ export default function RegisterScreen() {
         errorMessage = typeof e.error === 'string' ? e.error : JSON.stringify(e.error);
       }
       
-      Alert.alert('Registration Failed', errorMessage);
+      showAlert('Registration Failed', errorMessage);
     } finally {
       setLoading(false);
     }

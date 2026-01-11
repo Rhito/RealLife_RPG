@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask } from '../../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../../../components/Card';
+import { useAlert } from '../../../context/AlertContext';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ type TabType = 'habit' | 'daily' | 'todo';
 export default function TasksScreen() {
   const { user, setUser } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlert();
   
   const [activeTab, setActiveTab] = useState<TabType>('habit');
   
@@ -61,10 +63,10 @@ export default function TasksScreen() {
       try {
           const res = await scoreHabit(id);
           updateUserStats(res.rewards);
-          Alert.alert('Good Job!', `+${res.rewards.exp} XP, +${res.rewards.coins} Coins, +1 HP!`);
+          showAlert('Good Job!', `+${res.rewards.exp} XP, +${res.rewards.coins} Coins, +1 HP!`);
           loadTasks();
       } catch (e: any) {
-          Alert.alert('Error', e.message || 'Failed to score habit');
+          showAlert('Error', e.message || 'Failed to score habit');
       } finally {
           setTimeout(() => setProcessing(false), 500); // Small delay to prevent rapid taps
       }
@@ -77,11 +79,11 @@ export default function TasksScreen() {
           const res = await completeTask(id);
           updateUserStats(res.rewards);
            if (res.rewards.level > (user?.level || 1)) {
-              Alert.alert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
+              showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
           }
           loadTasks(); // Reload to remove from list
       } catch (e: any) {
-          Alert.alert('Error', e.message || 'Failed to complete task');
+          showAlert('Error', e.message || 'Failed to complete task');
       } finally {
           setTimeout(() => setProcessing(false), 500);
       }
@@ -89,7 +91,7 @@ export default function TasksScreen() {
 
   const handleDelete = (id: number, title: string) => {
       if (processing) return;
-      Alert.alert(
+      showAlert(
           'Delete Quest',
           `Are you sure you want to delete "${title}" forever?`,
           [
@@ -104,7 +106,7 @@ export default function TasksScreen() {
                           await deleteTask(id);
                           loadTasks();
                       } catch (e: any) {
-                          Alert.alert('Error', e.message);
+                          showAlert('Error', e.message);
                       } finally {
                           setProcessing(false);
                       }
@@ -116,7 +118,7 @@ export default function TasksScreen() {
 
   const handleFail = (id: number, title: string) => {
       if (processing) return;
-      Alert.alert(
+      showAlert(
           'Give Up?',
           `Are you sure you want to give up on "${title}"? You will take damage!`,
           [
@@ -130,10 +132,10 @@ export default function TasksScreen() {
                       try {
                           const res = await failTask(id);
                           updateUserStats(res.rewards);
-                          Alert.alert('Failed!', `You took damage. HP is now ${res.rewards.hp}.`);
+                          showAlert('Failed!', `You took damage. HP is now ${res.rewards.hp}.`);
                           loadTasks();
                       } catch (e: any) {
-                          Alert.alert('Error', e.message);
+                          showAlert('Error', e.message);
                       } finally {
                           setProcessing(false);
                       }

@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { completeFocusTask } from '../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { useAlert } from '../../context/AlertContext';
 
 const FOCUS_TIME = 25 * 60; // 25 minutes
 
@@ -11,6 +12,7 @@ export default function FocusTimerScreen() {
     const { id, title } = useLocalSearchParams();
     const router = useRouter();
     const { user, setUser } = useAuth();
+    const { showAlert } = useAlert();
     
     const [timeLeft, setTimeLeft] = useState(FOCUS_TIME);
     const [isActive, setIsActive] = useState(false);
@@ -40,13 +42,13 @@ export default function FocusTimerScreen() {
             if (user) {
                 setUser({ ...user, ...res.rewards });
             }
-            Alert.alert(
+            showAlert(
                 'Focus Session Complete!', 
                 `Awesome job! You earned bonus rewards.\n+${res.rewards.exp} XP (incl. bonus)\n+${res.rewards.coins} Coins`,
                 [{ text: 'Great!', onPress: () => router.back() }]
             );
         } catch (e: any) {
-            Alert.alert('Error', e.message || 'Failed to submit focus session.');
+            showAlert('Error', e.message || 'Failed to submit focus session.');
             setIsFinished(false);
         }
     };

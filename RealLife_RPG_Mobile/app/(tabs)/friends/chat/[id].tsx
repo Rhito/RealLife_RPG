@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { getMessages, sendMessage, Message } from '../../services/MessageService';
-import { useAuth } from '../../context/AuthContext'; // Assuming AuthContext exists
+import { getMessages, sendMessage, Message } from '../../../../services/MessageService';
+import { useAuth } from '../../../../context/AuthContext';
+import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ChatScreen() {
-    const { id } = useLocalSearchParams();
+    const { id, name } = useLocalSearchParams();
     const router = useRouter();
+    const { showAlert } = useAlert();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -43,8 +45,8 @@ export default function ChatScreen() {
             setNewMessage('');
             // Scroll to bottom
             setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-        } catch (error) {
-            console.error('Failed to send message', error);
+        } catch (error: any) {
+            showAlert('Error', error.message || 'Failed to send message');
         } finally {
             setSending(false);
         }
@@ -78,11 +80,16 @@ export default function ChatScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
-            <Stack.Screen options={{ title: 'Chat' }} />
+            <Stack.Screen options={{ 
+                title: (name as string) || 'Chat',
+                headerBackTitle: '',
+                headerStyle: { backgroundColor: '#432874' },
+                headerTintColor: '#fff',
+            }} />
             
             {loading ? (
                 <View style={styles.center}>
-                    <ActivityIndicator size="large" color="#4F46E5" />
+                    <ActivityIndicator size="large" color="#FF9800" />
                 </View>
             ) : (
                 <FlatList
@@ -101,7 +108,7 @@ export default function ChatScreen() {
                     value={newMessage}
                     onChangeText={setNewMessage}
                     placeholder="Type a message..."
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor="#BBAADD"
                     multiline
                 />
                 <TouchableOpacity 
@@ -123,7 +130,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#342056', // Deep Purple Background
     },
     center: {
         flex: 1,
@@ -142,12 +149,12 @@ const styles = StyleSheet.create({
     },
     myMessage: {
         alignSelf: 'flex-end',
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#4F46E5', // Indigo
         borderBottomRightRadius: 4,
     },
     theirMessage: {
         alignSelf: 'flex-start',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#4a3b72', // Darker purple tint
         borderBottomLeftRadius: 4,
     },
     messageText: {
@@ -157,7 +164,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     theirMessageText: {
-        color: '#1F2937',
+        color: '#FFFFFF', // White text for improved contrast on dark purple
     },
     timestamp: {
         fontSize: 10,
@@ -165,31 +172,32 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     myTimestamp: {
-        color: '#E0E7FF',
+        color: 'rgba(255,255,255,0.7)',
     },
     theirTimestamp: {
-        color: '#9CA3AF',
+        color: 'rgba(255,255,255,0.5)',
     },
     inputContainer: {
         flexDirection: 'row',
         padding: 16,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#432874', // Match Header
         borderTopWidth: 1,
-        borderTopColor: '#E5E7EB',
+        borderTopColor: 'rgba(255,255,255,0.1)',
         alignItems: 'center',
     },
     input: {
         flex: 1,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 20,
         paddingHorizontal: 16,
         paddingVertical: 10,
         marginRight: 10,
         maxHeight: 100,
         fontSize: 16,
+        color: '#fff',
     },
     sendButton: {
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#FF9800', // Gold Accent
         width: 40,
         height: 40,
         borderRadius: 20,
@@ -197,6 +205,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sendButtonDisabled: {
-        backgroundColor: '#9CA3AF',
+        backgroundColor: 'rgba(255,255,255,0.2)',
     },
 });

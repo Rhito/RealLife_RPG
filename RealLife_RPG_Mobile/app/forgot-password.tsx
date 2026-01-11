@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
+import { useAlert } from '../context/AlertContext';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const handleForgotPassword = async () => {
     if (!email) {
-      Alert.alert('Error', 'Please enter your email address');
+      showAlert('Error', 'Please enter your email address');
       return;
     }
 
@@ -19,7 +21,7 @@ export default function ForgotPasswordScreen() {
     try {
       const response = await api.post('/forgot-password', { email });
       setSuccess(true);
-      Alert.alert(
+      showAlert(
         'Success', 
         'Password reset link has been sent to your email!',
         [{ text: 'OK', onPress: () => router.back() }]
@@ -27,7 +29,7 @@ export default function ForgotPasswordScreen() {
     } catch (e: any) {
       console.error('Forgot password error:', e);
       const errorMessage = e.response?.data?.message || e.message || 'Failed to send reset email';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

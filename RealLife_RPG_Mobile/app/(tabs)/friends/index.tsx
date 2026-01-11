@@ -1,10 +1,11 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Alert,  RefreshControl, Image } from 'react-native';
 import { useEffect, useState } from 'react';
-import { fetchFriends, fetchRequests, searchUsers, sendRequest, acceptRequest, removeFriend, User, Friendship } from '../../services/friends';
-import { fetchGlobalLeaderboard, fetchFriendsLeaderboard } from '../../services/leaderboard';
+import { fetchFriends, fetchRequests, searchUsers, sendRequest, acceptRequest, removeFriend, User, Friendship } from '../../../services/friends';
+import { fetchGlobalLeaderboard, fetchFriendsLeaderboard } from '../../../services/leaderboard';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { useRouter } from 'expo-router';
+import { useAlert } from '../../../context/AlertContext';
 
 type Tab = 'friends' | 'requests' | 'search' | 'ranking';
 type RankingType = 'global' | 'friends';
@@ -12,6 +13,7 @@ type RankingType = 'global' | 'friends';
 export default function SocialScreen() {
     const { user: currentUser } = useAuth();
     const router = useRouter();
+    const { showAlert } = useAlert();
     const [tab, setTab] = useState<Tab>('friends');
     const [rankingType, setRankingType] = useState<RankingType>('global');
     
@@ -67,40 +69,40 @@ export default function SocialScreen() {
     const handleAdd = async (id: number) => {
         try {
             await sendRequest(id);
-            Alert.alert('Success', 'Friend request sent!');
+            showAlert('Success', 'Friend request sent!');
         } catch (e: any) {
-            Alert.alert('Error', e.message);
+            showAlert('Error', e.message);
         }
     }
 
     const handleAccept = async (id: number) => {
         try {
             await acceptRequest(id);
-            Alert.alert('Success', 'Friend added!');
+            showAlert('Success', 'Friend added!');
             loadData();
         } catch (e: any) {
-            Alert.alert('Error', e.message);
+            showAlert('Error', e.message);
         }
     }
 
-    const renderFriend = ({ item }: { item: User }) => (
+const renderFriend = ({ item }: { item: User }) => (
         <View style={styles.card}>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => router.push({ pathname: '/users/[id]', params: { id: item.id } })}>
-                <Ionicons name="person-circle" size={40} color="#ccc" />
+                <Ionicons name="person-circle" size={40} color="#BBAADD" />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={styles.name}>{item.name}</Text>
                     <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/chat/[id]' as any, params: { id: item.id } })}>
-                <Ionicons name="chatbubble-ellipses" size={24} color="#007AFF" />
+            <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/(tabs)/friends/chat/[id]', params: { id: item.id, name: item.name } })}>
+                <Ionicons name="chatbubble-ellipses" size={24} color="#FF9800" />
             </TouchableOpacity>
         </View>
     );
 
     const renderRequest = ({ item }: { item: Friendship }) => (
         <View style={styles.card}>
-             <Ionicons name="person-circle" size={40} color="#ccc" />
+             <Ionicons name="person-circle" size={40} color="#BBAADD" />
              <View style={{ flex: 1, marginLeft: 10 }}>
                  <Text style={styles.name}>{item.user?.name}</Text>
                  <Text style={styles.level}>Sent you a request</Text>
@@ -113,7 +115,7 @@ export default function SocialScreen() {
 
     const renderSearchUser = ({ item }: { item: User }) => (
         <View style={styles.card}>
-             <Ionicons name="person-circle" size={40} color="#ccc" />
+             <Ionicons name="person-circle" size={40} color="#BBAADD" />
              <View style={{ flex: 1, marginLeft: 10 }}>
                  <Text style={styles.name}>{item.name}</Text>
                  <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
@@ -129,9 +131,9 @@ export default function SocialScreen() {
         return (
             <View style={[styles.card, isMe && styles.myRankCard]}>
                 <Text style={styles.rank}>#{index + 1}</Text>
-                <Ionicons name="person-circle" size={36} color={isMe ? "#007AFF" : "#ccc"} />
+                <Ionicons name="person-circle" size={36} color={isMe ? "#FF9800" : "#BBAADD"} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text style={[styles.name, isMe && { color: '#007AFF' }]}>{item.name}</Text>
+                    <Text style={[styles.name, isMe && { color: '#FF9800' }]}>{item.name}</Text>
                     <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
                 </View>
                 <Text style={styles.exp}>{item.exp} XP</Text>
@@ -161,7 +163,7 @@ export default function SocialScreen() {
              data={friends}
              keyExtractor={(item) => item.id.toString()}
              renderItem={renderFriend}
-             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} />}
+             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}
              ListEmptyComponent={<Text style={styles.empty}>No friends yet.</Text>}
           />
       )}
@@ -171,7 +173,7 @@ export default function SocialScreen() {
              data={requests}
              keyExtractor={(item) => item.id.toString()}
              renderItem={renderRequest}
-             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} />}
+             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}
              ListEmptyComponent={<Text style={styles.empty}>No pending requests.</Text>}
           />
       )}
@@ -190,7 +192,7 @@ export default function SocialScreen() {
                   data={rankings}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={renderRankingItem}
-                  refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} />}
+                  refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}
               />
           </View>
       )}
@@ -201,11 +203,12 @@ export default function SocialScreen() {
                   <TextInput 
                     style={styles.searchInput} 
                     placeholder="Search name or email..." 
+                    placeholderTextColor="#BBAADD"
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />
                   <TouchableOpacity onPress={handleSearch}>
-                      <Ionicons name="search" size={24} color="#007AFF" />
+                      <Ionicons name="search" size={24} color="#FF9800" />
                   </TouchableOpacity>
               </View>
               <FlatList
@@ -223,12 +226,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    paddingTop: 60, // Add gap for Status Bar / Overlay
+    backgroundColor: '#342056', // Deep Purple
   },
   tabs: {
       flexDirection: 'row',
       marginBottom: 10,
-      backgroundColor: 'white',
+      backgroundColor: '#432874', // Lighter Purple
       borderRadius: 10,
       padding: 5,
   },
@@ -239,15 +243,15 @@ const styles = StyleSheet.create({
       borderRadius: 8,
   },
   activeTab: {
-      backgroundColor: '#e6f2ff',
+      backgroundColor: '#FF9800', // Gold for Active
   },
   tabText: {
-      color: '#666',
+      color: '#BBAADD', // Lavender Gray
       fontWeight: '600',
-      fontSize: 12, // smaller font to fit 4 tabs
+      fontSize: 12, 
   },
   activeTabText: {
-      color: '#007AFF',
+      color: '#FFF',
       fontWeight: 'bold',
   },
   subTabs: {
@@ -260,31 +264,35 @@ const styles = StyleSheet.create({
       paddingVertical: 6,
       paddingHorizontal: 16,
       borderRadius: 20,
-      backgroundColor: '#ddd',
+      backgroundColor: 'rgba(255,255,255,0.1)',
+      borderWidth: 1,
+      borderColor: '#5B4290',
   },
   activeSubTab: {
-      backgroundColor: '#007AFF',
+      backgroundColor: '#FF9800',
+      borderColor: '#FF9800',
   },
   subTabText: {
-      color: '#333',
+      color: '#BBAADD',
   },
   activeSubTabText: {
-      color: 'white',
+      color: '#FFF',
       fontWeight: 'bold',
   },
   card: {
-    backgroundColor: 'white',
+    backgroundColor: '#432874',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#5B4290',
   },
   myRankCard: {
       borderWidth: 2,
-      borderColor: '#007AFF',
-      backgroundColor: '#f0f8ff',
+      borderColor: '#FF9800',
+      backgroundColor: 'rgba(255, 152, 0, 0.1)',
   },
   rank: {
       fontSize: 16,
@@ -292,23 +300,24 @@ const styles = StyleSheet.create({
       marginRight: 10,
       width: 30,
       textAlign: 'center',
-      color: '#666',
+      color: '#FFD700', // Gold
   },
   name: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#FFF',
   },
   level: {
-      color: '#666',
+      color: '#BBAADD',
       fontSize: 14,
   },
   exp: {
       fontSize: 14,
       fontWeight: '600',
-      color: '#666',
+      color: '#FFD700',
   },
   addButton: {
-      backgroundColor: '#007AFF',
+      backgroundColor: '#FF9800',
       paddingVertical: 6,
       paddingHorizontal: 12,
       borderRadius: 5,
@@ -324,19 +333,22 @@ const styles = StyleSheet.create({
   },
   searchBox: {
       flexDirection: 'row',
-      backgroundColor: 'white',
+      backgroundColor: '#432874',
       padding: 10,
       borderRadius: 10,
       alignItems: 'center',
       marginBottom: 10,
+      borderWidth: 1,
+      borderColor: '#5B4290',
   },
   searchInput: {
       flex: 1,
       marginRight: 10,
+      color: '#FFF',
   },
   empty: {
       textAlign: 'center',
       marginTop: 20,
-      color: '#666',
+      color: '#BBAADD',
   }
 });

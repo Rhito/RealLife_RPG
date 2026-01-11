@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 export default function ResetPasswordScreen() {
   const [password, setPassword] = useState('');
@@ -12,13 +13,14 @@ export default function ResetPasswordScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { login } = useAuth();
+  const { showAlert } = useAlert();
 
   const token = params.token as string;
   const email = params.email as string;
 
   useEffect(() => {
     if (!token || !email) {
-      Alert.alert('Error', 'Invalid reset link', [
+      showAlert('Error', 'Invalid reset link', [
         { text: 'OK', onPress: () => router.replace('/login') }
       ]);
       return;
@@ -33,7 +35,7 @@ export default function ResetPasswordScreen() {
       await api.post('/verify-reset-token', { token, email });
       setVerifying(false);
     } catch (e: any) {
-      Alert.alert(
+      showAlert(
         'Invalid Link', 
         'This password reset link is invalid or has expired.',
         [{ text: 'OK', onPress: () => router.replace('/login') }]
@@ -43,17 +45,17 @@ export default function ResetPasswordScreen() {
 
   const handleResetPassword = async () => {
     if (!password || !passwordConfirmation) {
-      Alert.alert('Error', 'Please fill in all fields');
+      showAlert('Error', 'Please fill in all fields');
       return;
     }
 
     if (password !== passwordConfirmation) {
-      Alert.alert('Error', 'Passwords do not match');
+      showAlert('Error', 'Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
+      showAlert('Error', 'Password must be at least 8 characters');
       return;
     }
 
@@ -69,9 +71,9 @@ export default function ResetPasswordScreen() {
       // Auto-login after successful reset
       if (response.data?.data?.token) {
         await login(email, password);
-        Alert.alert('Success', 'Your password has been reset and you are now logged in!');
+        showAlert('Success', 'Your password has been reset and you are now logged in!');
       } else {
-        Alert.alert(
+        showAlert(
           'Success', 
           'Your password has been reset. Please login with your new password.',
           [{ text: 'OK', onPress: () => router.replace('/login') }]
@@ -80,7 +82,7 @@ export default function ResetPasswordScreen() {
     } catch (e: any) {
       console.error('Reset password error:', e);
       const errorMessage = e.response?.data?.message || e.message || 'Failed to reset password';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

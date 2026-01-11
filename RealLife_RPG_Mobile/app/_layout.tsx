@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { syncPushToken } from '../services/notifications';
+import '../i18n'; // Initialize i18n
 
 const InitialLayout = () => {
   const { user, isLoading } = useAuth();
@@ -55,12 +56,16 @@ const InitialLayout = () => {
   return <Slot />;
 };
 
+import { AlertProvider } from '../context/AlertContext';
+
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <StatusBar style="light" backgroundColor="#432874" />
-      <InitialLayout />
-    </AuthProvider>
+    <AlertProvider>
+      <AuthProvider>
+        <StatusBar style="light" backgroundColor="#432874" />
+        <InitialLayout />
+      </AuthProvider>
+    </AlertProvider>
   );
 }
 

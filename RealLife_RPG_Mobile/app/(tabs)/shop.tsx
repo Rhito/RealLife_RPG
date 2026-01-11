@@ -4,11 +4,13 @@ import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { fetchItems, fetchInventory, buyItem, useItem, Item, UserItem } from '../../services/shop';
 import { Ionicons } from '@expo/vector-icons';
+import { useAlert } from '../../context/AlertContext';
 
 type ViewMode = 'shop' | 'inventory';
 
 export default function ShopScreen() {
     const { user, setUser } = useAuth();
+    const { showAlert } = useAlert();
     const [mode, setMode] = useState<ViewMode>('shop');
     const [items, setItems] = useState<Item[]>([]);
     const [inventory, setInventory] = useState<UserItem[]>([]);
@@ -46,21 +48,21 @@ export default function ShopScreen() {
 
     const handleBuy = async (item: Item) => {
         if ((user?.coins || 0) < item.cost) {
-            Alert.alert('Not enough coins', 'Complete more tasks to earn coins!');
+            showAlert('Not enough coins', 'Complete more tasks to earn coins!');
             return;
         }
 
         try {
             const res = await buyItem(item.id);
             // Axios response structure: res.data is the payload
-            Alert.alert('Success', res.data.message);
+            showAlert('Success', res.data.message);
             // Update coins
             if (user) {
                 setUser({ ...user, coins: res.data.data.coins });
             }
         } catch (e: any) {
              const msg = e.response?.data?.message || 'Failed to buy item';
-             Alert.alert('Error', msg);
+             showAlert('Error', msg);
         }
     };
 
@@ -68,7 +70,7 @@ export default function ShopScreen() {
         try {
             const res = await useItem(userItem.id);
              // Axios response structure: res.data is the payload
-            Alert.alert('Used!', res.data.message);
+            showAlert('Used!', res.data.message);
             
             // Update user stats
             if (user && res.data.rewards) {
@@ -82,7 +84,7 @@ export default function ShopScreen() {
             loadData();
         } catch (e: any) {
             const msg = e.response?.data?.message || 'Failed to use item';
-            Alert.alert('Error', msg);
+            showAlert('Error', msg);
         }
     };
 

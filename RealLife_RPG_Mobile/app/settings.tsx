@@ -1,13 +1,14 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile } from '../services/profile';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAlert } from '../context/AlertContext';
+import { useTranslation } from 'react-i18next';
+import * as SecureStore from 'expo-secure-store';
 
-// Pre-defined avatars (using icons/emojis or placeholders only for now as per "simple" requirements, 
-// but to make it premium, let's use some cool gradient circles or image assets if available. 
-// For now, I'll use a set of urls or icon names.)
+// Pre-defined avatars
 const AVATARS = [
     'https://api.dicebear.com/7.x/avataaars/png?seed=Felix',
     'https://api.dicebear.com/7.x/avataaars/png?seed=Aneka',
@@ -20,25 +21,37 @@ const AVATARS = [
 export default function SettingsScreen() {
     const { user, setUser } = useAuth();
     const router = useRouter();
+    const { showAlert } = useAlert();
+    const { t, i18n } = useTranslation();
+    
     const [name, setName] = useState(user?.name || '');
     const [avatar, setAvatar] = useState(user?.avatar || AVATARS[0]);
     const [loading, setLoading] = useState(false);
 
+    const changeLanguage = async (lang: string) => {
+        try {
+            await i18n.changeLanguage(lang);
+            await SecureStore.setItemAsync('user-language', lang);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     const handleSave = async () => {
         if (!name) {
-            Alert.alert('Error', 'Name is required');
+            showAlert(t('common.error'), 'Name is required');
             return;
         }
         setLoading(true);
         try {
-            const res = await updateProfile({ name, avatar });
+            await updateProfile({ name, avatar });
             if (user) {
                 setUser({ ...user, name, avatar });
             }
-            Alert.alert('Success', 'Profile updated!');
+            showAlert(t('common.success'), 'Profile updated!');
             router.back();
         } catch (e: any) {
-            Alert.alert('Error', e.message);
+            showAlert(t('common.error'), e.message);
         } finally {
             setLoading(false);
         }
@@ -47,14 +60,23 @@ export default function SettingsScreen() {
     return (
         <ScrollView style={styles.container}>
              <TouchableOpacity style={styles.headerBackButton} onPress={() => router.back()}>
-                <Ionicons name="arrow-back" size={24} color="#333" />
+                <Ionicons name="arrow-back" size={24} color="#FFF" />
             </TouchableOpacity>
+
+            <Text style={styles.sectionTitle}>{t('settings.profile')}</Text>
+            
+            <Text style={styles.label}>{t('auth.email')}</Text>
+            <View style={styles.readOnlyInput}>
+                <Text style={styles.readOnlyText}>{user?.email}</Text>
+            </View>
+
             <Text style={styles.label}>Display Name</Text>
             <TextInput 
                 style={styles.input} 
                 value={name} 
                 onChangeText={setName} 
-                placeholder="Your Name" 
+                placeholder="Your Name"
+                placeholderTextColor="#BBAADD"
             />
 
             <Text style={styles.label}>Choose Avatar</Text>
@@ -84,8 +106,24 @@ export default function SettingsScreen() {
                  </View>
             </View>
 
+            <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+            <View style={styles.langContainer}>
+                <TouchableOpacity 
+                    style={[styles.langButton, i18n.language === 'en' && styles.selectedLang]}
+                    onPress={() => changeLanguage('en')}
+                >
+                    <Text style={[styles.langText, i18n.language === 'en' && styles.selectedLangText]}>English</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.langButton, i18n.language === 'vi' && styles.selectedLang]}
+                    onPress={() => changeLanguage('vi')}
+                >
+                    <Text style={[styles.langText, i18n.language === 'vi' && styles.selectedLangText]}>Tiếng Việt</Text>
+                </TouchableOpacity>
+            </View>
+
             <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
-                <Text style={styles.saveButtonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
+                <Text style={styles.saveButtonText}>{loading ? t('common.loading') : t('common.save')}</Text>
             </TouchableOpacity>
         </ScrollView>
     );
@@ -95,22 +133,43 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#342056',
+        paddingTop: 60,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#FF9800',
+        marginBottom: 15,
+        marginTop: 10,
     },
     label: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 8,
         marginTop: 10,
-        color: '#333',
+        color: '#E0E7FF',
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: '#432874',
         padding: 15,
         borderRadius: 12,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#eee',
+        borderColor: '#5B4290',
+        fontSize: 16,
+        color: '#FFF',
+    },
+    readOnlyInput: {
+        backgroundColor: '#2D1B4E',
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
+    readOnlyText: {
+        color: '#888',
         fontSize: 16,
     },
     avatarGrid: {
@@ -126,20 +185,20 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
     },
     selectedAvatar: {
-        borderColor: '#007AFF',
+        borderColor: '#FF9800',
     },
     avatarImage: {
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#ddd',
+        backgroundColor: '#432874',
     },
     previewContainer: {
         marginTop: 10,
         marginBottom: 30,
     },
     previewLabel: {
-        color: '#666',
+        color: '#BBAADD',
         fontSize: 12,
         marginBottom: 5,
         textAlign: 'center',
@@ -147,37 +206,60 @@ const styles = StyleSheet.create({
     previewCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: '#432874',
         padding: 20,
         borderRadius: 15,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: '#5B4290',
     },
     previewAvatar: {
         width: 50,
         height: 50,
         borderRadius: 25,
         marginRight: 15,
-        backgroundColor: '#eee',
+        backgroundColor: '#333',
     },
     previewName: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#FFF',
     },
     previewLevel: {
-        color: '#666',
+        color: '#FFD700',
         fontSize: 14,
     },
+    langContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        marginBottom: 30,
+    },
+    langButton: {
+        flex: 1,
+        padding: 12,
+        backgroundColor: '#432874',
+        borderRadius: 10,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#5B4290',
+    },
+    selectedLang: {
+        backgroundColor: '#FF9800',
+        borderColor: '#FF9800',
+    },
+    langText: {
+        color: '#E0E7FF',
+        fontWeight: '600',
+    },
+    selectedLangText: {
+        color: '#FFF',
+        fontWeight: 'bold',
+    },
     saveButton: {
-        backgroundColor: '#007AFF',
+        backgroundColor: '#FF9800',
         padding: 18,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#007AFF',
+        shadowColor: '#FF9800',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -189,10 +271,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     headerBackButton: {
-        marginBottom: 20,
+        marginBottom: 10,
         padding: 8,
         alignSelf: 'flex-start',
-        backgroundColor: 'rgba(0,0,0,0.05)',
+        backgroundColor: '#432874',
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#5B4290',
     }
 });
