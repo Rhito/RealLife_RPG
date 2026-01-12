@@ -9,4 +9,5 @@ enum TaskType: string
     case HABIT = 'habit';
     case WEEKLY = 'weekly';
     case MONTHLY = 'monthly';
+    case TODO = 'todo';
 }
