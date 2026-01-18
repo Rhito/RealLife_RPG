@@ -20,6 +20,14 @@ export function AlertProvider({ children }: { children: ReactNode }) {
   const [buttons, setButtons] = useState<AlertButton[]>([]);
 
   const showAlert = (newTitle: string, newMessage: string, newButtons?: AlertButton[]) => {
+    // Suppress network errors as we have a dedicated banner
+    if (
+        newTitle === 'Error' && 
+        (newMessage === 'Network Error' || newMessage.includes('Network request failed'))
+    ) {
+        return;
+    }
+
     setTitle(newTitle);
     setMessage(newMessage);
     setButtons(newButtons || []);

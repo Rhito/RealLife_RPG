@@ -72,12 +72,18 @@ class AnalyticsController extends Controller
         }
 
         // 3. Rank
-        $rank = User::where('level', '>', $user->level)
-            ->orWhere(function ($query) use ($user) {
-                $query->where('level', $user->level)
-                    ->where('exp', '>', $user->exp);
-            })
-            ->count() + 1;
+        $rank = User::where(function ($query) use ($user) {
+            $query->where('level', '>', $user->level)
+                  ->orWhere(function ($q) use ($user) {
+                      $q->where('level', $user->level)
+                        ->where('exp', '>', $user->exp);
+                  })
+                  ->orWhere(function ($q) use ($user) {
+                      $q->where('level', $user->level)
+                        ->where('exp', $user->exp)
+                        ->where('id', '<', $user->id); // Tie breaker: Lower ID = Better Rank
+                  });
+        })->count() + 1;
 
         return response()->json([
             'streak' => $streak,

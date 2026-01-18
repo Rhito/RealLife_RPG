@@ -1,42 +1,81 @@
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { syncPushToken } from '../services/notifications';
+import * as SecureStore from 'expo-secure-store';
 
 const InitialLayout = () => {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
+  const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !rootNavigationState?.key) return;
+
+    const checkTutorial = async () => {
+        try {
+             // Only check for logged in users
+             if (user) {
+                 const hasSeen = await SecureStore.getItemAsync('HAS_SEEN_TUTORIAL');
+                 if (hasSeen !== 'true') {
+                     // Check if we are already there to avoid loop (though replace works fine)
+                     if (segments[0] !== 'tutorial') {
+                         router.replace('/tutorial');
+                     }
+                     return; 
+                 }
+             }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const inTabsGroup = segments[0] === '(tabs)';
-
-    console.log('User state changed', { user: !!user, inTabsGroup });
+    console.log('User state changed', { user: !!user, inTabsGroup, segment: segments[0] });
 
     if (user && !inTabsGroup) {
       if (!user.email_verified_at && segments[0] !== 'verify-email') {
           router.replace('/verify-email');
       } else if (user.email_verified_at) {
-          // Only redirect to tabs if we are on login, register, or root
+          // Check tutorial ONLY if we are heading to tabs/index from a Public route
+          // OR if we are explicitly checking on mount.
+          // BUT, we need to allow 'tutorial' to be a valid route.
+          
+          if (segments[0] === 'tutorial') return; // Stay on tutorial
+
           const ispublicRoute = ['login', 'register', 'index', ''].includes(segments[0] || '');
           if (ispublicRoute) {
-               router.replace('/(tabs)');
+               checkTutorial().then(() => {
+                   // If checkTutorial didn't redirect, we go to tabs
+                   // Wait, checkTutorial is async. We might have a race condition.
+                   // Let's rely on the checkTutorial inside the effect for "first load" logic.
+                   // But here we are redirecting to tabs immediately.
+                   
+                   // Better logic: Always go to tabs, let tabs/index check? 
+                   // No, global layout is better.
+                   
+                   // Let's do:
+                   SecureStore.getItemAsync('HAS_SEEN_TUTORIAL').then(hasSeen => {
+                       if (hasSeen !== 'true') {
+                           router.replace('/tutorial');
+                       } else {
+                           router.replace('/(tabs)');
+                       }
+                   });
+               });
           }
       }
     } else if (!user && !['login', 'register', 'index', 'forgot-password', 'reset-password'].includes(segments[0] || '')) {
-         // If user is not logged in and tries to access a protected route (like verify-email), redirect to login
          router.replace('/login');
     } else if (user && inTabsGroup && !user.email_verified_at) {
-        // If they are inside tabs but unverified (e.g. state refresh), kick them out
         router.replace('/verify-email');
     } else if (!user && inTabsGroup) {
       router.replace('/login');
     }
-  }, [user, isLoading, segments]);
+  }, [user, isLoading, segments, rootNavigationState?.key]);
 
   useEffect(() => {
       if (user) {
@@ -52,17 +91,35 @@ const InitialLayout = () => {
     );
   }
 
-  return <Slot />;
+  return null; // InitialLayout now only handles logic, Stack is moved to RootLayout
 };
 
 import { AlertProvider } from '../context/AlertContext';
+import { NetworkStatus } from '../components/NetworkStatus';
+import { TourProvider } from '../context/TourContext';
+import { TourOverlay } from '../components/TourOverlay';
 
 export default function RootLayout() {
   return (
     <AuthProvider>
       <AlertProvider>
-        <StatusBar style="light" backgroundColor="#432874" />
-        <InitialLayout />
+        <TourProvider>
+            <StatusBar style="light" backgroundColor="#432874" />
+            <InitialLayout />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="login" />
+              <Stack.Screen name="register" />
+              <Stack.Screen name="forgot-password" />
+              <Stack.Screen name="reset-password" />
+              <Stack.Screen name="verify-email" />
+              <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />
+            </Stack>
+            <NetworkStatus />
+            <TourOverlay />
+        </TourProvider>
       </AlertProvider>
     </AuthProvider>
   );

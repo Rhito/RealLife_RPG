@@ -20,11 +20,11 @@ const AVATARS = [
 ];
 
 export default function SettingsScreen() {
-    const { user, setUser } = useAuth();
+    const { user, updateUser } = useAuth();
     const router = useRouter();
     const { showAlert } = useAlert();
     const [name, setName] = useState(user?.name || '');
-    const [avatar, setAvatar] = useState(user?.avatar || AVATARS[0]);
+    const [avatar, setAvatar] = useState<string | null>(user?.avatar || null);
     const [loading, setLoading] = useState(false);
 
     const handleSave = async () => {
@@ -36,7 +36,7 @@ export default function SettingsScreen() {
         try {
             const res = await updateProfile({ name, avatar });
             if (user) {
-                setUser({ ...user, name, avatar });
+                await updateUser({ ...user, name, avatar });
             }
             showAlert('Success', 'Profile updated!');
             router.back();
@@ -62,6 +62,19 @@ export default function SettingsScreen() {
 
             <Text style={styles.label}>Choose Avatar</Text>
             <View style={styles.avatarGrid}>
+                 {/* Default / Initials Option */}
+                <TouchableOpacity 
+                    onPress={() => setAvatar(null)}
+                    style={[
+                        styles.avatarOption, 
+                        !avatar && styles.selectedAvatar
+                    ]}
+                >
+                    <View style={[styles.avatarImage, { backgroundColor: '#6C5CE7', justifyContent: 'center', alignItems: 'center' }]}>
+                         <Text style={{ color: 'white', fontWeight: 'bold' }}>{name ? name.substring(0, 2).toUpperCase() : '?'}</Text>
+                    </View>
+                </TouchableOpacity>
+
                 {AVATARS.map((url, index) => (
                     <TouchableOpacity 
                         key={index} 
@@ -89,6 +102,13 @@ export default function SettingsScreen() {
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
                 <Text style={styles.saveButtonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={[styles.saveButton, { marginTop: 10, backgroundColor: '#6C5CE7', marginBottom: 40 }]} 
+                onPress={() => router.push('/tutorial')}
+            >
+                <Text style={styles.saveButtonText}>Replay Tutorial</Text>
             </TouchableOpacity>
         </ScrollView>
     );

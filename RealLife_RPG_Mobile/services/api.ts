@@ -34,15 +34,25 @@ api.interceptors.request.use(async (config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+      // If we had a previous error, maybe we are back online?
+      // simple naive check: every success means online.
+      // To avoid spamming, the emitter could handle checking if value changed, but component does state diff too.
+      // Importing locally to avoid cyclic deps if any (though utils is safe)
+      const { networkEvents } = require('../utils/networkEventEmitter');
+      networkEvents.emitStatus(true);
+      return response;
+  },
   (error) => {
-    /* console.error('[API Error]', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    }); */
+    const { networkEvents } = require('../utils/networkEventEmitter');
+    
+    // Check for network error
+    if (error.message === 'Network Error' || error.code === 'ERR_NETWORK' || !error.response) {
+         networkEvents.emitStatus(false);
+         // Reject with a special flag so AlertContext can ignore it
+         error.isNetworkError = true; 
+    }
+    
     return Promise.reject(error);
   }
 );

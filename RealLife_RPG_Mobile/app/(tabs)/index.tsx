@@ -4,7 +4,9 @@ import { useCallback, useState } from 'react';
 import { fetchProfileStats, UserStats } from '../../services/profile';
 import { fetchAnalytics, AnalyticsData } from '../../services/analytics';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, Link } from 'expo-router';
+import { Avatar } from '../../components/Avatar';
+import { TourTarget } from '../../components/TourTarget';
 import { Card } from '../../components/Card';
 import { AnalyticsChart } from '../../components/AnalyticsChart';
 import { StatBadge } from '../../components/StatBadge';
@@ -33,6 +35,7 @@ export default function Dashboard() {
       {/* Hero Header */}
       <View style={styles.headerBackground}>
           <View style={styles.headerContent}>
+            {/* Header / Profile Summary */}
             <View style={styles.topRow}>
                 <View>
                     <Text style={styles.greeting}>Welcome back,</Text>
@@ -45,10 +48,17 @@ export default function Dashboard() {
 
             <View style={styles.heroProfile}>
                 <View style={styles.avatarContainer}>
-                    <Image 
-                        source={{ uri: user?.avatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=Felix' }} 
-                        style={styles.avatar} 
-                    />
+                    <Link href="/settings" asChild>
+                        <TouchableOpacity>
+                            <TourTarget id="avatar">
+                                <Avatar
+                                    name={user?.name}
+                                    image={user?.avatar}
+                                    size={50}
+                                />
+                            </TourTarget>
+                        </TouchableOpacity>
+                    </Link>
                     <View style={styles.levelBadge}>
                         <Text style={styles.levelText}>{stats?.level ?? user?.level ?? 1}</Text>
                     </View>

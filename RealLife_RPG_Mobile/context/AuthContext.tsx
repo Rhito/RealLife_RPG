@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: any) => void;
+  updateUser: (user: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -104,8 +105,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await deleteItem('user');
   };
 
+  const updateUser = async (userData: any) => {
+    setUser(userData);
+    await saveItem('user', JSON.stringify(userData));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, setUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, setUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

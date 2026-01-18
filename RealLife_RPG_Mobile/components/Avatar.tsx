@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { View, Text, Image, StyleSheet, StyleProp, ViewStyle, ImageStyle } from 'react-native';
 
 interface AvatarProps {
   name?: string;
@@ -42,7 +42,7 @@ export const Avatar: React.FC<AvatarProps> = ({ name, image, size = 40, style })
         style={[
           styles.image,
           { width: size, height: size, borderRadius: size / 2 },
-          style,
+          style as StyleProp<ImageStyle>,
         ]}
       />
     );

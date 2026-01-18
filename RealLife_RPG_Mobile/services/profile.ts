@@ -1,6 +1,16 @@
 import api from '@/services/api';
 import { Item } from './items';
 
+// User definition moved from friends.ts
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    level: number;
+    exp: number;
+    avatar?: string;
+}
+
 export interface FeedItem {
   id: number;
   activity_type: string;
@@ -60,14 +70,15 @@ export const fetchProfileStats = async () => {
     }
 }
 
-export const updateProfile = async (data: { name: string; avatar?: string }) => {
-    try {
-        const response = await api.post('/profile', data);
-        return response.data;
-    } catch (error: any) {
-        throw error.response?.data || error.message;
-    }
+export interface UpdateProfileData {
+  name?: string;
+  avatar?: string | null;
 }
+
+export const updateProfile = async (data: UpdateProfileData): Promise<User> => {
+    const res = await api.post<User>('/profile', data);
+    return res.data;
+};
 
 export const getUserProfile = async (id: number) => {
     try {

@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b32ea6ae-1294-48e4-a4b5-6ab84cb65d6e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/Item/ItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Controllers/DashBoard/Item/ItemController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Http/Requests/Item/ItemRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Http/Requests/Item/ItemRequest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Policies/TaskPolicy.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Policies/TaskPolicy.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Item/ItemRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Repositories/Item/ItemRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealLife_RPG/app/Services/Dashboard/Item/ItemService.php" beforeDir="false" afterPath="$PROJECT_DIR$/RealLife_RPG/app/Services/Dashboard/Item/ItemService.php" afterDir="false" />
-    </list>
+    <list default="true" id="b32ea6ae-1294-48e4-a4b5-6ab84cb65d6e" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -286,6 +280,7 @@
       <workItem from="1763174321660" duration="5434000" />
       <workItem from="1763345373764" duration="2582000" />
       <workItem from="1764907007193" duration="9000" />
+      <workItem from="1768365814335" duration="7000" />
     </task>
     <servers />
   </component>

@@ -15,6 +15,7 @@ class LeaderboardController extends Controller
         // Global Leaderboard: Top 50 by Level DESC, EXP DESC
         $users = User::orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
+            ->orderBy('id', 'asc') // Consistent tie-breaking
             ->limit(50)
             ->get(['id', 'name', 'level', 'exp', 'avatar']);
 
@@ -43,6 +44,7 @@ class LeaderboardController extends Controller
         $users = User::whereIn('id', $friendIds)
             ->orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
+            ->orderBy('id', 'asc')
             ->get(['id', 'name', 'level', 'exp', 'avatar']);
 
         return response()->json(['data' => $users]);

@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { TourTarget } from '../../components/TourTarget';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 
@@ -44,7 +45,11 @@ export default function TabLayout() {
         options={{
           headerShown: false, // Tasks screen has its own custom header/tabs
           title: 'Quests',
-          tabBarIcon: ({ color }) => <Ionicons name="document-text" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TourTarget id="tab_tasks">
+                <Ionicons name="document-text" size={24} color={color} />
+            </TourTarget>
+          ),
         }}
       />
       <Tabs.Screen
@@ -52,7 +57,11 @@ export default function TabLayout() {
         options={{
           headerShown: false,
           title: 'Market',
-          tabBarIcon: ({ color }) => <Ionicons name="basket" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TourTarget id="tab_shop">
+                <Ionicons name="basket" size={24} color={color} />
+            </TourTarget>
+          ),
         }}
       />
       {/* Hidden tabs or secondary tabs can go to "More" or keep them if space permits. 
@@ -90,7 +99,11 @@ export default function TabLayout() {
         options={{
           title: 'Guild', // Social -> Guild
           headerShown: false, // Let Stack handle header
-          tabBarIcon: ({ color }) => <Ionicons name="people" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TourTarget id="tab_friends">
+                <Ionicons name="people" size={24} color={color} />
+            </TourTarget>
+          ),
         }}
       />
     </Tabs>

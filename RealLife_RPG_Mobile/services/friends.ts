@@ -1,13 +1,6 @@
 import api from './api';
 
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    level: number;
-    exp: number;
-    avatar?: string;
-}
+import { User } from './profile';
 
 export interface Friendship {
     id: number;
