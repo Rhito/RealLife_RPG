@@ -4,9 +4,10 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask } from '../../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { TourTarget } from '../../../components/TourTarget';
 import { Card } from '../../../components/Card';
 import { useAlert } from '../../../context/AlertContext';
-import { TourTarget } from '../../../components/TourTarget';
 
 const { width } = Dimensions.get('window');
 
@@ -315,11 +316,9 @@ export default function TasksScreen() {
        />
 
         {/* FAB */}
-         <TouchableOpacity onPress={() => router.push('/tasks/create')} style={styles.fab}>
-             <TourTarget id="add_task_btn">
-                <Ionicons name="add" size={32} color="#432874" />
-             </TourTarget>
-         </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/tasks/create')} style={styles.fab}>
+             <Ionicons name="add" size={32} color="#432874" />
+        </TouchableOpacity>
     </View>
   );
 }

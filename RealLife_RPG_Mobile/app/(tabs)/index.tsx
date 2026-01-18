@@ -1,24 +1,27 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { fetchProfileStats, UserStats } from '../../services/profile';
 import { fetchAnalytics, AnalyticsData } from '../../services/analytics';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useFocusEffect, Link } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Avatar } from '../../components/Avatar';
-import { TourTarget } from '../../components/TourTarget';
 import { Card } from '../../components/Card';
 import { AnalyticsChart } from '../../components/AnalyticsChart';
 import { StatBadge } from '../../components/StatBadge';
+import { TourTarget } from '../../components/TourTarget';
+import { useTour } from '../../context/TourContext';
 
 const { width } = Dimensions.get('window');
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const { startTour } = useTour();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
-  
+  const [checkingTour, setCheckingTour] = useState(true);
+
   useFocusEffect(
     useCallback(() => {
         if (user?.id) {
@@ -27,6 +30,34 @@ export default function Dashboard() {
         }
     }, [user?.id])
   );
+
+  useEffect(() => {
+    const checkTour = async () => {
+        // Simple delay to ensure layout is ready
+        setTimeout(async () => {
+             // We can check if we should start it.
+            // For now, let's just start it if it works in context? 
+            // The Context should handle persistence? 
+            // Actually context as written just exposes startTour.
+            // We should check storage here.
+            try {
+                // Import SecureStore locally or use a helper? 
+                // Context uses it, maybe context should expose a "checkAndStart"
+                // But context is pure logic.
+                
+                // Let's rely on manual start for now or check here.
+                const { getItemAsync } = require('expo-secure-store');
+                const hasSeen = await getItemAsync('HAS_SEEN_INTERACTIVE_TOUR');
+                if (!hasSeen) {
+                    startTour();
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        }, 1000);
+    };
+    checkTour();
+  }, []);
 
 
 
@@ -39,7 +70,7 @@ export default function Dashboard() {
             <View style={styles.topRow}>
                 <View>
                     <Text style={styles.greeting}>Welcome back,</Text>
-                    <Text style={styles.username}>{user?.name || 'Hero'}</Text>
+                    {/* UserAvatar removed as per instruction, TourTarget moved */}
                 </View>
                 <TouchableOpacity onPress={() => router.push('/settings')} style={styles.settingsButton}>
                     <Ionicons name="settings-outline" size={24} color="#fff" />
@@ -48,17 +79,14 @@ export default function Dashboard() {
 
             <View style={styles.heroProfile}>
                 <View style={styles.avatarContainer}>
-                    <Link href="/settings" asChild>
-                        <TouchableOpacity>
-                            <TourTarget id="avatar">
-                                <Avatar
-                                    name={user?.name}
-                                    image={user?.avatar}
-                                    size={50}
-                                />
-                            </TourTarget>
-                        </TouchableOpacity>
-                    </Link>
+                    <TourTarget name="avatar">
+                        <Avatar 
+                            name={user?.name}
+                            image={user?.avatar}
+                            size={80}
+                            style={styles.avatar} 
+                        />
+                    </TourTarget>
                     <View style={styles.levelBadge}>
                         <Text style={styles.levelText}>{stats?.level ?? user?.level ?? 1}</Text>
                     </View>

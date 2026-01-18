@@ -91,7 +91,19 @@ const InitialLayout = () => {
     );
   }
 
-  return null; // InitialLayout now only handles logic, Stack is moved to RootLayout
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="register" />
+      <Stack.Screen name="forgot-password" />
+      <Stack.Screen name="reset-password" />
+      <Stack.Screen name="verify-email" />
+      <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />
+    </Stack>
+  );
 };
 
 import { AlertProvider } from '../context/AlertContext';
@@ -103,23 +115,10 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AlertProvider>
-        <TourProvider>
-            <StatusBar style="light" backgroundColor="#432874" />
-            <InitialLayout />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="login" />
-              <Stack.Screen name="register" />
-              <Stack.Screen name="forgot-password" />
-              <Stack.Screen name="reset-password" />
-              <Stack.Screen name="verify-email" />
-              <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />
-            </Stack>
-            <NetworkStatus />
-            <TourOverlay />
-        </TourProvider>
+        <StatusBar style="light" backgroundColor="#432874" />
+        <InitialLayout />
+
+        <NetworkStatus />
       </AlertProvider>
     </AuthProvider>
   );

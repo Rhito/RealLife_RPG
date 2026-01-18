@@ -1,85 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useTour } from '../context/TourContext';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
 export const TourOverlay = () => {
-    const { currentStep, activeStepData, targets, nextStep, stopTour } = useTour();
+    const { activeStep, targets, nextStep, stopTour } = useTour();
+
+    if (!activeStep) return null;
+
+    const targetVal = targets[activeStep.id];
     
-    if (!currentStep || !activeStepData) return null;
+    // If target is not yet registered/measured (e.g. screen transition), show generic or wait
+    if (!targetVal) return null; 
 
-    const targetLayout = targets[activeStepData.targetId];
-    
-    // If target isn't visible/measured yet, maybe show nothing or a loader?
-    // We'll just hide for now until it pops in.
-    if (!targetLayout) return null;
+    // Calculate holes and tooltip position
+    // For simplicity, we just use 4 partial views to create a "hole" or use a full SVG mask.
+    // React Native doesn't have easy masking without libraries like skia/svg.
+    // Simple approach: 4 semi-transparent views around the target rect.
 
-    const { x, y, width: tWidth, height: tHeight } = targetLayout;
+    const topHeight = targetVal.y;
+    const bottomHeight = height - (targetVal.y + targetVal.height);
+    const leftWidth = targetVal.x;
+    const rightWidth = width - (targetVal.x + targetVal.width);
 
-    // Calculate tooltip position (above or below target)
-    const isBottomHalf = y > height / 2;
-    const tooltipTop = isBottomHalf ? y - 160 : y + tHeight + 20;
+    // Tooltip position (above or below)
+    const showTop = activeStep.position === 'top' || (targetVal.y > 150);
+    const tooltipTop = showTop 
+        ? targetVal.y - 120 
+        : targetVal.y + targetVal.height + 20;
 
     return (
-        <Modal transparent visible={!!currentStep} animationType="fade">
+        <Modal transparent animationType="fade" visible={!!activeStep}>
             <View style={styles.container}>
-                {/* 
-                   We need to draw 4 rectangles to dim the screen AROUND the target.
-                   Top, Bottom, Left of target, Right of target.
-                */}
-                
-                {/* Top Dim */}
-                <View style={[styles.dim, { top: 0, left: 0, right: 0, height: y }]} />
-                
-                {/* Bottom Dim */}
-                <View style={[styles.dim, { top: y + tHeight, left: 0, right: 0, bottom: 0 }]} />
-                
-                {/* Left Dim */}
-                <View style={[styles.dim, { top: y, left: 0, width: x, height: tHeight }]} />
-                
-                {/* Right Dim */}
-                <View style={[styles.dim, { top: y, left: x + tWidth, right: 0, height: tHeight }]} />
+                {/* Mask Views */}
+                <View style={[styles.mask, { top: 0, height: topHeight, width: width, left: 0 }]} />
+                <View style={[styles.mask, { bottom: 0, height: bottomHeight, width: width, left: 0 }]} />
+                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: leftWidth, left: 0 }]} />
+                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: rightWidth, right: 0 }]} />
 
-                {/* Spotlight Border (Optional) */}
-                <View 
-                    style={[
-                        styles.spotlight, 
-                        { top: y - 4, left: x - 4, width: tWidth + 8, height: tHeight + 8 }
-                    ]} 
-                    pointerEvents="none" 
-                />
+                {/* Highlight Border */}
+                <View style={[
+                    styles.highlight, 
+                    { 
+                        top: targetVal.y - 4, 
+                        left: targetVal.x - 4, 
+                        width: targetVal.width + 8, 
+                        height: targetVal.height + 8,
+                        borderRadius: (targetVal.width > 50) ? 12 : targetVal.width / 2 
+                    }
+                ]} />
 
-                {/* Tooltip Bubble */}
+                {/* Tooltip */}
                 <View style={[styles.tooltip, { top: tooltipTop, left: 20, right: 20 }]}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>Quick Tip</Text>
+                    <Text style={styles.tooltipText}>{activeStep.text}</Text>
+                    <View style={styles.buttons}>
                         <TouchableOpacity onPress={stopTour}>
-                            <Ionicons name="close" size={20} color="#999" />
+                            <Text style={styles.skipText}>Close Tour</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.nextButton} onPress={nextStep}>
+                            <Text style={styles.nextText}>Next</Text>
+                            <Ionicons name="arrow-forward" color="white" size={16} />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.text}>{activeStepData.text}</Text>
-                    
-                    <TouchableOpacity style={styles.button} onPress={nextStep}>
-                        <Text style={styles.buttonText}>
-                            {activeStepData.next ? 'Next' : 'Finish'}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {/* Arrow Pointer */}
-                    <View style={[
-                        styles.arrow, 
-                        isBottomHalf ? { bottom: -10, borderTopColor: 'white' } : { top: -10, borderBottomColor: 'white' }
-                    ]} />
                 </View>
-                
-                {/* Allow tapping the target through? 
-                    Actually, for a strict tour, usually we block interaction unless the user follows the instruction.
-                    But for this "Next" button flow, we can just let them click Next.
-                    If we want them to click the BUTTON to proceed, that's harder to coordinate.
-                    Let's stick to "Next" button on tooltip for simplicity and robustness.
-                */}
             </View>
         </Modal>
     );
@@ -88,71 +72,57 @@ export const TourOverlay = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        zIndex: 9999,
     },
-    dim: {
+    mask: {
         position: 'absolute',
         backgroundColor: 'rgba(0,0,0,0.7)',
     },
-    spotlight: {
+    highlight: {
         position: 'absolute',
-        borderColor: 'white',
         borderWidth: 2,
-        borderRadius: 8,
-        borderStyle: 'dashed',
+        borderColor: '#FFD700', // Gold color
+        backgroundColor: 'transparent',
+        // boxShadow equivalent for glow?
     },
     tooltip: {
         position: 'absolute',
         backgroundColor: 'white',
-        borderRadius: 12,
         padding: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
         shadowOpacity: 0.3,
-        shadowRadius: 8,
+        shadowRadius: 10,
         elevation: 10,
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 14,
-        color: '#6C5CE7',
-        textTransform: 'uppercase',
-    },
-    text: {
-        color: '#333',
+    tooltipText: {
         fontSize: 16,
-        marginBottom: 20,
+        color: '#333',
+        marginBottom: 15,
         lineHeight: 22,
     },
-    button: {
-        backgroundColor: '#6C5CE7',
-        paddingVertical: 12,
-        borderRadius: 8,
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
     },
-    buttonText: {
+    skipText: {
+        color: '#999',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    nextButton: {
+        backgroundColor: '#6C5CE7',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+    },
+    nextText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 16,
-    },
-    arrow: {
-        position: 'absolute',
-        left: '50%',
-        marginLeft: -10,
-        width: 0,
-        height: 0,
-        borderLeftWidth: 10,
-        borderRightWidth: 10,
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
-        borderStyle: 'solid',
-        borderBottomWidth: 10, // Default pointing up
-        borderTopWidth: 10,    // Default pointing down
-        borderTopColor: 'transparent',
-        borderBottomColor: 'transparent',
     }
 });
