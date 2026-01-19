@@ -11,11 +11,17 @@ export interface Message {
 }
 
 export const getMessages = async (friendId: number): Promise<Message[]> => {
+    if (friendId === 0) return []; // No history for AI yet
     const response = await api.get(`/messages/${friendId}`);
     return response.data;
 };
 
 export const sendMessage = async (friendId: number, content: string): Promise<Message> => {
+    if (friendId === 0) {
+        // Chat with AI
+        const response = await api.post('/ai/chat', { content });
+        return response.data;
+    }
     const response = await api.post(`/messages/${friendId}`, { content });
     return response.data;
 };

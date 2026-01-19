@@ -33,7 +33,16 @@ export default function SocialScreen() {
         try {
             if (tab === 'friends') {
                 const res = await fetchFriends();
-                setFriends(res.data);
+                // Add Gemini AI as a pinned friend
+                const geminiBot: User = { 
+                    id: 0, 
+                    name: 'Gemini AI', 
+                    email: 'ai@gemini.google', 
+                    level: 999, 
+                    exp: 0, 
+                    avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' // We might need a local asset or handle this in Avatar component
+                };
+                setFriends([geminiBot, ...res.data]);
             } else if (tab === 'requests') {
                 const res = await fetchRequests();
                 setRequests(res.data);

@@ -31,6 +31,10 @@ export default function ChatScreen() {
 
     useEffect(() => {
         fetchMessages();
+        
+        // Disable polling for AI Bot (ID 0) as it has no persistence/history yet
+        if (friendId === 0) return;
+
         // Poll for new messages every 5 seconds (temporary solution until websockets)
         const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
@@ -38,14 +42,45 @@ export default function ChatScreen() {
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;
+        
+        const contentToSend = newMessage;
+        setNewMessage(''); // Clear input immediately for better UX
         setSending(true);
+
+        // Optimistic update for User's message
+        // (Required for AI chat since backend doesn't return the user's msg, 
+        // and good for normal chat too)
+        const optimisticMsg: Message = {
+            id: Date.now(),
+            sender_id: useAuth().user?.id || 999,
+            receiver_id: friendId,
+            content: contentToSend,
+            read_at: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+
+        if (friendId === 0) {
+            setMessages(prev => [...prev, optimisticMsg]);
+        }
+
         try {
-            const message = await sendMessage(friendId, newMessage);
-            setMessages([...messages, message]);
-            setNewMessage('');
+            const message = await sendMessage(friendId, contentToSend);
+            
+            if (friendId === 0) {
+                // For AI, the response is the AI's reply
+                setMessages(prev => [...prev, message]);
+            } else {
+                // For normal chat, the response is the saved message
+                // We reload to ensure sync or replace optimistic
+                // For now, simpler to just fetch or append if valid
+                setMessages(prev => [...prev, message]);
+            }
+
             // Scroll to bottom
             setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
         } catch (error: any) {
+             // Remove optimistic message on fail if strictly managing state
             showAlert('Error', error.message || 'Failed to send message');
         } finally {
             setSending(false);
