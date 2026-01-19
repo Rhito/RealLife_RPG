@@ -105,6 +105,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/messages/{id}', [\App\Http\Controllers\User\MessageController::class, 'store']);
         
         // AI Chat
+        Route::get('/ai/profile', [\App\Http\Controllers\User\AiChatController::class, 'index']);
         Route::post('/ai/chat', [\App\Http\Controllers\User\AiChatController::class, 'chat']);
         
         Route::get('/logout', [AuthenticatedController::class, 'logout'])->name('v1.logout');
