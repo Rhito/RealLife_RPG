@@ -7,7 +7,7 @@ import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ChatScreen() {
-    const { id, name } = useLocalSearchParams();
+    const { id, name, isAi } = useLocalSearchParams();
     const router = useRouter();
     const { showAlert } = useAlert();
     const { user } = useAuth(); // Call hook here at top level
@@ -17,6 +17,7 @@ export default function ChatScreen() {
     const [sending, setSending] = useState(false);
     const flatListRef = useRef<FlatList>(null);
     const friendId = Number(id);
+    const isBot = isAi === 'true';
 
     // Fetch messages
     const fetchMessages = async () => {
@@ -33,13 +34,14 @@ export default function ChatScreen() {
     useEffect(() => {
         fetchMessages();
         
-        // Disable polling for AI Bot (ID 0) as it has no persistence/history yet
-        if (friendId === 0) return;
+        // Disable polling for AI Bot for now if desired, OR keep it to see delay responses if stored async
+        // For now, let's allow polling so we see the message if it comes in late
+        // if (isBot) return;
 
         // Poll for new messages every 5 seconds (temporary solution until websockets)
         const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
-    }, [friendId]);
+    }, [friendId, isBot]);
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;
@@ -59,20 +61,22 @@ export default function ChatScreen() {
             updated_at: new Date().toISOString(),
         };
 
-        if (friendId === 0) {
+        if (isBot) {
             setMessages(prev => [...prev, optimisticMsg]);
         }
 
         try {
-            const message = await sendMessage(friendId, contentToSend);
+            // Pass isBot flag to service
+            const message = await sendMessage(friendId, contentToSend, isBot);
             
-            if (friendId === 0) {
+            if (isBot) {
                 // For AI, the response is the AI's reply
+                // We should append it.
+                // Note: backend now saves both user msg and AI reply.
+                // If we optimistically added user msg, we might duplicate it if we refetch.
+                // Ideally we should just append the AI reply here.
                 setMessages(prev => [...prev, message]);
             } else {
-                // For normal chat, the response is the saved message
-                // We reload to ensure sync or replace optimistic
-                // For now, simpler to just fetch or append if valid
                 setMessages(prev => [...prev, message]);
             }
 

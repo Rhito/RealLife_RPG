@@ -1,6 +1,7 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Alert,  RefreshControl, Image } from 'react-native';
 import { useEffect, useState } from 'react';
 import { fetchFriends, fetchRequests, searchUsers, sendRequest, acceptRequest, removeFriend, User, Friendship } from '../../../services/friends';
+import { getAiProfile } from '../../../services/MessageService';
 import { fetchGlobalLeaderboard, fetchFriendsLeaderboard } from '../../../services/leaderboard';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
@@ -32,17 +33,18 @@ export default function SocialScreen() {
     const loadData = async () => {
         try {
             if (tab === 'friends') {
-                const res = await fetchFriends();
-                // Add Gemini AI as a pinned friend
+                const [friendsRes, aiRes] = await Promise.all([
+                    fetchFriends(),
+                    getAiProfile()
+                ]);
+                
+                // Add Gemini AI as a pinned friend using real DB data
                 const geminiBot: User = { 
-                    id: 0, 
+                    ...aiRes,
                     name: 'Gemini AI', 
-                    email: 'ai@gemini.google', 
-                    level: 999, 
-                    exp: 0, 
-                    avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' // We might need a local asset or handle this in Avatar component
+                    avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg'
                 };
-                setFriends([geminiBot, ...res.data]);
+                setFriends([geminiBot, ...friendsRes.data]);
             } else if (tab === 'requests') {
                 const res = await fetchRequests();
                 setRequests(res.data);
@@ -104,7 +106,7 @@ const renderFriend = ({ item }: { item: User }) => (
                     <Text style={styles.level}>Lvl {item.level ?? 1}</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/(tabs)/friends/chat/[id]', params: { id: item.id, name: item.name } })}>
+            <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/(tabs)/friends/chat/[id]', params: { id: item.id, name: item.name, isAi: (item.name === 'Gemini AI' ? 'true' : 'false') } })}>
                 <Ionicons name="chatbubble-ellipses" size={24} color="#FF9800" />
             </TouchableOpacity>
         </View>
