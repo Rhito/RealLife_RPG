@@ -1,22 +1,41 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { getMessages, sendMessage, Message } from '../../../../services/MessageService';
 import { useAuth } from '../../../../context/AuthContext';
 import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
     const router = useRouter();
     const { showAlert } = useAlert();
-    const { user } = useAuth(); // Call hook here at top level
+    const { user } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const flatListRef = useRef<FlatList>(null);
     const friendId = Number(id);
+
+    // Check Privacy for AI
+    useEffect(() => {
+        if (friendId === 0) {
+            SecureStore.getItemAsync('HAS_ACCEPTED_PRIVACY_POLICY').then(accepted => {
+                if (accepted !== 'true') {
+                    Alert.alert(
+                        'Privacy Policy Required',
+                        'To use the AI Chat feature, you must review and accept our Privacy & Data Policy.',
+                        [
+                            { text: 'Cancel', style: 'cancel', onPress: () => router.back() },
+                            { text: 'Review Policy', onPress: () => router.push('/privacy-policy') }
+                        ]
+                    );
+                }
+            });
+        }
+    }, [friendId]);
 
     // Fetch messages
     const fetchMessages = async () => {
@@ -44,6 +63,15 @@ export default function ChatScreen() {
     const handleSend = async () => {
         if (!newMessage.trim()) return;
         
+        // Double check policy for AI before sending
+        if (friendId === 0) {
+            const accepted = await SecureStore.getItemAsync('HAS_ACCEPTED_PRIVACY_POLICY');
+            if (accepted !== 'true') {
+                 router.push('/privacy-policy');
+                 return;
+            }
+        }
+
         const contentToSend = newMessage;
         setNewMessage(''); // Clear input immediately for better UX
         setSending(true);
@@ -51,7 +79,7 @@ export default function ChatScreen() {
         // Optimistic update for User's message
         const optimisticMsg: Message = {
             id: Date.now(),
-            sender_id: user?.id || 999, // Use stored user variable
+            sender_id: user?.id || 999,
             receiver_id: friendId,
             content: contentToSend,
             read_at: null,
@@ -68,18 +96,15 @@ export default function ChatScreen() {
             
             if (friendId === 0) {
                 // For AI, the response is the AI's reply
-                setMessages(prev => [...prev, message]);
+                const aiReply = message; // Rename for clarity
+                setMessages(prev => [...prev, aiReply]);
             } else {
-                // For normal chat, the response is the saved message
-                // We reload to ensure sync or replace optimistic
-                // For now, simpler to just fetch or append if valid
                 setMessages(prev => [...prev, message]);
             }
 
             // Scroll to bottom
             setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
         } catch (error: any) {
-             // Remove optimistic message on fail if strictly managing state
             showAlert('Error', error.message || 'Failed to send message');
         } finally {
             setSending(false);

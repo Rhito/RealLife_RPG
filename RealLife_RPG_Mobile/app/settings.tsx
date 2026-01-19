@@ -110,6 +110,13 @@ export default function SettingsScreen() {
             >
                 <Text style={styles.saveButtonText}>Replay Tutorial</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={[styles.saveButton, { marginTop: 10, backgroundColor: '#342056', marginBottom: 60 }]} 
+                onPress={() => router.push('/privacy-policy')}
+            >
+                <Text style={styles.saveButtonText}>Privacy & Data</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 }

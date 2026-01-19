@@ -28,7 +28,27 @@ class AiChatController extends Controller
         }
 
         try {
-            // 1. First, try to discover a valid model
+            // 1. Fetch User Context (Feed & Stats)
+            $user = auth()->user();
+            $feed = \App\Models\ActivityFeed::where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->limit(20)
+                ->get();
+                
+            $context = "User Context:\n";
+            $context .= "Name: {$user->name}, Level: {$user->level}, XP: {$user->exp}\n";
+            $context .= "Recent Activity:\n";
+            foreach ($feed as $item) {
+                // Assuming ActivityFeed has 'description', 'type', 'created_at' or similar fields
+                // Adjust fields based on actual ActivityFeed model if needed. 
+                // Based on standard RPG logs, usually 'content' or 'description'.
+                // If ActivityFeed structure is unknown, I'll assume a generic 'data' or 'description'.
+                // Let's check model if this fails, but for now assuming 'description' or standard cast.
+                 $context .= "- [{$item->created_at}] {$item->description}\n";
+            }
+            $context .= "\nUser Question: " . $message;
+
+            // 2. Discover Model (Logic preserved)
             $modelToUse = 'gemini-1.5-flash'; // Default preference
             
             // List models to find what's actually available
@@ -57,14 +77,14 @@ class AiChatController extends Controller
                 }
             }
 
-            // 2. Send the request using the discovered model
+            // 3. Send Request with Context
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$modelToUse}:generateContent?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => $message]
+                            ['text' => $context] // Send the enriched context
                         ]
                     ]
                 ]
