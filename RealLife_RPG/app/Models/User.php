@@ -179,4 +179,48 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(GuildJoinRequest::class, 'user_id', 'id');
     }
+    /**
+     * Handle taking damage and potential fainting
+     */
+    public function takeDamage(int $amount, string $reason = 'damage')
+    {
+        $this->hp = max(0, $this->hp - $amount);
+        
+        if ($this->hp <= 0) {
+            $this->faint();
+        } else {
+            $this->save();
+        }
+
+        // Log damage if needed, but usually handled by caller. 
+        // Logic for faint log could be here.
+    }
+
+    /**
+     * Handle user fainting (death)
+     */
+    public function faint()
+    {
+        // Penalty: -1 Level
+        $previousLevel = $this->level;
+        $this->level = max(1, $this->level - 1);
+        
+        // Reset/Heal to 20 HP
+        $this->hp = 20;
+        
+        $this->save();
+
+        // Log the fainting event
+        \App\Models\ActivityFeed::create([
+            'user_id' => $this->id,
+            'activity_type' => 'fainted',
+            'visibility' => 'public',
+            'data' => [
+                'reason' => 'Ran out of HP',
+                'level_loss' => $previousLevel - $this->level,
+                'current_hp' => $this->hp
+            ],
+            'created_at' => now(), 
+        ]);
+    }
 }

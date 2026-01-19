@@ -280,8 +280,8 @@ class TaskController extends Controller
             $instance->update(['status' => 'failed']);
             
             $damage = 5;
-            $user->hp = max(0, $user->hp - $damage);
-            $user->save();
+            $user->takeDamage($damage, "Gave up on '{$instance->task->title}'");
+            // $user->save(); // takeDamage saves automatically
 
             \App\Models\ActivityFeed::create([
                 'user_id' => $user->id,
