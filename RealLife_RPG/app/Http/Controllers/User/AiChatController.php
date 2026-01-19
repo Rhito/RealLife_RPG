@@ -18,7 +18,6 @@ class AiChatController extends Controller
         $apiKey = env('GEMINI_API_KEY');
 
         if (!$apiKey) {
-            // Fallback mock response if no key (for testing)
             return response()->json([
                 'id' => rand(1000, 99999), 
                 'sender_id' => 0, 
@@ -29,9 +28,39 @@ class AiChatController extends Controller
         }
 
         try {
+            // 1. First, try to discover a valid model
+            $modelToUse = 'gemini-1.5-flash'; // Default preference
+            
+            // List models to find what's actually available
+            $modelsResponse = Http::get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
+            
+            if ($modelsResponse->successful()) {
+                $models = $modelsResponse->json()['models'] ?? [];
+                
+                // prefer gemini-1.5-flash, then gemini-pro, then any gemini
+                $availableModels = array_map(function($m) { return str_replace('models/', '', $m['name']); }, $models);
+                
+                if (in_array('gemini-1.5-flash', $availableModels)) {
+                    $modelToUse = 'gemini-1.5-flash';
+                } elseif (in_array('gemini-pro', $availableModels)) {
+                    $modelToUse = 'gemini-pro';
+                } elseif (in_array('gemini-1.0-pro', $availableModels)) {
+                    $modelToUse = 'gemini-1.0-pro';
+                } else {
+                    // Pick the first one that supports generateContent
+                    foreach ($models as $m) {
+                        if (in_array('generateContent', $m['supportedGenerationMethods'] ?? [])) {
+                            $modelToUse = str_replace('models/', '', $m['name']);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 2. Send the request using the discovered model
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$apiKey}", [
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$modelToUse}:generateContent?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [
@@ -43,7 +72,7 @@ class AiChatController extends Controller
     
             if ($response->successful()) {
                 $data = $response->json();
-                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'I am contemplating the void.';
+                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "I am speechless (Model: $modelToUse).";
                 
                 return response()->json([
                     'id' => rand(1000, 99999),
@@ -53,11 +82,14 @@ class AiChatController extends Controller
                     'created_at' => now(),
                 ]);
             } else {
+                $errorBody = $response->json();
+                $errorMessage = $errorBody['error']['message'] ?? $response->body();
+                
                 return response()->json([
                     'id' => rand(1000, 99999),
                     'sender_id' => 0,
                     'receiver_id' => auth()->id(),
-                    'content' => "Error: " . $response->body(),
+                    'content' => "API Error with model '{$modelToUse}': " . $errorMessage,
                     'created_at' => now(),
                 ]);
             }
