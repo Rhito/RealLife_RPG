@@ -13,7 +13,9 @@ class LeaderboardController extends Controller
     public function index()
     {
         // Global Leaderboard: Top 50 by Level DESC, EXP DESC
-        $users = User::orderBy('level', 'desc')
+        $users = User::where('id', '!=', 0)
+            ->where('email', '!=', 'ai@gemini.google')
+            ->orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
             ->limit(50)
             ->get(['id', 'name', 'level', 'exp', 'avatar']);
@@ -41,6 +43,8 @@ class LeaderboardController extends Controller
 
         // Get users in list
         $users = User::whereIn('id', $friendIds)
+            ->where('id', '!=', 0)
+            ->where('email', '!=', 'ai@gemini.google')
             ->orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
             ->get(['id', 'name', 'level', 'exp', 'avatar']);

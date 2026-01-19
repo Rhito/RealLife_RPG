@@ -33,16 +33,7 @@ export default function SocialScreen() {
         try {
             if (tab === 'friends') {
                 const res = await fetchFriends();
-                // Add Gemini AI as a pinned friend
-                const geminiBot: User = { 
-                    id: 0, 
-                    name: 'Gemini AI', 
-                    email: 'ai@gemini.google', 
-                    level: 999, 
-                    exp: 0, 
-                    avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' // We might need a local asset or handle this in Avatar component
-                };
-                setFriends([geminiBot, ...res.data]);
+                setFriends(res.data);
             } else if (tab === 'requests') {
                 const res = await fetchRequests();
                 setRequests(res.data);
@@ -177,13 +168,33 @@ const renderFriend = ({ item }: { item: User }) => (
       </View>
 
       {tab === 'friends' && (
-          <FlatList
-             data={friends}
-             keyExtractor={(item) => item.id.toString()}
-             renderItem={renderFriend}
-             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}
-             ListEmptyComponent={<Text style={styles.empty}>No friends yet.</Text>}
-          />
+          <View style={{ flex: 1 }}>
+                <TouchableOpacity 
+                    style={styles.aiCard} 
+                    onPress={() => router.push({ pathname: '/(tabs)/friends/chat/[id]', params: { id: 0, name: 'Gemini AI' } })}
+                >
+                    <View style={styles.aiAvatarContainer}>
+                        <Image 
+                            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' }} 
+                            style={styles.aiAvatar} 
+                        />
+                        <View style={styles.aiOnlineBadge} />
+                    </View>
+                    <View style={styles.aiInfo}>
+                        <Text style={styles.aiName}>Gemini AI</Text>
+                        <Text style={styles.aiStatus}>Always here to help</Text>
+                    </View>
+                    <Ionicons name="chatbubble-ellipses" size={24} color="#FF9800" />
+                </TouchableOpacity>
+
+              <FlatList
+                 data={friends}
+                 keyExtractor={(item) => item.id.toString()}
+                 renderItem={renderFriend}
+                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}
+                 ListEmptyComponent={<Text style={styles.empty}>No friends yet.</Text>}
+              />
+          </View>
       )}
 
       {tab === 'requests' && (
@@ -312,6 +323,53 @@ const styles = StyleSheet.create({
       borderColor: '#FF9800',
       backgroundColor: 'rgba(255, 152, 0, 0.1)',
   },
+    // AI Card Styles
+    aiCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF8E1', // Light Gold/Yellow bg to distinguish
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 16,
+        marginHorizontal: 10, 
+        marginTop: 5,
+        borderWidth: 1,
+        borderColor: '#FF9800',
+        elevation: 2,
+    },
+    aiAvatarContainer: {
+        position: 'relative',
+        marginRight: 15,
+    },
+    aiAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#fff',
+    },
+    aiOnlineBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#4CAF50',
+        borderWidth: 2,
+        borderColor: '#FFF8E1',
+    },
+    aiInfo: {
+        flex: 1,
+    },
+    aiName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#E65100', // Dark Orange
+    },
+    aiStatus: {
+        fontSize: 12,
+        color: '#F57C00',
+    },
   rank: {
       fontSize: 16,
       fontWeight: 'bold',
