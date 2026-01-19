@@ -115,10 +115,12 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AlertProvider>
-        <StatusBar style="light" backgroundColor="#432874" />
-        <InitialLayout />
-
-        <NetworkStatus />
+        <TourProvider>
+            <StatusBar style="light" backgroundColor="#432874" />
+            <InitialLayout />
+            <TourOverlay />
+            <NetworkStatus />
+        </TourProvider>
       </AlertProvider>
     </AuthProvider>
   );

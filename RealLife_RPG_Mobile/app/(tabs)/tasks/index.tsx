@@ -316,9 +316,11 @@ export default function TasksScreen() {
        />
 
         {/* FAB */}
-        <TouchableOpacity onPress={() => router.push('/tasks/create')} style={styles.fab}>
-             <Ionicons name="add" size={32} color="#432874" />
-        </TouchableOpacity>
+        <TourTarget name="add-task" style={styles.fabContainer}>
+            <TouchableOpacity onPress={() => router.push('/tasks/create')} style={styles.fab}>
+                 <Ionicons name="add" size={32} color="#432874" />
+            </TouchableOpacity>
+        </TourTarget>
     </View>
   );
 }
@@ -524,10 +526,13 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
   },
-  fab: {
+  fabContainer: {
       position: 'absolute',
       bottom: 24,
       right: 24,
+      zIndex: 100, // Ensure it's on top
+  },
+  fab: {
       width: 64,
       height: 64,
       borderRadius: 32,

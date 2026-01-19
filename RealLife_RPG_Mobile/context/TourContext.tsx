@@ -13,7 +13,8 @@ const STEPS: TourStep[] = [
     { id: 'avatar', text: "Check your Level, HP, and XP here." },
     { id: 'tab-tasks', text: "This is your Quest Log. Manage Habits, Dailies, and To-Dos." },
     { id: 'add-task', text: "Tap '+' to create a new Quest or Habit.", position: 'top' },
-    // We can add more specific "Task Item" steps later if we can target a specific item
+    { id: 'create-types', text: "Choose your Quest Type: Habit, Daily, or To-Do.", position: 'bottom' },
+    { id: 'create-submit', text: "Fill in the details and Create your Quest!", position: 'top' }
 ];
 
 interface TourContextData {

@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAlert } from '../../../context/AlertContext';
+import { TourTarget } from '../../../components/TourTarget';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -95,28 +96,30 @@ export default function CreateTaskScreen() {
             <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
                 
                 <Text style={styles.sectionLabel}>Quest Type</Text>
-                <View style={styles.row}>
-                    {Object.values(TaskType).map(t => (
-                        <TouchableOpacity 
-                            key={t} 
-                            style={[
-                                styles.typeOption, 
-                                type === t ? { backgroundColor: getTypeColor(t), borderColor: getTypeColor(t) } : {}
-                            ]} 
-                            onPress={() => setType(t)}
-                        >
-                            <Ionicons 
-                                name={t === 'habit' ? 'bicycle' : t === 'daily' ? 'calendar' : 'list'} 
-                                size={20} 
-                                color={type === t ? 'white' : '#666'} 
-                                style={{ marginBottom: 4 }}
-                            />
-                            <Text style={[styles.optionText, type === t && styles.selectedOptionText]}>
-                                {t.toUpperCase()}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <TourTarget name="create-types" style={{ width: '100%' }}>
+                    <View style={styles.row}>
+                        {Object.values(TaskType).map(t => (
+                            <TouchableOpacity 
+                                key={t} 
+                                style={[
+                                    styles.typeOption, 
+                                    type === t ? { backgroundColor: getTypeColor(t), borderColor: getTypeColor(t) } : {}
+                                ]} 
+                                onPress={() => setType(t)}
+                            >
+                                <Ionicons 
+                                    name={t === 'habit' ? 'bicycle' : t === 'daily' ? 'calendar' : 'list'} 
+                                    size={20} 
+                                    color={type === t ? 'white' : '#666'} 
+                                    style={{ marginBottom: 4 }}
+                                />
+                                <Text style={[styles.optionText, type === t && styles.selectedOptionText]}>
+                                    {t.toUpperCase()}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </TourTarget>
 
                 <View style={styles.card}>
                     <Text style={styles.inputLabel}>Title</Text>
@@ -224,9 +227,11 @@ export default function CreateTaskScreen() {
                     </>
                 )}
 
-                <TouchableOpacity style={styles.createButton} onPress={handleCreate} disabled={loading}>
-                    {loading ? <ActivityIndicator color="white" /> : <Text style={styles.createButtonText}>Create Quest</Text>}
-                </TouchableOpacity>
+                <TourTarget name="create-submit" style={{ width: '100%' }}>
+                    <TouchableOpacity style={styles.createButton} onPress={handleCreate} disabled={loading}>
+                        {loading ? <ActivityIndicator color="white" /> : <Text style={styles.createButtonText}>Create Quest</Text>}
+                    </TouchableOpacity>
+                </TourTarget>
 
             </ScrollView>
         </View>

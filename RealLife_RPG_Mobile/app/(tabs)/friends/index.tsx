@@ -129,9 +129,17 @@ const renderFriend = ({ item }: { item: User }) => (
 
     const renderRankingItem = ({ item, index }: { item: User, index: number }) => {
         const isMe = item.id === currentUser?.id;
+        
+        // Calculate Rank (Standard Competition Ranking 1224)
+        // Find the index of the first user with the same stats
+        // Since the list is sorted, this gives us the correct "Rank"
+        // Note: For large lists, pre-calculating ranks is better, but for 50 items this is fine.
+        const rankIndex = rankings.findIndex(u => u.level === item.level && u.exp === item.exp);
+        const rank = rankIndex !== -1 ? rankIndex + 1 : index + 1;
+
         return (
             <View style={[styles.card, isMe && styles.myRankCard]}>
-                <Text style={styles.rank}>#{index + 1}</Text>
+                <Text style={styles.rank}>#{rank}</Text>
                 <Avatar name={item.name} size={36} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                     <Text style={[styles.name, isMe && { color: '#FF9800' }]}>{item.name}</Text>

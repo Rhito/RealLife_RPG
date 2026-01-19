@@ -1,6 +1,7 @@
 import api from './api';
 
 import { User } from './profile';
+export { User };
 
 export interface Friendship {
     id: number;

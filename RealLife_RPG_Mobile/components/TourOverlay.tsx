@@ -24,22 +24,35 @@ export const TourOverlay = () => {
     const leftWidth = targetVal.x;
     const rightWidth = width - (targetVal.x + targetVal.width);
 
-    // Tooltip position (above or below)
-    const showTop = activeStep.position === 'top' || (targetVal.y > 150);
-    const tooltipTop = showTop 
-        ? targetVal.y - 120 
-        : targetVal.y + targetVal.height + 20;
+    // Tooltip position detection
+    const showTop = activeStep.position === 'top' || (targetVal.y > height / 2);
+    
+    // Dynamic styling for tooltip execution
+    const tooltipStyle: any = {
+        left: 20,
+        right: 20,
+        position: 'absolute',
+    };
+
+    if (showTop) {
+        // Position ABOVE the target
+        // We use bottom relative to screen height to ensure it grows upwards
+        tooltipStyle.bottom = height - targetVal.y + 25; // 25px gap
+    } else {
+        // Position BELOW the target
+        tooltipStyle.top = targetVal.y + targetVal.height + 25; // 25px gap
+    }
 
     return (
         <Modal transparent animationType="fade" visible={!!activeStep}>
-            <View style={styles.container}>
-                {/* Mask Views */}
-                <View style={[styles.mask, { top: 0, height: topHeight, width: width, left: 0 }]} />
-                <View style={[styles.mask, { bottom: 0, height: bottomHeight, width: width, left: 0 }]} />
-                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: leftWidth, left: 0 }]} />
-                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: rightWidth, right: 0 }]} />
+            <View style={styles.container} pointerEvents="box-none">
+                {/* Mask Views - Block touches */}
+                <View style={[styles.mask, { top: 0, height: topHeight, width: width, left: 0 }]} pointerEvents="auto" />
+                <View style={[styles.mask, { bottom: 0, height: bottomHeight, width: width, left: 0 }]} pointerEvents="auto" />
+                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: leftWidth, left: 0 }]} pointerEvents="auto" />
+                <View style={[styles.mask, { top: topHeight, height: targetVal.height, width: rightWidth, right: 0 }]} pointerEvents="auto" />
 
-                {/* Highlight Border */}
+                {/* Highlight Border - Ignore touches */}
                 <View style={[
                     styles.highlight, 
                     { 
@@ -49,10 +62,10 @@ export const TourOverlay = () => {
                         height: targetVal.height + 8,
                         borderRadius: (targetVal.width > 50) ? 12 : targetVal.width / 2 
                     }
-                ]} />
+                ]} pointerEvents="none" />
 
-                {/* Tooltip */}
-                <View style={[styles.tooltip, { top: tooltipTop, left: 20, right: 20 }]}>
+                {/* Tooltip - Catch touches */}
+                <View style={[styles.tooltip, tooltipStyle]} pointerEvents="auto">
                     <Text style={styles.tooltipText}>{activeStep.text}</Text>
                     <View style={styles.buttons}>
                         <TouchableOpacity onPress={stopTour}>
