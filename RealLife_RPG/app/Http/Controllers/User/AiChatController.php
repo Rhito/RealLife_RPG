@@ -8,57 +8,26 @@ use Illuminate\Support\Facades\Http;
 
 class AiChatController extends Controller
 {
-    private function getAiUser()
-    {
-        // Use a unique email for the bot
-        $email = 'ai@realliferpg.online';
-        $aiUser = \App\Models\User::firstOrCreate(
-            ['email' => $email],
-            [
-                'name' => 'Gemini AI',
-                'password' => bcrypt('gemini_ai_secret_password'),
-                'level' => 999,
-                'exp' => 0,
-                'coins' => 0,
-                'avatar' => 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg'
-            ]
-        );
-        return $aiUser;
-    }
-
-    public function index()
-    {
-        return response()->json($this->getAiUser());
-    }
-
     public function chat(Request $request)
     {
         $request->validate([
             'content' => 'required|string',
         ]);
 
-        $user = auth()->user();
-        $messageContent = $request->input('content');
+        $message = $request->input('content');
         $apiKey = env('GEMINI_API_KEY');
-        $aiUser = $this->getAiUser();
-
-        // 1. Save User's Message to DB
-        \App\Models\Message::create([
-            'sender_id' => $user->id,
-            'receiver_id' => $aiUser->id,
-            'content' => $messageContent,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
 
         if (!$apiKey) {
-            $reply = "I need a brain! Please set GEMINI_API_KEY in your .env file.";
-            $this->saveAiResponse($reply, $aiUser->id, $user->id);
-            return $this->formatResponse($reply, $aiUser->id, $user->id);
+            return response()->json([
+                'id' => rand(1000, 99999), 
+                'sender_id' => 0, 
+                'receiver_id' => auth()->id(),
+                'content' => "I need a brain! Please set GEMINI_API_KEY in your .env file.",
+                'created_at' => now(),
+            ]);
         }
 
         try {
-            // ... (Model discovery logic) ...
             // 1. First, try to discover a valid model
             $modelToUse = 'gemini-1.5-flash'; // Default preference
             
@@ -95,7 +64,7 @@ class AiChatController extends Controller
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => $messageContent] // Use extracted content
+                            ['text' => $message]
                         ]
                     ]
                 ]
@@ -105,44 +74,33 @@ class AiChatController extends Controller
                 $data = $response->json();
                 $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "I am speechless (Model: $modelToUse).";
                 
-                // Save and Return
-                $savedMsg = $this->saveAiResponse($reply, $aiUser->id, $user->id);
-                return response()->json($savedMsg);
-
+                return response()->json([
+                    'id' => rand(1000, 99999),
+                    'sender_id' => 0,
+                    'receiver_id' => auth()->id(),
+                    'content' => $reply,
+                    'created_at' => now(),
+                ]);
             } else {
                 $errorBody = $response->json();
                 $errorMessage = $errorBody['error']['message'] ?? $response->body();
-                $reply = "API Error with model '{$modelToUse}': " . $errorMessage;
                 
-                $savedMsg = $this->saveAiResponse($reply, $aiUser->id, $user->id);
-                return response()->json($savedMsg);
+                return response()->json([
+                    'id' => rand(1000, 99999),
+                    'sender_id' => 0,
+                    'receiver_id' => auth()->id(),
+                    'content' => "API Error with model '{$modelToUse}': " . $errorMessage,
+                    'created_at' => now(),
+                ]);
             }
         } catch (\Exception $e) {
-            $reply = "Connection error: " . $e->getMessage();
-            $savedMsg = $this->saveAiResponse($reply, $aiUser->id, $user->id);
-            return response()->json($savedMsg);
+             return response()->json([
+                'id' => rand(1000, 99999),
+                'sender_id' => 0,
+                'receiver_id' => auth()->id(),
+                'content' => "Connection error: " . $e->getMessage(),
+                'created_at' => now(),
+            ]);
         }
-    }
-
-    private function saveAiResponse($content, $aiId, $userId)
-    {
-        return \App\Models\Message::create([
-            'sender_id' => $aiId,
-            'receiver_id' => $userId,
-            'content' => $content,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    }
-
-    private function formatResponse($content, $aiId, $userId) 
-    {
-         return [
-            'id' => rand(1000, 99999), // Temporary ID if not saving immediately
-            'sender_id' => $aiId,
-            'receiver_id' => $userId,
-            'content' => $content,
-            'created_at' => now(),
-        ];
     }
 }

@@ -1,5 +1,4 @@
 import api from './api';
-import { User } from './profile';
 
 export interface Message {
     id: number;
@@ -11,18 +10,14 @@ export interface Message {
     updated_at: string;
 }
 
-export const getAiProfile = async (): Promise<User> => {
-    const response = await api.get('/ai/profile');
-    return response.data;
-};
-
 export const getMessages = async (friendId: number): Promise<Message[]> => {
+    if (friendId === 0) return []; // No history for AI yet
     const response = await api.get(`/messages/${friendId}`);
     return response.data;
 };
 
-export const sendMessage = async (friendId: number, content: string, isAi: boolean = false): Promise<Message> => {
-    if (isAi) {
+export const sendMessage = async (friendId: number, content: string): Promise<Message> => {
+    if (friendId === 0) {
         // Chat with AI
         const response = await api.post('/ai/chat', { content });
         return response.data;
