@@ -10,6 +10,7 @@ export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
     const router = useRouter();
     const { showAlert } = useAlert();
+    const { user } = useAuth(); // Call hook here at top level
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -48,11 +49,9 @@ export default function ChatScreen() {
         setSending(true);
 
         // Optimistic update for User's message
-        // (Required for AI chat since backend doesn't return the user's msg, 
-        // and good for normal chat too)
         const optimisticMsg: Message = {
             id: Date.now(),
-            sender_id: useAuth().user?.id || 999,
+            sender_id: user?.id || 999, // Use stored user variable
             receiver_id: friendId,
             content: contentToSend,
             read_at: null,
