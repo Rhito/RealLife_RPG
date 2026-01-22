@@ -28,6 +28,7 @@ class Task extends Model
         'reward_coins',
         'due_date',
         'is_active',
+        'is_pinned',
     ];
 
     /**

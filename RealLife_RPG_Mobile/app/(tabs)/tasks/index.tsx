@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl, Image, Dimensions, Modal, ScrollView } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask } from '../../../services/tasks';
+import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask, pinTask } from '../../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TourTarget } from '../../../components/TourTarget';
@@ -24,6 +24,7 @@ export default function TasksScreen() {
   const [habits, setHabits] = useState<any[]>([]); // Task definitions
   const [dailies, setDailies] = useState<TaskInstance[]>([]);
   const [todos, setTodos] = useState<TaskInstance[]>([]);
+  const [selectedTask, setSelectedTask] = useState<any | null>(null);
   
   const [refreshing, setRefreshing] = useState(false);
 
@@ -94,12 +95,10 @@ export default function TasksScreen() {
           
           // Check for Achievements
           if (res.rewards.achievements && res.rewards.achievements.length > 0) {
-              // Show first achievement or summary
-              // If multiple, join them
               const message = res.rewards.achievements.join('\n');
               setTimeout(() => {
                   showAlert('🏆 Achievement Unlocked!', message);
-              }, 500); // Slight delay so it doesn't clash with Level Up if both happen (though alert context might handle one at a time)
+              }, 500); 
           }
 
           loadTasks(); // Reload to remove from list
@@ -126,6 +125,7 @@ export default function TasksScreen() {
                       try {
                           await deleteTask(id);
                           loadTasks();
+                          setSelectedTask(null); // Close modal if open
                       } catch (e: any) {
                           showAlert('Error', e.message);
                       } finally {
@@ -155,6 +155,7 @@ export default function TasksScreen() {
                           updateUserStats(res.rewards);
                           showAlert('Failed!', `You took damage. HP is now ${res.rewards.hp}.`);
                           loadTasks();
+                          setSelectedTask(null); // Close modal
                       } catch (e: any) {
                           showAlert('Error', e.message);
                       } finally {
@@ -164,6 +165,38 @@ export default function TasksScreen() {
               }
           ]
       );
+  };
+
+  const handlePin = async (id: number, isInstance: boolean) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+        // If instance, we need to pass Task ID or Instance ID depending on backend logic.
+        // Backend `pin` method checks if ID is task or instance and handles it.
+        // So we can just pass the ID we have.
+        // BUT if it's an instance, we assume the ID is the instance ID.
+        // Backend logic: "Check if ID matches a Task... if not, check Instance".
+        // Habits use Task ID. Dailies use Instance ID. Backend handles both!
+        
+        await pinTask(id);
+        
+        // Update local state immediately for responsiveness (optional but better)
+        // Or just reload
+        loadTasks();
+        
+        // Close modal or update selectedTask's pinned status if modal is open
+        if (selectedTask) {
+             // We need to know if we acted on the selected task
+             const isSelected = selectedTask.id === id || (selectedTask.task && selectedTask.task.id === id); // This logic is approximate
+             // Actually backend toggle. We don't know the new state without response.
+        }
+        setSelectedTask(null);
+
+    } catch (e: any) {
+        showAlert('Error', e.message);
+    } finally {
+        setProcessing(false);
+    }
   };
 
   const updateUserStats = (rewards: any) => {
@@ -193,16 +226,24 @@ export default function TasksScreen() {
           >
               <Ionicons name="trash-outline" size={16} color="#B0BEC5" />
           </TouchableOpacity>
-          <View style={styles.taskContent}>
+          <TouchableOpacity 
+            style={styles.taskContent} 
+            onPress={() => setSelectedTask({...item, type: 'habit'})}
+          >
               <Text style={styles.taskTitle}>{item.title}</Text>
-              {item.description ? <Text style={styles.taskDesc}>{item.description}</Text> : null}
+              {item.description ? <Text style={styles.taskDesc} numberOfLines={1}>{item.description}</Text> : null}
               {item.today_count > 0 && (
                   <View style={styles.habitCounter}>
                       <Ionicons name="checkmark-circle" size={14} color="#FFC107" />
                       <Text style={styles.habitCounterText}>{item.today_count}x today</Text>
                   </View>
               )}
-          </View>
+              {item.is_pinned && (
+                 <View style={styles.pinnedBadge}>
+                     <Ionicons name="push" size={12} color="#FF9800" />
+                 </View>
+              )}
+          </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={() => handleScoreHabit(item.id)}>
               <Ionicons name="add" size={28} color="white" />
           </TouchableOpacity>
@@ -214,22 +255,30 @@ export default function TasksScreen() {
            <TouchableOpacity style={styles.checkBox} onPress={() => handleComplete(item.id)}>
                <View style={styles.checkBoxInner} />
            </TouchableOpacity>
-           <View style={styles.taskContent}>
+           <TouchableOpacity 
+                style={styles.taskContent}
+                onPress={() => setSelectedTask({...item, type: 'daily'})}
+           >
               <Text style={styles.taskTitle}>{item.task.title}</Text>
               <View style={styles.metaRow}>
                   <View style={styles.tagContainer}>
                       <Text style={styles.tagText}>{item.task.difficulty.toUpperCase()}</Text>
                   </View>
-                  <View style={styles.actionRow}>
-                        <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
-                            <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.task.id, item.task.title)}>
-                            <Ionicons name="trash-outline" size={18} color="#B0BEC5" />
-                        </TouchableOpacity>
-                  </View>
+                  {item.task.is_pinned && (
+                    <View style={styles.pinnedBadge}>
+                        <Ionicons name="push" size={12} color="#FF9800" />
+                    </View>
+                  )}
               </View>
-           </View>
+           </TouchableOpacity>
+           <View style={styles.actionRow}>
+                <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
+                    <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.task.id, item.task.title)}>
+                    <Ionicons name="trash-outline" size={18} color="#B0BEC5" />
+                </TouchableOpacity>
+            </View>
       </View>
   );
 
@@ -238,7 +287,10 @@ export default function TasksScreen() {
           <TouchableOpacity style={[styles.checkBox, styles.todoCheckBox]} onPress={() => handleComplete(item.id)}>
                <View style={[styles.checkBoxInner, styles.todoCheckBoxInner]} />
            </TouchableOpacity>
-           <View style={styles.taskContent}>
+           <TouchableOpacity 
+                style={styles.taskContent}
+                onPress={() => setSelectedTask({...item, type: 'todo'})}
+           >
               <Text style={styles.taskTitle}>{item.task.title}</Text>
               <View style={styles.metaRow}>
                   {item.scheduled_date && (
@@ -249,16 +301,16 @@ export default function TasksScreen() {
                         </Text>
                     </View>
                   )}
-                  <View style={styles.actionRow}>
-                        <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
-                            <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.task.id, item.task.title)}>
-                            <Ionicons name="trash-outline" size={18} color="#B0BEC5" />
-                        </TouchableOpacity>
-                  </View>
               </View>
-           </View>
+           </TouchableOpacity>
+           <View style={styles.actionRow}>
+                <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
+                    <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.task.id, item.task.title)}>
+                    <Ionicons name="trash-outline" size={18} color="#B0BEC5" />
+                </TouchableOpacity>
+            </View>
       </View>
   );
 
@@ -277,6 +329,85 @@ export default function TasksScreen() {
           case 'daily': return "No daily duties. Enjoy your rest, hero.";
           case 'todo': return "Your quest log is clear.";
       }
+  };
+
+  const renderDetailModal = () => {
+      if (!selectedTask) return null;
+      
+      const isInstance = selectedTask.type === 'daily' || selectedTask.type === 'todo';
+      const task = isInstance ? selectedTask.task : selectedTask;
+      
+      return (
+          <Modal
+              animationType="fade"
+              transparent={true}
+              visible={!!selectedTask}
+              onRequestClose={() => setSelectedTask(null)}
+          >
+              <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                      <View style={[styles.modalHeader, 
+                          selectedTask.type === 'habit' ? styles.habitHeader : 
+                          selectedTask.type === 'daily' ? styles.dailyHeader : styles.todoHeader
+                      ]}>
+                          <Text style={styles.modalTitle}>Mission Details</Text>
+                          <TouchableOpacity onPress={() => setSelectedTask(null)} style={styles.closeButton}>
+                              <Ionicons name="close" size={24} color="white" />
+                          </TouchableOpacity>
+                      </View>
+                      
+                      <ScrollView style={styles.modalBody}>
+                          <Text style={styles.detailTitle}>{task.title}</Text>
+                          <View style={styles.tagRow}>
+                               <View style={styles.difficultyTag}>
+                                   <Text style={styles.tagTextLabel}>{task.difficulty?.toUpperCase() || 'NORMAL'}</Text>
+                               </View>
+
+                               <View style={{ flex: 1 }} />
+                               
+                               <TouchableOpacity 
+                                    onPress={() => handlePin(selectedTask.id, isInstance)}
+                                    style={styles.pinButtonModal}
+                                >
+                                    <Ionicons 
+                                        name={task.is_pinned ? "push" : "push-outline"} 
+                                        size={20} 
+                                        color={task.is_pinned ? "#FF9800" : "#BBAADD"} 
+                                    />
+                                    <Text style={[styles.pinText, task.is_pinned && styles.pinTextActive]}>
+                                        {task.is_pinned ? 'Pinned' : 'Pin'}
+                                    </Text>
+                               </TouchableOpacity>
+                          </View>
+                          
+                          <Text style={styles.sectionHeader}>Description</Text>
+                          <Text style={styles.detailDesc}>{task.description || "No description provided."}</Text>
+                          
+                          <Text style={styles.sectionHeader}>Rewards</Text>
+                          <View style={styles.rewardsRow}>
+                              <View style={styles.rewardBadge}>
+                                  <Ionicons name="star" size={16} color="#FFC107" />
+                                  <Text style={styles.rewardText}>XP</Text>
+                              </View>
+                              <View style={styles.rewardBadge}>
+                                  <Ionicons name="wallet" size={16} color="#FF9800" />
+                                  <Text style={styles.rewardText}>Coins</Text>
+                              </View>
+                          </View>
+                          
+                          {selectedTask.type === 'todo' && selectedTask.scheduled_date && (
+                              <>
+                                <Text style={styles.sectionHeader}>Due Date</Text>
+                                <Text style={styles.detailDesc}>
+                                    {new Date(selectedTask.scheduled_date).toLocaleString()}
+                                </Text>
+                              </>
+                          )}
+                      </ScrollView>
+                  </View>
+              </View>
+          </Modal>
+      );
   };
 
   return (
@@ -321,6 +452,8 @@ export default function TasksScreen() {
                  <Ionicons name="add" size={32} color="#432874" />
             </TouchableOpacity>
         </TourTarget>
+        
+        {renderDetailModal()}
     </View>
   );
 }
@@ -561,9 +694,121 @@ const styles = StyleSheet.create({
   actionRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      marginLeft: 8,
   },
   iconBtn: {
-      marginLeft: 12,
+      marginLeft: 8,
+      padding: 4,
+  },
+  // Modal Styles
+  modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      justifyContent: 'center',
+      padding: 24,
+  },
+  modalContent: {
+      backgroundColor: 'white',
+      borderRadius: 24,
+      overflow: 'hidden',
+  },
+  modalHeader: {
+      padding: 20,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+  },
+  habitHeader: { backgroundColor: '#FFC107' },
+  dailyHeader: { backgroundColor: '#9E9E9E' },
+  todoHeader: { backgroundColor: '#F44336' },
+  modalTitle: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 18,
+  },
+  closeButton: {
+      padding: 4,
+  },
+  modalBody: {
+      padding: 24,
+  },
+  detailTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#333',
+      marginBottom: 12,
+  },
+  tagRow: {
+      flexDirection: 'row',
+      marginBottom: 24,
+  },
+  difficultyTag: {
+      backgroundColor: '#eee',
+      paddingVertical: 4,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+  },
+  tagTextLabel: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: '#666',
+  },
+  sectionHeader: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#BBAADD',
+      textTransform: 'uppercase',
+      marginBottom: 8,
+  },
+  detailDesc: {
+      fontSize: 16,
+      color: '#555',
+      lineHeight: 24,
+      marginBottom: 24,
+  },
+  rewardsRow: {
+      flexDirection: 'row',
+      gap: 12,
+      marginBottom: 24,
+  },
+  rewardBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFF8E1',
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: '#FFECB3',
+      gap: 6,
+  },
+  rewardText: {
+      fontWeight: 'bold',
+      color: '#F57C00',
+  },
+  pinButtonModal: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FAFAFA',
+      paddingVertical: 4,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: '#eee',
+      gap: 4,
+  },
+  pinText: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: '#BBAADD',
+  },
+  pinTextActive: {
+      color: '#FF9800',
+  },
+  pinnedBadge: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
       padding: 4,
   }
 });

@@ -122,29 +122,31 @@ export default function Dashboard() {
           <View style={styles.headerCurve} />
       </View>
 
-      {/* Quick Stats */}
-      <View style={styles.statsRow}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20 }}>
-            <StatBadge icon="wallet" value={analytics?.coins ?? user?.coins ?? 0} label="Coins" color="#FF9800" />
-            <StatBadge icon="flame" value={analytics?.streak ?? user?.current_streak ?? 0} label="Day Streak" color="#F44336" />
-            <StatBadge icon="star" value={`#${analytics?.rank ?? '-'}`} label="Rank" color="#9C27B0" />
-        </ScrollView>
-      </View>
-
-      <View style={styles.mainContent}>
-        {/* Analytics Chart */}
-        {analytics && (
-            <View style={styles.sectionContainer}>
-                <Text style={styles.sectionTitle}>Performance</Text>
-                <Card>
-                    <AnalyticsChart data={analytics} />
-                </Card>
-            </View>
-        )}
-
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
+      <View style={{ backgroundColor: 'rgba(245, 246, 250, 0.9)', borderTopLeftRadius: 30, borderTopRightRadius: 30, minHeight: 500, paddingBottom: 100 }}>
+       {/* Quick Stats */}
+       <View style={styles.statsRow}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20 }}>
+              <StatBadge icon="wallet" value={analytics?.coins ?? user?.coins ?? 0} label="Coins" color="#FF9800" />
+              <StatBadge icon="flame" value={analytics?.streak ?? user?.current_streak ?? 0} label="Day Streak" color="#F44336" />
+              <StatBadge icon="star" value={`#${analytics?.rank ?? '-'}`} label="Rank" color="#9C27B0" />
+          </ScrollView>
+       </View>
+ 
+       <View style={styles.mainContent}>
+         {/* Analytics Chart */}
+         {analytics && (
+             <View style={styles.sectionContainer}>
+                 <Text style={styles.sectionTitle}>Performance</Text>
+                 <Card>
+                     <AnalyticsChart data={analytics} />
+                 </Card>
+             </View>
+         )}
+ 
+         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+             <Text style={styles.logoutText}>Log Out</Text>
+         </TouchableOpacity>
+       </View>
       </View>
     </ScrollView>
   );
@@ -153,7 +155,7 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F6FA',
+    backgroundColor: 'transparent', // Let ImageBackground show through
   },
   headerBackground: {
       backgroundColor: '#432874',
@@ -258,9 +260,10 @@ const styles = StyleSheet.create({
       left: 0,
       right: 0,
       height: 40,
-      backgroundColor: '#F5F6FA',
+      backgroundColor: '#432874', // Match header to hide seam
       borderTopLeftRadius: 30,
       borderTopRightRadius: 30,
+      opacity: 0.95, 
   },
   statsRow: {
       marginTop: -25, // Overlap with header

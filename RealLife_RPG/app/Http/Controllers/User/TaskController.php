@@ -81,6 +81,7 @@ class TaskController extends Controller
         $habits = Task::where('user_id', $user->id)
             ->where('type', 'habit')
             ->where('is_active', true)
+            ->orderBy('is_pinned', 'desc')
             ->get()
             ->map(function($habit) use ($user) {
                 // Count how many times this habit was completed today
@@ -95,14 +96,17 @@ class TaskController extends Controller
             });
 
         // 2. Get Dailies (Pending Instances for today/past)
-        // We filter instances where task value is 'daily'
         $dailies = TaskInstance::where('user_id', $user->id)
             ->where('status', 'pending')
             ->whereHas('task', function($q) {
-                $q->where('type', 'daily'); // or 'habit' if we treated habits as daily instances before, but now we split
+                $q->where('type', 'daily');
             })
             ->with('task')
-            ->get();
+            ->get()
+            ->sortByDesc(function($instance) {
+                 return $instance->task->is_pinned ? 1 : 0;
+            })
+            ->values(); // Reset keys
 
         // 3. Get To-Dos (Pending Instances)
         $todos = TaskInstance::where('user_id', $user->id)
@@ -111,7 +115,11 @@ class TaskController extends Controller
                  $q->whereIn('type', ['todo', 'once']);
             })
             ->with('task')
-            ->get();
+            ->get()
+            ->sortByDesc(function($instance) {
+                 return $instance->task->is_pinned ? 1 : 0;
+            })
+            ->values();
 
         return response()->json([
             'data' => [
@@ -303,6 +311,32 @@ class TaskController extends Controller
                 'hp' => $user->hp,
                 'level' => $user->level,
             ]
+        ]);
+    }
+
+    public function pin(string $id)
+    {
+        $user = Auth::user();
+        
+        // Check if $id is instance ID or Task ID depending on what frontend sends.
+        // Frontend lists Habits (Task) and Dailies/Todos (TaskInstance).
+        // BUT pinning should affect the parent Task so it persists for Dailies.
+        
+        // If ID matches a Task directly:
+        $task = Task::where('id', $id)->where('user_id', $user->id)->first();
+        
+        if (!$task) {
+            // Check if it's an instance, then get parent task
+            $instance = TaskInstance::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+            $task = $instance->task;
+        }
+
+        $task->is_pinned = !$task->is_pinned;
+        $task->save();
+
+        return response()->json([
+            'message' => $task->is_pinned ? 'Task pinned!' : 'Task unpinned!',
+            'data' => $task
         ]);
     }
 }
