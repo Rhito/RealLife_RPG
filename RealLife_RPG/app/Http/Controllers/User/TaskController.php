@@ -81,7 +81,6 @@ class TaskController extends Controller
         $habits = Task::where('user_id', $user->id)
             ->where('type', 'habit')
             ->where('is_active', true)
-            ->orderBy('is_pinned', 'desc')
             ->get()
             ->map(function($habit) use ($user) {
                 // Count how many times this habit was completed today
@@ -102,11 +101,7 @@ class TaskController extends Controller
                 $q->where('type', 'daily');
             })
             ->with('task')
-            ->get()
-            ->sortByDesc(function($instance) {
-                 return $instance->task->is_pinned ? 1 : 0;
-            })
-            ->values(); // Reset keys
+            ->get();
 
         // 3. Get To-Dos (Pending Instances)
         $todos = TaskInstance::where('user_id', $user->id)
@@ -115,11 +110,7 @@ class TaskController extends Controller
                  $q->whereIn('type', ['todo', 'once']);
             })
             ->with('task')
-            ->get()
-            ->sortByDesc(function($instance) {
-                 return $instance->task->is_pinned ? 1 : 0;
-            })
-            ->values();
+            ->get();
 
         return response()->json([
             'data' => [
