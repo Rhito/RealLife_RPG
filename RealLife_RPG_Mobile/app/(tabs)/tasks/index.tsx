@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshContr
 import { useAuth } from '../../../context/AuthContext';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask, pinTask } from '../../../services/tasks';
+import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask } from '../../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TourTarget } from '../../../components/TourTarget';
@@ -167,38 +167,6 @@ export default function TasksScreen() {
       );
   };
 
-  const handlePin = async (id: number, isInstance: boolean) => {
-    if (processing) return;
-    setProcessing(true);
-    try {
-        // If instance, we need to pass Task ID or Instance ID depending on backend logic.
-        // Backend `pin` method checks if ID is task or instance and handles it.
-        // So we can just pass the ID we have.
-        // BUT if it's an instance, we assume the ID is the instance ID.
-        // Backend logic: "Check if ID matches a Task... if not, check Instance".
-        // Habits use Task ID. Dailies use Instance ID. Backend handles both!
-        
-        await pinTask(id);
-        
-        // Update local state immediately for responsiveness (optional but better)
-        // Or just reload
-        loadTasks();
-        
-        // Close modal or update selectedTask's pinned status if modal is open
-        if (selectedTask) {
-             // We need to know if we acted on the selected task
-             const isSelected = selectedTask.id === id || (selectedTask.task && selectedTask.task.id === id); // This logic is approximate
-             // Actually backend toggle. We don't know the new state without response.
-        }
-        setSelectedTask(null);
-
-    } catch (e: any) {
-        showAlert('Error', e.message);
-    } finally {
-        setProcessing(false);
-    }
-  };
-
   const updateUserStats = (rewards: any) => {
       if (user) {
          setUser({ ...user, level: rewards.level, exp: rewards.exp, coins: rewards.coins, hp: rewards.hp });
@@ -238,11 +206,6 @@ export default function TasksScreen() {
                       <Text style={styles.habitCounterText}>{item.today_count}x today</Text>
                   </View>
               )}
-              {item.is_pinned && (
-                 <View style={styles.pinnedBadge}>
-                     <Ionicons name="push" size={12} color="#FF9800" />
-                 </View>
-              )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={() => handleScoreHabit(item.id)}>
               <Ionicons name="add" size={28} color="white" />
@@ -264,11 +227,6 @@ export default function TasksScreen() {
                   <View style={styles.tagContainer}>
                       <Text style={styles.tagText}>{item.task.difficulty.toUpperCase()}</Text>
                   </View>
-                  {item.task.is_pinned && (
-                    <View style={styles.pinnedBadge}>
-                        <Ionicons name="push" size={12} color="#FF9800" />
-                    </View>
-                  )}
               </View>
            </TouchableOpacity>
            <View style={styles.actionRow}>
@@ -362,22 +320,7 @@ export default function TasksScreen() {
                                <View style={styles.difficultyTag}>
                                    <Text style={styles.tagTextLabel}>{task.difficulty?.toUpperCase() || 'NORMAL'}</Text>
                                </View>
-
                                <View style={{ flex: 1 }} />
-                               
-                               <TouchableOpacity 
-                                    onPress={() => handlePin(selectedTask.id, isInstance)}
-                                    style={styles.pinButtonModal}
-                                >
-                                    <Ionicons 
-                                        name={task.is_pinned ? "push" : "push-outline"} 
-                                        size={20} 
-                                        color={task.is_pinned ? "#FF9800" : "#BBAADD"} 
-                                    />
-                                    <Text style={[styles.pinText, task.is_pinned && styles.pinTextActive]}>
-                                        {task.is_pinned ? 'Pinned' : 'Pin'}
-                                    </Text>
-                               </TouchableOpacity>
                           </View>
                           
                           <Text style={styles.sectionHeader}>Description</Text>
@@ -785,30 +728,5 @@ const styles = StyleSheet.create({
   rewardText: {
       fontWeight: 'bold',
       color: '#F57C00',
-  },
-  pinButtonModal: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#FAFAFA',
-      paddingVertical: 4,
-      paddingHorizontal: 12,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: '#eee',
-      gap: 4,
-  },
-  pinText: {
-      fontSize: 12,
-      fontWeight: 'bold',
-      color: '#BBAADD',
-  },
-  pinTextActive: {
-      color: '#FF9800',
-  },
-  pinnedBadge: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      padding: 4,
   }
 });

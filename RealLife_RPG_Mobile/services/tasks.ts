@@ -22,7 +22,6 @@ export interface Task {
     reward_exp: number;
     reward_coins: number;
     due_date?: string;
-    is_pinned?: boolean;
 }
 
 export interface TaskInstance {
@@ -105,15 +104,6 @@ export const deleteTask = async (taskId: number) => {
 export const failTask = async (instanceId: number) => {
     try {
         const response = await api.post(`/tasks/${instanceId}/fail`);
-        return response.data;
-    } catch (error: any) {
-        throw error.response?.data || error.message;
-    }
-};
-
-export const pinTask = async (id: number) => {
-    try {
-        const response = await api.post(`/tasks/${id}/pin`);
         return response.data;
     } catch (error: any) {
         throw error.response?.data || error.message;
