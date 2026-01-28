@@ -6,6 +6,8 @@ import { useAuth } from '../../../../context/AuthContext';
 import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
+import createEcho from '../../../../services/echo';
+import { getToken } from '../../../../services/api';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -52,13 +54,45 @@ export default function ChatScreen() {
     useEffect(() => {
         fetchMessages();
         
-        // Disable polling for AI Bot (ID 0) as it has no persistence/history yet
+        // Disable real-time for AI Bot (ID 0)
         if (friendId === 0) return;
 
-        // Poll for new messages every 5 seconds (temporary solution until websockets)
-        const interval = setInterval(fetchMessages, 5000);
-        return () => clearInterval(interval);
-    }, [friendId]);
+        let echo: any;
+
+        const setupEcho = async () => {
+            const token = await getToken();
+            if (!token) return;
+
+            echo = createEcho(token);
+            
+            // Channel name: chat.{minId}.{maxId}
+            const ids = [user?.id, friendId].sort((a, b) => (a || 0) - (b || 0));
+            const channelName = `chat.${ids[0]}.${ids[1]}`;
+
+            console.log('Listening to channel:', channelName);
+
+            echo.private(channelName)
+                .listen('MessageSent', (event: any) => {
+                    const newMessage = event.message;
+                    setMessages(prev => {
+                        // Check if we already have this message (by ID or content/timestamp if ID is temp)
+                        const exists = prev.some(m => m.id === newMessage.id);
+                        if (exists) return prev;
+                        return [...prev, newMessage];
+                    });
+                     
+                     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+                });
+        };
+
+        setupEcho();
+
+        return () => {
+            if (echo) {
+                echo.disconnect();
+            }
+        };
+    }, [friendId, user?.id]);
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;

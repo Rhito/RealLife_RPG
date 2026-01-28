@@ -1,11 +1,11 @@
 {
    "private": true,
-  "scripts": {
-    "production": "echo 'No frontend build'",
-    "build": "echo 'No frontend build'"
-  },
-  "devDependencies": {
-    "laravel-echo": "^2.1.7",
-    "pusher-js": "^8.4.0"
-  }
+   "scripts": {
+      "production": "echo 'No frontend build'",
+      "build": "echo 'No frontend build'"
+   },
+   "devDependencies": {
+      "laravel-echo": "^2.3.0",
+      "pusher-js": "^8.4.0"
+   }
 }
