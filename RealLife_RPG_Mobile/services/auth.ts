@@ -49,10 +49,10 @@ export const resendVerificationEmail = async () => {
 };
 
 export const seedOnboarding = async (planId: string | null) => {
-  try {
-    const response = await api.post('/onboarding/seed', { plan_id: planId });
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || error.message;
-  }
+    try {
+        const response = await api.post('/onboarding/seed', { plan_id: planId });
+        return response.data;
+    } catch (error: any) {
+        throw error.response?.data || error.message;
+    }
 };

@@ -40,18 +40,24 @@ const InitialLayout = () => {
       if (!user.email_verified_at && segments[0] !== 'verify-email') {
           router.replace('/verify-email');
       } else if (user.email_verified_at) {
-          // Check onboarding first
-          if (!user.is_onboarded && segments[0] !== 'onboarding') {
-              router.replace('/onboarding');
-              return;
-          }
+          // Check tutorial ONLY if we are heading to tabs/index from a Public route
+          // OR if we are explicitly checking on mount.
+          // BUT, we need to allow 'tutorial' to be a valid route.
           
           if (segments[0] === 'tutorial') return; // Stay on tutorial
-          if (segments[0] === 'onboarding') return; // Stay on onboarding
 
           const ispublicRoute = ['login', 'register', 'index', ''].includes(segments[0] || '');
           if (ispublicRoute) {
                checkTutorial().then(() => {
+                   // If checkTutorial didn't redirect, we go to tabs
+                   // Wait, checkTutorial is async. We might have a race condition.
+                   // Let's rely on the checkTutorial inside the effect for "first load" logic.
+                   // But here we are redirecting to tabs immediately.
+                   
+                   // Better logic: Always go to tabs, let tabs/index check? 
+                   // No, global layout is better.
+                   
+                   // Let's do:
                    SecureStore.getItemAsync('HAS_SEEN_TUTORIAL').then(hasSeen => {
                        if (hasSeen !== 'true') {
                            router.replace('/tutorial');
@@ -77,6 +83,19 @@ const InitialLayout = () => {
       }
   }, [user]);
 
+  // Handle Onboarding Redirect
+  useEffect(() => {
+    if (user && !isLoading) {
+        // Check if user is NOT onboarded (handles 0, false, null, undefined)
+        if (!user.is_onboarded) { 
+             // Check if we are already in onboarding to avoid loop
+             if (segments[0] !== 'onboarding') {
+                 router.replace('/onboarding' as any);
+             }
+        }
+    }
+  }, [user, isLoading, segments]);
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -93,8 +112,8 @@ const InitialLayout = () => {
       <Stack.Screen name="forgot-password" />
       <Stack.Screen name="reset-password" />
       <Stack.Screen name="verify-email" />
+      <Stack.Screen name="onboarding/index" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
-      <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />
     </Stack>
