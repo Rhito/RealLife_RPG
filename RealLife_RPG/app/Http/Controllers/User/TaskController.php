@@ -66,6 +66,36 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task created', 'data' => $task], 201);
     }
 
+    public function update(Request $request, string $id)
+    {
+        $user = Auth::user();
+        $task = Task::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+
+        $request->validate([
+            'title' => 'string|max:255',
+            'type' => 'string',
+            'difficulty' => 'in:easy,medium,hard',
+            'repeat_days' => 'nullable|array',
+            'due_date' => 'nullable|date',
+        ]);
+
+        // If changing type to/once or changing date of a once task, we might need to update instances?
+        // For simplicity v1: Update the definition. If it's a "live" edit of a Todo, also update the pending instance?
+        
+        $task->update($request->only([
+            'title', 'description', 'type', 'difficulty', 'repeat_days', 'due_date'
+        ]));
+
+        if ($request->has('due_date') && ($task->type->value === 'todo' || $task->type->value === 'once')) {
+            // Update pending instances schedule
+            TaskInstance::where('task_id', $task->id)
+                ->where('status', 'pending')
+                ->update(['scheduled_date' => \Carbon\Carbon::parse($request->due_date)]);
+        }
+
+        return response()->json(['message' => 'Task updated', 'data' => $task]);
+    }
+
     public function generateDaily()
     {
         $user = Auth::user();
@@ -94,14 +124,20 @@ class TaskController extends Controller
                 return $habit;
             });
 
-        // 2. Get Dailies (Pending Instances for today/past)
-        // We filter instances where task value is 'daily'
+        // 2. Get Dailies (Pending Instances for today/past AND Completed for today)
         $dailies = TaskInstance::where('user_id', $user->id)
-            ->where('status', 'pending')
             ->whereHas('task', function($q) {
-                $q->where('type', 'daily'); // or 'habit' if we treated habits as daily instances before, but now we split
+                $q->where('type', 'daily');
+            })
+            ->where(function($q) {
+                $q->where('status', 'pending')
+                  ->orWhere(function($sub) {
+                      $sub->where('status', 'completed')
+                          ->whereDate('scheduled_date', today());
+                  });
             })
             ->with('task')
+            ->orderBy('status', 'asc') // Pending first, then completed
             ->get();
 
         // 3. Get To-Dos (Pending Instances)

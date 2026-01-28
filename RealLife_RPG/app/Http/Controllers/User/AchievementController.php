@@ -20,8 +20,8 @@ class AchievementController extends Controller
             }])
             ->get();
 
-        // Transform collection to include 'is_unlocked' flag
-        $data = $achievements->map(function ($achievement) {
+            // Transform collection to include 'is_unlocked' flag
+            $data = $achievements->map(function ($achievement) {
             $userAchievement = $achievement->users->first();
             
             return [

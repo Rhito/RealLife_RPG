@@ -83,6 +83,19 @@ const InitialLayout = () => {
       }
   }, [user]);
 
+  // Handle Onboarding Redirect
+  useEffect(() => {
+    if (user && !isLoading) {
+        // If user is NOT onboarded and NOT already on the onboarding screen
+        if (user.is_onboarded === 0 || user.is_onboarded === false) { 
+             // Check if we are already in onboarding to avoid loop
+             if (segments[0] !== 'onboarding') {
+                 router.replace('/onboarding' as any);
+             }
+        }
+    }
+  }, [user, isLoading, segments]);
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -99,6 +112,7 @@ const InitialLayout = () => {
       <Stack.Screen name="forgot-password" />
       <Stack.Screen name="reset-password" />
       <Stack.Screen name="verify-email" />
+      <Stack.Screen name="onboarding/index" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />

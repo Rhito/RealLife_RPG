@@ -3,7 +3,7 @@ import api from './api';
 export enum TaskType {
     HABIT = 'habit',
     DAILY = 'daily',
-    TODO = 'todo',
+    TODO = 'once',
 }
 
 export enum TaskDifficulty {
@@ -78,6 +78,15 @@ export const completeFocusTask = async (id: number) => {
 export const createTask = async (data: Partial<Task>) => {
     try {
         const response = await api.post('/tasks', data);
+        return response.data;
+    } catch (error: any) {
+        throw error.response?.data || error.message;
+    }
+}
+
+export const updateTask = async (id: number, data: Partial<Task>) => {
+    try {
+        const response = await api.put(`/tasks/${id}`, data);
         return response.data;
     } catch (error: any) {
         throw error.response?.data || error.message;
