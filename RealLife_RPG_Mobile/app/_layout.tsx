@@ -86,8 +86,8 @@ const InitialLayout = () => {
   // Handle Onboarding Redirect
   useEffect(() => {
     if (user && !isLoading) {
-        // If user is NOT onboarded and NOT already on the onboarding screen
-        if (user.is_onboarded === 0 || user.is_onboarded === false) { 
+        // Check if user is NOT onboarded (handles 0, false, null, undefined)
+        if (!user.is_onboarded) { 
              // Check if we are already in onboarding to avoid loop
              if (segments[0] !== 'onboarding') {
                  router.replace('/onboarding' as any);

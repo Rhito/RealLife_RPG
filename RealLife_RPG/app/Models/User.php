@@ -68,6 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'coins' => 'integer',
             'exp' => 'integer',
             'current_streak' => 'integer',
+            'is_onboarded' => 'boolean',
         ];
     }
 
