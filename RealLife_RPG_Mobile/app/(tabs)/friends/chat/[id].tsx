@@ -6,7 +6,6 @@ import { useAuth } from '../../../../context/AuthContext';
 import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import createEcho from '../../../../services/echo';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -50,47 +49,16 @@ export default function ChatScreen() {
         }
     };
 
-
     useEffect(() => {
         fetchMessages();
         
-        let echoInstance: any;
+        // Disable polling for AI Bot (ID 0) as it has no persistence/history yet
+        if (friendId === 0) return;
 
-        const setupEcho = async () => {
-            if (!user?.id) return;
-            
-            // Disable for AI Bot (ID 0)
-            if (friendId === 0) return;
-            
-            echoInstance = await createEcho();
-            
-            echoInstance.private(`chat.${user.id}`)
-                .listen('MessageSent', (e: any) => {
-                    // Check if message belongs to this conversation
-                    const isFromFriend = e.sender_id === friendId;
-                    const isToFriend = e.receiver_id === friendId;
-                    
-                    if (isFromFriend || isToFriend) {
-                        setMessages(prev => {
-                            // Deduplicate based on ID just in case
-                            if (prev.some(m => m.id === e.id)) return prev;
-                            return [...prev, e];
-                        });
-                        
-                        // Scroll to bottom
-                        setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-                    }
-                });
-        };
-
-        setupEcho();
-
-        return () => {
-            if (echoInstance) {
-                echoInstance.leave(`chat.${user?.id}`);
-            }
-        };
-    }, [friendId, user?.id]);
+        // Poll for new messages every 5 seconds (temporary solution until websockets)
+        const interval = setInterval(fetchMessages, 5000);
+        return () => clearInterval(interval);
+    }, [friendId]);
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;

@@ -56,8 +56,6 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
-        broadcast(new \App\Events\MessageSent($message))->toOthers();
-
         return response()->json($message, 201);
     }
 }
