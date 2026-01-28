@@ -7,7 +7,6 @@ import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import createEcho from '../../../../services/echo';
-import { getToken } from '../../../../services/api';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -51,45 +50,44 @@ export default function ChatScreen() {
         }
     };
 
+
     useEffect(() => {
         fetchMessages();
         
-        // Disable real-time for AI Bot (ID 0)
-        if (friendId === 0) return;
-
-        let echo: any;
+        let echoInstance: any;
 
         const setupEcho = async () => {
-            const token = await getToken();
-            if (!token) return;
-
-            echo = createEcho(token);
+            if (!user?.id) return;
             
-            // Channel name: chat.{minId}.{maxId}
-            const ids = [user?.id, friendId].sort((a, b) => (a || 0) - (b || 0));
-            const channelName = `chat.${ids[0]}.${ids[1]}`;
-
-            console.log('Listening to channel:', channelName);
-
-            echo.private(channelName)
-                .listen('MessageSent', (event: any) => {
-                    const newMessage = event.message;
-                    setMessages(prev => {
-                        // Check if we already have this message (by ID or content/timestamp if ID is temp)
-                        const exists = prev.some(m => m.id === newMessage.id);
-                        if (exists) return prev;
-                        return [...prev, newMessage];
-                    });
-                     
-                     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+            // Disable for AI Bot (ID 0)
+            if (friendId === 0) return;
+            
+            echoInstance = await createEcho();
+            
+            echoInstance.private(`chat.${user.id}`)
+                .listen('MessageSent', (e: any) => {
+                    // Check if message belongs to this conversation
+                    const isFromFriend = e.sender_id === friendId;
+                    const isToFriend = e.receiver_id === friendId;
+                    
+                    if (isFromFriend || isToFriend) {
+                        setMessages(prev => {
+                            // Deduplicate based on ID just in case
+                            if (prev.some(m => m.id === e.id)) return prev;
+                            return [...prev, e];
+                        });
+                        
+                        // Scroll to bottom
+                        setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+                    }
                 });
         };
 
         setupEcho();
 
         return () => {
-            if (echo) {
-                echo.disconnect();
+            if (echoInstance) {
+                echoInstance.leave(`chat.${user?.id}`);
             }
         };
     }, [friendId, user?.id]);

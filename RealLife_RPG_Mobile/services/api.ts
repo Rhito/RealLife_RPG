@@ -57,11 +57,4 @@ api.interceptors.response.use(
   }
 );
 
-export const getToken = async () => {
-    if (Platform.OS === 'web') {
-        return localStorage.getItem('token');
-    }
-    return await SecureStore.getItemAsync('token');
-};
-
 export default api;

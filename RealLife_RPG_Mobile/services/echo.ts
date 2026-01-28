@@ -1,18 +1,39 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import * as SecureStore from 'expo-secure-store';
 
-// Define global Pusher if not already defined (required for React Native sometimes)
-// @ts-ignore
+// Define the global window object for Pusher
+declare global {
+    interface Window {
+        Pusher: any;
+        Echo: any;
+    }
+}
+
 window.Pusher = Pusher;
 
-const createEcho = (token: string) => {
+const createEcho = async () => {
+    const token = await SecureStore.getItemAsync('token');
+
+    if (!token) {
+        console.warn('Echo: No token found, cannot authenticate channels.');
+    }
+
+    const host = process.env.EXPO_PUBLIC_REVERB_HOST;
+    const port = process.env.EXPO_PUBLIC_REVERB_PORT;
+    const scheme = process.env.EXPO_PUBLIC_REVERB_SCHEME || 'https';
+    
+    // Explicitly construct the wsHost to match the hostname
+    // Reverb usually listens on the same host
+    console.log(`Connecting to Reverb at ${scheme}://${host}:${port}`);
+
     return new Echo({
         broadcaster: 'reverb',
         key: process.env.EXPO_PUBLIC_REVERB_APP_KEY,
-        wsHost: process.env.EXPO_PUBLIC_REVERB_HOST,
-        wsPort: process.env.EXPO_PUBLIC_REVERB_PORT ? Number(process.env.EXPO_PUBLIC_REVERB_PORT) : 80,
-        wssPort: process.env.EXPO_PUBLIC_REVERB_PORT ? Number(process.env.EXPO_PUBLIC_REVERB_PORT) : 443,
-        forceTLS: (process.env.EXPO_PUBLIC_REVERB_SCHEME ?? 'https') === 'https',
+        wsHost: host,
+        wsPort: port ? parseInt(port) : 443,
+        wssPort: port ? parseInt(port) : 443,
+        forceTLS: scheme === 'https',
         enabledTransports: ['ws', 'wss'],
         authEndpoint: `${process.env.EXPO_PUBLIC_API_URL}/broadcasting/auth`,
         auth: {
@@ -21,6 +42,7 @@ const createEcho = (token: string) => {
                 Accept: 'application/json',
             },
         },
+        disableStats: true,
     });
 };
 
