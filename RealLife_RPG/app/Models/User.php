@@ -36,7 +36,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'current_streak',
         'last_streak_date',
         'timezone',
-        'is_onboarded',
     ];
 
     /**

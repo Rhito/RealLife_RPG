@@ -14,6 +14,7 @@ class LeaderboardController extends Controller
     {
         // Global Leaderboard: Top 50 by Level DESC, EXP DESC
         $users = User::where('id', '!=', 0)
+            ->where('email', '!=', 'ai@gemini.google')
             ->orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
             ->limit(50)
@@ -44,7 +45,6 @@ class LeaderboardController extends Controller
         $users = User::whereIn('id', $friendIds)
             ->where('id', '!=', 0)
             ->where('email', '!=', 'ai@gemini.google')
-            ->where('name', '!=', 'Gemini AI')
             ->orderBy('level', 'desc')
             ->orderBy('exp', 'desc')
             ->get(['id', 'name', 'level', 'exp', 'avatar']);

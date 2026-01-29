@@ -88,20 +88,19 @@ export default function TasksScreen() {
           const res = await completeTask(id);
           updateUserStats(res.rewards);
           
-          let message = `+${res.rewards.exp} XP, +${res.rewards.coins} Coins`;
-          if (res.rewards.achievements && res.rewards.achievements.length > 0) {
-              message += `\n\n🏆 ${res.rewards.achievements.join('\n🏆 ')}`;
-          }
-
-          showAlert('Task Complete!', message);
-          
           // Check for Level Up
            if (res.rewards.level > (user?.level || 1)) {
-              setTimeout(() => {
-                  showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
-              }, 500);
+              showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
           }
           
+          // Check for Achievements
+          if (res.rewards.achievements && res.rewards.achievements.length > 0) {
+              const message = res.rewards.achievements.join('\n');
+              setTimeout(() => {
+                  showAlert('🏆 Achievement Unlocked!', message);
+              }, 500); 
+          }
+
           loadTasks(); // Reload to remove from list
       } catch (e: any) {
           showAlert('Error', e.message || 'Failed to complete task');
@@ -191,12 +190,6 @@ export default function TasksScreen() {
       <View style={[styles.taskCard, styles.habitCard]}>
           <TouchableOpacity 
             style={styles.deleteButtonSmall} 
-            onPress={() => router.push({ pathname: '/tasks/edit', params: { taskData: JSON.stringify(item) } })}
-          >
-              <Ionicons name="pencil-outline" size={16} color="#B0BEC5" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.deleteButtonSmall} 
             onPress={() => handleDelete(item.id, item.title)}
           >
               <Ionicons name="trash-outline" size={16} color="#B0BEC5" />
@@ -222,18 +215,14 @@ export default function TasksScreen() {
 
   const renderDailyItem = ({ item }: { item: TaskInstance }) => (
       <View style={[styles.taskCard, styles.dailyCard]}>
-           <TouchableOpacity 
-                style={[styles.checkBox, item.status === 'completed' && styles.checkBoxCompleted]} 
-                onPress={() => item.status !== 'completed' && handleComplete(item.id)}
-            >
-               {item.status === 'completed' && <Ionicons name="checkmark" size={20} color="white" />}
-               {item.status !== 'completed' && <View style={styles.checkBoxInner} />}
+           <TouchableOpacity style={styles.checkBox} onPress={() => handleComplete(item.id)}>
+               <View style={styles.checkBoxInner} />
            </TouchableOpacity>
            <TouchableOpacity 
                 style={styles.taskContent}
                 onPress={() => setSelectedTask({...item, type: 'daily'})}
            >
-              <Text style={[styles.taskTitle, item.status === 'completed' && styles.completedText]}>{item.task.title}</Text>
+              <Text style={styles.taskTitle}>{item.task.title}</Text>
               <View style={styles.metaRow}>
                   <View style={styles.tagContainer}>
                       <Text style={styles.tagText}>{item.task.difficulty.toUpperCase()}</Text>
@@ -241,14 +230,9 @@ export default function TasksScreen() {
               </View>
            </TouchableOpacity>
            <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.iconBtn} onPress={() => router.push({ pathname: '/tasks/edit', params: { taskData: JSON.stringify(item.task) } })}>
-                    <Ionicons name="pencil-outline" size={18} color="#B0BEC5" />
+                <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
+                    <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
                 </TouchableOpacity>
-                {item.status !== 'completed' && (
-                    <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
-                        <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
-                    </TouchableOpacity>
-                )}
                 <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.task.id, item.task.title)}>
                     <Ionicons name="trash-outline" size={18} color="#B0BEC5" />
                 </TouchableOpacity>
@@ -278,9 +262,6 @@ export default function TasksScreen() {
               </View>
            </TouchableOpacity>
            <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.iconBtn} onPress={() => router.push({ pathname: '/tasks/edit', params: { taskData: JSON.stringify(item.task) } })}>
-                    <Ionicons name="pencil-outline" size={18} color="#B0BEC5" />
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.iconBtn} onPress={() => handleFail(item.id, item.task.title)}>
                     <Ionicons name="close-circle-outline" size={20} color="#EF9A9A" />
                 </TouchableOpacity>
@@ -363,19 +344,6 @@ export default function TasksScreen() {
                                 <Text style={styles.detailDesc}>
                                     {new Date(selectedTask.scheduled_date).toLocaleString()}
                                 </Text>
-                              </>
-                          )}
-
-                          {selectedTask.type === 'daily' && task.repeat_days && (
-                              <>
-                                <Text style={styles.sectionHeader}>Repeats On</Text>
-                                <View style={styles.repeatsRow}>
-                                    {task.repeat_days.map((day: string) => (
-                                        <View key={day} style={styles.repeatBadge}>
-                                            <Text style={styles.repeatText}>{day}</Text>
-                                        </View>
-                                    ))}
-                                </View>
                               </>
                           )}
                       </ScrollView>
@@ -607,32 +575,6 @@ const styles = StyleSheet.create({
   dateText: {
       fontSize: 12,
       color: '#666',
-  },
-  checkBoxCompleted: {
-      backgroundColor: '#4CAF50', // Green
-      borderColor: '#4CAF50',
-  },
-  completedText: {
-      textDecorationLine: 'line-through',
-      color: '#9E9E9E',
-  },
-  repeatsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 5,
-    marginBottom: 24,
-  },
-  repeatBadge: {
-    backgroundColor: '#E0E0E0',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-  },
-  repeatText: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: 'bold',
   },
   emptyContainer: {
       alignItems: 'center',
