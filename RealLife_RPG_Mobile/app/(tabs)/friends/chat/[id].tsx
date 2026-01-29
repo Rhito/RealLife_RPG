@@ -6,6 +6,7 @@ import { useAuth } from '../../../../context/AuthContext';
 import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
+import { echo } from '../../../../utils/echo';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -52,13 +53,33 @@ export default function ChatScreen() {
     useEffect(() => {
         fetchMessages();
         
-        // Disable polling for AI Bot (ID 0) as it has no persistence/history yet
-        if (friendId === 0) return;
+        if (friendId === 0 || !user) return;
 
-        // Poll for new messages every 5 seconds (temporary solution until websockets)
-        const interval = setInterval(fetchMessages, 5000);
-        return () => clearInterval(interval);
-    }, [friendId]);
+        // Listen for incoming messages on my channel
+        const channel = echo.private(`chat.${user.id}`);
+        
+        channel.listen('MessageSent', (event: any) => {
+            console.log('New Message Event:', event);
+            const newMessage = event.message;
+            
+            // Only append if the message is from the friend we are currently chatting with
+            if (newMessage.sender_id === friendId) {
+                setMessages(currentMessages => {
+                    // Avoid duplicates if any
+                    if (currentMessages.some(m => m.id === newMessage.id)) return currentMessages;
+                    return [...currentMessages, newMessage];
+                });
+                
+                // Scroll to bottom
+                setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+            }
+        });
+
+        // Cleanup
+        return () => {
+            channel.stopListening('MessageSent');
+        };
+    }, [friendId, user]);
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;

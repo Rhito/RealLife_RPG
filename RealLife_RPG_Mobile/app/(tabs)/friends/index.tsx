@@ -175,7 +175,7 @@ const renderFriend = ({ item }: { item: User }) => (
                 >
                     <View style={styles.aiAvatarContainer}>
                         <Image 
-                            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' }} 
+                            source={require('../../../assets/images/gemini-logo.jpg')} 
                             style={styles.aiAvatar} 
                         />
                         <View style={styles.aiOnlineBadge} />

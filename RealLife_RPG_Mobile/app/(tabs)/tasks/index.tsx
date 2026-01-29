@@ -86,11 +86,20 @@ export default function TasksScreen() {
       setProcessing(true);
       try {
           const res = await completeTask(id);
+          const gainedExp = res.rewards.exp - (user?.exp || 0);
+          const gainedCoins = res.rewards.coins - (user?.coins || 0);
+          
           updateUserStats(res.rewards);
           
+          // Show Reward Alert
+          let rewardMsg = `+${gainedExp} XP, +${gainedCoins} Coins`;
+          showAlert('Quest Complete!', rewardMsg);
+
           // Check for Level Up
            if (res.rewards.level > (user?.level || 1)) {
-              showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
+              setTimeout(() => {
+                  showAlert('🎉 LEVEL UP! 🎉', `You reached Level ${res.rewards.level}!`);
+              }, 500);
           }
           
           // Check for Achievements
@@ -98,7 +107,7 @@ export default function TasksScreen() {
               const message = res.rewards.achievements.join('\n');
               setTimeout(() => {
                   showAlert('🏆 Achievement Unlocked!', message);
-              }, 500); 
+              }, 1000); 
           }
 
           loadTasks(); // Reload to remove from list
@@ -238,7 +247,7 @@ export default function TasksScreen() {
                       <Text style={styles.habitCounterText}>{item.today_count}x today</Text>
                   </View>
               )}
-              {item.is_pinned && (
+              {Boolean(item.is_pinned) && (
                  <View style={styles.pinnedBadge}>
                      <Ionicons name="push" size={12} color="#FF9800" />
                  </View>
@@ -264,7 +273,7 @@ export default function TasksScreen() {
                   <View style={styles.tagContainer}>
                       <Text style={styles.tagText}>{item.task.difficulty.toUpperCase()}</Text>
                   </View>
-                  {item.task.is_pinned && (
+                  {Boolean(item.task.is_pinned) && (
                     <View style={styles.pinnedBadge}>
                         <Ionicons name="push" size={12} color="#FF9800" />
                     </View>
@@ -316,9 +325,9 @@ export default function TasksScreen() {
 
   const getData = () => {
       switch(activeTab) {
-          case 'habit': return habits;
-          case 'daily': return dailies;
-          case 'todo': return todos;
+          case 'habit': return habits; // Habits don't have 'status' per se, they are perpetual
+          case 'daily': return dailies.filter(t => t.status === 'pending');
+          case 'todo': return todos.filter(t => t.status === 'pending');
           default: return [];
       }
   };
