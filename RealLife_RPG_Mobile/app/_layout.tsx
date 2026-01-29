@@ -112,6 +112,7 @@ const InitialLayout = () => {
       <Stack.Screen name="forgot-password" />
       <Stack.Screen name="reset-password" />
       <Stack.Screen name="verify-email" />
+      <Stack.Screen name="onboarding/index" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="tutorial" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="focus/[id]" options={{ presentation: 'modal' }} />

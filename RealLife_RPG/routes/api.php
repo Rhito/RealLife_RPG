@@ -73,7 +73,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/tasks/{id}/score', [\App\Http\Controllers\User\TaskController::class, 'scoreHabit']);
         Route::delete('/tasks/{id}', [\App\Http\Controllers\User\TaskController::class, 'destroy']);
         Route::post('/tasks/{id}/fail', [\App\Http\Controllers\User\TaskController::class, 'fail']);
-        Route::post('/tasks/{id}/pin', [\App\Http\Controllers\User\TaskController::class, 'pin']);
+        Route::put('/tasks/{id}', [\App\Http\Controllers\User\TaskController::class, 'update']);
+        Route::post('/onboarding/seed', [\App\Http\Controllers\User\OnboardingController::class, 'seed']);
 
         // Item Shop
         Route::get('/items', [\App\Http\Controllers\User\ItemController::class, 'index']);
