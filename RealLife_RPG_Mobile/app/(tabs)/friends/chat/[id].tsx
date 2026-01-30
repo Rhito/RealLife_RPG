@@ -6,7 +6,7 @@ import { useAuth } from '../../../../context/AuthContext';
 import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { echo } from '../../../../utils/echo';
+import { reverb } from '../../../../utils/websocket';
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -17,6 +17,7 @@ export default function ChatScreen() {
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [wsConnected, setWsConnected] = useState(false);
     const flatListRef = useRef<FlatList>(null);
     const friendId = Number(id);
 
@@ -40,44 +41,74 @@ export default function ChatScreen() {
 
     // Fetch messages
     const fetchMessages = async () => {
+        // Don't fetch if user is logged out
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+        
         try {
             const data = await getMessages(friendId);
             setMessages(data);
-        } catch (error) {
-            console.error('Failed to load messages', error);
+        } catch (error: any) {
+            // Ignore 401 errors (user logged out)
+            if (error?.response?.status !== 401) {
+                console.error('Failed to load messages', error);
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    // WebSocket subscription for real-time messages
     useEffect(() => {
         fetchMessages();
         
+        // AI Bot (ID 0) doesn't use real-time
         if (friendId === 0 || !user) return;
 
-        // Listen for incoming messages on my channel
-        const channel = echo.private(`chat.${user.id}`);
-        
-        channel.listen('MessageSent', (event: any) => {
-            console.log('New Message Event:', event);
-            const newMessage = event.message;
-            
-            // Only append if the message is from the friend we are currently chatting with
-            if (newMessage.sender_id === friendId) {
-                setMessages(currentMessages => {
-                    // Avoid duplicates if any
-                    if (currentMessages.some(m => m.id === newMessage.id)) return currentMessages;
-                    return [...currentMessages, newMessage];
+        let channel: any = null;
+        let pollingInterval: ReturnType<typeof setInterval> | null = null;
+
+        const setupWebSocket = async () => {
+            try {
+                await reverb.connect();
+                setWsConnected(true);
+                
+                // Subscribe to my private channel to receive messages
+                channel = await reverb.subscribePrivate(`chat.${user.id}`);
+                
+                channel.listen('MessageSent', (event: any) => {
+                    console.log('[WS] New message:', event);
+                    const incomingMessage = event.message;
+                    
+                    // Only append if from current chat partner
+                    if (incomingMessage.sender_id === friendId) {
+                        setMessages(prev => {
+                            if (prev.some(m => m.id === incomingMessage.id)) return prev;
+                            return [...prev, incomingMessage];
+                        });
+                        setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+                    }
                 });
                 
-                // Scroll to bottom
-                setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+            } catch (error) {
+                console.warn('[WS] Failed to connect, falling back to polling:', error);
+                setWsConnected(false);
+                // Fallback to polling
+                pollingInterval = setInterval(fetchMessages, 5000);
             }
-        });
+        };
 
-        // Cleanup
+        setupWebSocket();
+
         return () => {
-            channel.stopListening('MessageSent');
+            if (channel) {
+                channel.unsubscribe();
+            }
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
         };
     }, [friendId, user]);
 

@@ -37,4 +37,23 @@ class MessageSent implements ShouldBroadcast
             new PrivateChannel('chat.' . $this->message->receiver_id),
         ];
     }
+
+    /**
+     * The event's broadcast name.
+     * Use simple name instead of "App\Events\MessageSent"
+     */
+    public function broadcastAs(): string
+    {
+        return 'MessageSent';
+    }
+
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => $this->message->load('sender'),
+        ];
+    }
 }

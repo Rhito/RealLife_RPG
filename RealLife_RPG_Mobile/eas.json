@@ -9,21 +9,50 @@
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleDebug"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://realliferpg-production-7f0c.up.railway.app/api/v1",
+        "EXPO_PUBLIC_REVERB_APP_KEY": "ugh7jkxqznd3ajxeigp8",
+        "EXPO_PUBLIC_REVERB_HOST": "reverb-production-8bc2.up.railway.app",
+        "EXPO_PUBLIC_REVERB_PORT": "443",
+        "EXPO_PUBLIC_REVERB_SCHEME": "https"
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://realliferpg-production-7f0c.up.railway.app/api/v1",
+        "EXPO_PUBLIC_REVERB_APP_KEY": "ugh7jkxqznd3ajxeigp8",
+        "EXPO_PUBLIC_REVERB_HOST": "reverb-production-8bc2.up.railway.app",
+        "EXPO_PUBLIC_REVERB_PORT": "443",
+        "EXPO_PUBLIC_REVERB_SCHEME": "https"
       }
     },
     "apk": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://realliferpg-production-7f0c.up.railway.app/api/v1",
+        "EXPO_PUBLIC_REVERB_APP_KEY": "ugh7jkxqznd3ajxeigp8",
+        "EXPO_PUBLIC_REVERB_HOST": "reverb-production-8bc2.up.railway.app",
+        "EXPO_PUBLIC_REVERB_PORT": "443",
+        "EXPO_PUBLIC_REVERB_SCHEME": "https"
       }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://realliferpg-production-7f0c.up.railway.app/api/v1",
+        "EXPO_PUBLIC_REVERB_APP_KEY": "ugh7jkxqznd3ajxeigp8",
+        "EXPO_PUBLIC_REVERB_HOST": "reverb-production-8bc2.up.railway.app",
+        "EXPO_PUBLIC_REVERB_PORT": "443",
+        "EXPO_PUBLIC_REVERB_SCHEME": "https"
+      }
+    }
   },
   "submit": {
     "production": {}

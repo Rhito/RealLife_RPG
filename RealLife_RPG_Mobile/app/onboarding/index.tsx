@@ -51,13 +51,7 @@ export default function OnboardingScreen() {
             const res = await seedOnboarding(planId);
             
             // Update local user state to reflect onboarding completion
-            // We assume the backend returns the updated user or we manually update
             if (user) {
-                // Determine new tasks count or similar? 
-                // Mostly we just need to set is_onboarded = true to pass the layout check
-                // However, our AuthContext might not automatically refresh the user.
-                // We should probably manually update it.
-                // But `setUser` type might be strict.
                 setUser({ ...user, is_onboarded: true });
             }
 
@@ -69,6 +63,14 @@ export default function OnboardingScreen() {
 
             router.replace('/(tabs)');
         } catch (e: any) {
+            // If already onboarded, just redirect to tabs
+            if (e.message?.includes('already onboarded') || e.response?.status === 400) {
+                if (user) {
+                    setUser({ ...user, is_onboarded: true });
+                }
+                router.replace('/(tabs)');
+                return;
+            }
             showAlert('Error', e.message || 'Failed to setup account');
             setLoading(false);
         }

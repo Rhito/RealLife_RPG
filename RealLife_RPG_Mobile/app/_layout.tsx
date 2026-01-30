@@ -45,6 +45,7 @@ const InitialLayout = () => {
           // BUT, we need to allow 'tutorial' to be a valid route.
           
           if (segments[0] === 'tutorial') return; // Stay on tutorial
+          if (segments[0] === 'onboarding') return; // Stay on onboarding
 
           const ispublicRoute = ['login', 'register', 'index', ''].includes(segments[0] || '');
           if (ispublicRoute) {
@@ -86,12 +87,23 @@ const InitialLayout = () => {
   // Handle Onboarding Redirect
   useEffect(() => {
     if (user && !isLoading) {
-        // Check if user is NOT onboarded (handles 0, false, null, undefined)
-        if (!user.is_onboarded) { 
+        // Debug: log the actual value
+        console.log('[Onboarding Check] is_onboarded:', user.is_onboarded, typeof user.is_onboarded);
+        
+        // Check if user is onboarded - handle boolean, number (0/1), AND string ("0"/"1")
+        const isOnboarded = user.is_onboarded === true || 
+                            user.is_onboarded === 1 || 
+                            user.is_onboarded === '1' ||
+                            user.is_onboarded === 'true';
+        
+        if (!isOnboarded) { 
              // Check if we are already in onboarding to avoid loop
              if (segments[0] !== 'onboarding') {
                  router.replace('/onboarding' as any);
              }
+        } else if (segments[0] === 'onboarding') {
+            // User is onboarded but stuck on onboarding screen - redirect to tabs
+            router.replace('/(tabs)');
         }
     }
   }, [user, isLoading, segments]);
