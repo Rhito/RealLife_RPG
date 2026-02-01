@@ -60,8 +60,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 405);
         });
 
-        // 500 Internal Server Error (catch all)
+        // 500 Internal Server Error (catch app exceptions only)
         $exceptions->render(function (Throwable $e, $request) {
+            // Let HTTP exceptions be handled by Laravel's default handler
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return null;
+            }
+            
             return response()->json([
                 'error' => 'Server error',
                 'code'  => 500,

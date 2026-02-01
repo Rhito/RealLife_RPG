@@ -9,6 +9,9 @@ const REVERB_SCHEME = process.env.EXPO_PUBLIC_REVERB_SCHEME || 'https';
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 const AUTH_ENDPOINT = API_URL.replace('/v1', '/broadcasting/auth');
 
+// Debug log for APK troubleshooting
+console.log('[WebSocket Config]', { REVERB_HOST, REVERB_PORT, REVERB_SCHEME, AUTH_ENDPOINT });
+
 type EventCallback = (data: any) => void;
 type ConnectionCallback = () => void;
 
