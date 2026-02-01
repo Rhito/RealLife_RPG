@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { getMessages, sendMessage, Message } from '../../../../services/MessageService';
@@ -7,6 +7,24 @@ import { useAlert } from '../../../../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { reverb } from '../../../../utils/websocket';
+
+const MessageItem = React.memo(({ item, isMyMessage }: { item: Message, isMyMessage: boolean }) => (
+    <View style={[
+        styles.messageContainer, 
+        isMyMessage ? styles.myMessage : styles.theirMessage
+    ]}>
+        <Text style={[
+            styles.messageText,
+            isMyMessage ? styles.myMessageText : styles.theirMessageText
+        ]}>{item.content}</Text>
+        <Text style={[
+            styles.timestamp, 
+            isMyMessage ? styles.myTimestamp : styles.theirTimestamp
+        ]}>
+            {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
+    </View>
+));
 
 export default function ChatScreen() {
     const { id, name } = useLocalSearchParams();
@@ -79,16 +97,25 @@ export default function ChatScreen() {
                 channel = await reverb.subscribePrivate(`chat.${user.id}`);
                 
                 channel.listen('MessageSent', (event: any) => {
-                    console.log('[WS] New message:', event);
+                    console.log('[WS] New message event:', event);
                     const incomingMessage = event.message;
                     
+                    console.log(`[WS] Checking sender: ${incomingMessage.sender_id} vs Friend: ${friendId}`);
+
                     // Only append if from current chat partner
-                    if (incomingMessage.sender_id === friendId) {
+                    if (Number(incomingMessage.sender_id) === Number(friendId)) {
+                        console.log('[WS] Sender matches! Updating UI...');
                         setMessages(prev => {
-                            if (prev.some(m => m.id === incomingMessage.id)) return prev;
+                            if (prev.some(m => m.id === incomingMessage.id)) {
+                                console.log('[WS] Message already exists in state, skipping.');
+                                return prev;
+                            }
+                            console.log('[WS] Adding new message to state.');
                             return [...prev, incomingMessage];
                         });
                         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+                    } else {
+                        console.log('[WS] Sender mismatch - verification failed.');
                     }
                 });
                 
@@ -163,27 +190,9 @@ export default function ChatScreen() {
         }
     };
 
-    const renderItem = ({ item }: { item: Message }) => {
-        const isMyMessage = item.sender_id !== friendId; // If sender is not friend, it's me
-        
-        return (
-            <View style={[
-                styles.messageContainer, 
-                isMyMessage ? styles.myMessage : styles.theirMessage
-            ]}>
-                <Text style={[
-                    styles.messageText,
-                    isMyMessage ? styles.myMessageText : styles.theirMessageText
-                ]}>{item.content}</Text>
-                <Text style={[
-                    styles.timestamp, 
-                    isMyMessage ? styles.myTimestamp : styles.theirTimestamp
-                ]}>
-                    {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-            </View>
-        );
-    };
+    const renderItem = useCallback(({ item }: { item: Message }) => (
+        <MessageItem item={item} isMyMessage={item.sender_id !== friendId} />
+    ), [friendId]);
 
     return (
         <KeyboardAvoidingView 
@@ -210,6 +219,10 @@ export default function ChatScreen() {
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContent}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                    initialNumToRender={15}
+                    maxToRenderPerBatch={10}
+                    windowSize={10}
+                    removeClippedSubviews={Platform.OS === 'android'}
                 />
             )}
 

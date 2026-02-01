@@ -86,7 +86,7 @@ export default function SocialScreen() {
         }
     }
 
-const renderFriend = ({ item }: { item: User }) => (
+    const renderFriend = ({ item }: { item: User }) => (
         <View style={styles.card}>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => router.push({ pathname: '/users/[id]', params: { id: item.id } })}>
                 <Avatar name={item.name} size={40} />
@@ -97,6 +97,11 @@ const renderFriend = ({ item }: { item: User }) => (
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/(tabs)/friends/chat/[id]', params: { id: item.id, name: item.name } })}>
                 <Ionicons name="chatbubble-ellipses" size={24} color="#FF9800" />
+                {(item.unread_count || 0) > 0 && (
+                    <View style={styles.unreadBadge}>
+                        <Text style={styles.unreadText}>{item.unread_count}</Text>
+                    </View>
+                )}
             </TouchableOpacity>
         </View>
     );
@@ -426,5 +431,22 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       marginTop: 20,
       color: '#BBAADD',
+  },
+  unreadBadge: {
+      position: 'absolute',
+      right: -2,
+      top: -2,
+      backgroundColor: '#F44336',
+      borderRadius: 10,
+      minWidth: 18,
+      height: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 4,
+  },
+  unreadText: {
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 'bold',
   }
 });

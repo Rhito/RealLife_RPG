@@ -24,7 +24,14 @@ class FriendController extends Controller
             ->get()
             ->map(function ($friendship) use ($user) {
                 // Return the *other* user
-                return $friendship->user_id === $user->id ? $friendship->friend : $friendship->user;
+                $friend = $friendship->user_id === $user->id ? $friendship->friend : $friendship->user;
+                
+                $friend->unread_count = \App\Models\Message::where('sender_id', $friend->id)
+                    ->where('receiver_id', $user->id)
+                    ->whereNull('read_at')
+                    ->count();
+
+                return $friend;
             });
 
         return response()->json(['data' => $friends]);

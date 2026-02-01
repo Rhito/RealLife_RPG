@@ -9,6 +9,7 @@ export interface User {
     level: number;
     exp: number;
     avatar?: string;
+    unread_count?: number;
 }
 
 export interface FeedItem {
