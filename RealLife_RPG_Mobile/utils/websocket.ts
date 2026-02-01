@@ -68,9 +68,9 @@ class ReverbWebSocket {
                 this.ws = new WebSocket(url);
 
                 this.ws.onopen = () => {
-                    console.log('[WebSocket] Connected');
+                    console.log('[WebSocket] Connected (TCP open)');
                     this.reconnectAttempts = 0;
-                    this.isConnecting = false;
+                    // isConnecting remains true until we receive socket_id
                 };
 
                 this.ws.onmessage = (event) => {
@@ -78,6 +78,7 @@ class ReverbWebSocket {
                     
                     // On first message with socket_id, resolve the connection
                     if (this.socketId && this.isConnecting) {
+                        console.log('[WebSocket] Connection established with Socket ID');
                         this.isConnecting = false;
                         resolve();
                     }
@@ -157,6 +158,9 @@ class ReverbWebSocket {
                     if (message.channel && message.event) {
                         console.log('[WebSocket] Event received:', message.channel, message.event);
                         this.dispatchEvent(message.channel, message.event, message.data);
+                    } else {
+                        // Log any unhandled messages for debugging
+                        console.log('[WebSocket] Unhandled message:', message.event, message);
                     }
                     break;
             }
@@ -221,27 +225,37 @@ class ReverbWebSocket {
     async subscribePrivate(channelName: string): Promise<ChannelHandle> {
         const fullChannelName = channelName.startsWith('private-') ? channelName : `private-${channelName}`;
         
+        console.log('[WebSocket] Subscribing to private channel:', fullChannelName);
+        
         if (!this.socketId) {
+            console.log('[WebSocket] No socket ID, connecting first...');
             await this.connect();
         }
 
-        // Authenticate with Laravel
-        const auth = await this.authenticate(fullChannelName);
-        
-        this.send({
-            event: 'pusher:subscribe',
-            data: {
-                channel: fullChannelName,
-                auth: auth.auth
-            }
-        });
+        try {
+            // Authenticate with Laravel
+            console.log('[WebSocket] Authenticating channel:', fullChannelName, 'with socket:', this.socketId);
+            const auth = await this.authenticate(fullChannelName);
+            console.log('[WebSocket] Auth successful, sending subscribe');
+            
+            this.send({
+                event: 'pusher:subscribe',
+                data: {
+                    channel: fullChannelName,
+                    auth: auth.auth
+                }
+            });
 
-        this.channels.set(fullChannelName, {
-            channelName: fullChannelName,
-            events: new Map()
-        });
+            this.channels.set(fullChannelName, {
+                channelName: fullChannelName,
+                events: new Map()
+            });
 
-        return new ChannelHandle(this, fullChannelName);
+            return new ChannelHandle(this, fullChannelName);
+        } catch (error) {
+            console.error('[WebSocket] Subscribe failed:', error);
+            throw error;
+        }
     }
 
     /**
@@ -260,6 +274,8 @@ class ReverbWebSocket {
             throw new Error('No auth token found');
         }
 
+        console.log('[WebSocket] Auth request to:', AUTH_ENDPOINT);
+        
         const response = await fetch(AUTH_ENDPOINT, {
             method: 'POST',
             headers: {
@@ -273,10 +289,14 @@ class ReverbWebSocket {
         });
 
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[WebSocket] Auth response error:', response.status, errorText);
             throw new Error(`Auth failed: ${response.status}`);
         }
 
-        return response.json();
+        const authData = await response.json();
+        console.log('[WebSocket] Auth response OK');
+        return authData;
     }
 
     /**
