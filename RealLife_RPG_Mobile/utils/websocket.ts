@@ -139,6 +139,11 @@ class ReverbWebSocket {
                     this.onConnectedCallbacks.forEach(cb => cb());
                     break;
 
+                case 'pusher:ping':
+                    // Respond to server ping with pong to keep connection alive
+                    this.send({ event: 'pusher:pong', data: {} });
+                    break;
+
                 case 'pusher:error':
                     console.error('[WebSocket] Pusher error:', message.data);
                     break;
