@@ -99,6 +99,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
+    // Disconnect WebSocket before logout to prevent stale connections
+    const { reverb } = await import('../utils/websocket');
+    reverb.disconnect();
+    
     await logoutService();
     setUser(null);
     await deleteItem('token');

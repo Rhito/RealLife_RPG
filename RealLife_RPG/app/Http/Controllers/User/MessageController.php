@@ -56,6 +56,9 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
+        // Broadcast the message to the receiver's private channel
+        event(new \App\Events\MessageSent($message));
+
         return response()->json($message, 201);
     }
 }
