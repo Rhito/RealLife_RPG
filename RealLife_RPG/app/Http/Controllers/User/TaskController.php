@@ -77,6 +77,9 @@ class TaskController extends Controller
     {
         $user = Auth::user();
         
+        // Auto-generate daily tasks for today if missing
+        $this->taskGenerationService->generateForUser($user);
+
         // 1. Get Habits (Definitions, not instances)
         $habits = Task::where('user_id', $user->id)
             ->where('type', 'habit')
@@ -116,7 +119,10 @@ class TaskController extends Controller
             'data' => [
                 'habits' => $habits,
                 'dailies' => $dailies,
-                'todos' => $todos
+                'todos' => $todos,
+                'daily_definitions' => Task::where('user_id', $user->id)
+                    ->where('type', 'daily')
+                    ->get()
             ]
         ]);
     }

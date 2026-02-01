@@ -188,8 +188,8 @@ export default function ChatScreen() {
     return (
         <KeyboardAvoidingView 
             style={styles.container} 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'} 
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 100}
         >
             <Stack.Screen options={{ 
                 title: (name as string) || 'Chat',

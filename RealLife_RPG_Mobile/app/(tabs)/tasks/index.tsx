@@ -23,7 +23,9 @@ export default function TasksScreen() {
   // Data State
   const [habits, setHabits] = useState<any[]>([]); // Task definitions
   const [dailies, setDailies] = useState<TaskInstance[]>([]);
+  const [dailyDefinitions, setDailyDefinitions] = useState<any[]>([]); // New State
   const [todos, setTodos] = useState<TaskInstance[]>([]);
+  const [showManageDailies, setShowManageDailies] = useState(false); // New State
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   
   const [refreshing, setRefreshing] = useState(false);
@@ -35,6 +37,8 @@ export default function TasksScreen() {
       setHabits(res.data.habits || []);
       setDailies(res.data.dailies || []);
       setTodos(res.data.todos || []);
+      // @ts-ignore
+      setDailyDefinitions(res.data.daily_definitions || []); // Fetch definitions
     } catch (error) {
       console.error(error);
     }
@@ -80,6 +84,7 @@ export default function TasksScreen() {
           setTimeout(() => setProcessing(false), 500); // Small delay to prevent rapid taps
       }
   };
+
 
   const handleComplete = async (id: number) => {
       if (processing) return;
@@ -434,6 +439,16 @@ export default function TasksScreen() {
            {renderTabButton('todo', 'To-Dos', 'list')}
        </View>
 
+       {activeTab === 'daily' && (
+           <TouchableOpacity 
+                style={styles.manageButton}
+                onPress={() => setShowManageDailies(true)}
+           >
+               <Ionicons name="list" size={16} color="#BBAADD" />
+               <Text style={styles.manageButtonText}>Manage Recurring</Text>
+           </TouchableOpacity>
+       )}
+
         {/* Content */}
        <FlatList 
           data={getData()}
@@ -463,6 +478,58 @@ export default function TasksScreen() {
         </TourTarget>
         
         {renderDetailModal()}
+        {/* Manage Modal */}
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showManageDailies}
+            onRequestClose={() => setShowManageDailies(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={[styles.modalContent, { maxHeight: '80%' }]}>
+                    <View style={[styles.modalHeader, styles.dailyHeader]}>
+                        <Text style={styles.modalTitle}>Recurring Dailies</Text>
+                        <TouchableOpacity onPress={() => setShowManageDailies(false)} style={styles.closeButton}>
+                            <Ionicons name="close" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <View style={{ padding: 16, backgroundColor: '#f9f9f9', borderBottomWidth: 1, borderColor: '#eee' }}>
+                        <Text style={{ fontSize: 13, color: '#666' }}>
+                           These are your configured Daily Quests. They will auto-generate tasks on the scheduled days.
+                        </Text>
+                    </View>
+
+                    <FlatList
+                        data={dailyDefinitions}
+                        keyExtractor={(item) => item.id.toString()}
+                        contentContainerStyle={{ padding: 16 }}
+                        ListEmptyComponent={
+                            <View style={{ alignItems: 'center', padding: 20 }}>
+                                <Text style={{ color: '#999', fontStyle: 'italic' }}>No recurring tasks set up.</Text>
+                            </View>
+                        }
+                        renderItem={({ item }) => (
+                            <View style={[styles.taskCard, styles.recurringDailyCard]}>
+                                <View style={styles.taskContent}>
+                                    <Text style={styles.taskTitle}>{item.title}</Text>
+                                    <View style={styles.metaRow}>
+                                        <Text style={styles.modalTagText}>{item.repeat_days?.join(', ') || 'No repeat'}</Text>
+                                    </View>
+                                </View>
+                                <TouchableOpacity 
+                                    style={styles.deleteActionButton} 
+                                    onPress={() => handleDelete(item.id, item.title)}
+                                    // Use actionButton style but red background maybe? Or just trash icon
+                                >
+                                    <Ionicons name="trash-outline" size={20} color="#D32F2F" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                </View>
+            </View>
+        </Modal>
     </View>
   );
 }
@@ -728,7 +795,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
   },
   habitHeader: { backgroundColor: '#FFC107' },
-  dailyHeader: { backgroundColor: '#9E9E9E' },
   todoHeader: { backgroundColor: '#F44336' },
   modalTitle: {
       color: 'white',
@@ -798,26 +864,62 @@ const styles = StyleSheet.create({
   pinButtonModal: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#FAFAFA',
-      paddingVertical: 4,
-      paddingHorizontal: 12,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: '#eee',
-      gap: 4,
   },
   pinText: {
-      fontSize: 12,
-      fontWeight: 'bold',
+      marginLeft: 4,
+      fontSize: 14,
+      fontWeight: '600',
       color: '#BBAADD',
   },
   pinTextActive: {
       color: '#FF9800',
   },
+  manageButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-end',
+      marginRight: 16,
+      marginBottom: 8,
+      backgroundColor: 'rgba(255,255,255,0.1)',
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+  },
+  manageButtonText: {
+      color: '#BBAADD',
+      fontSize: 12,
+      fontWeight: '600',
+      marginLeft: 6,
+  },
   pinnedBadge: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      padding: 4,
+      backgroundColor: 'rgba(255, 152, 0, 0.15)',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
+      marginLeft: 6,
+      alignSelf: 'center',
+  },
+  dailyHeader: {
+      backgroundColor: '#7E57C2',
+  },
+  recurringDailyCard: {
+      borderLeftColor: '#7E57C2',
+      borderLeftWidth: 4,
+  },
+  modalTagText: { // Renamed from tagText to avoid conflict
+      fontSize: 12,
+      color: '#7E57C2',
+      backgroundColor: '#EDE7F6',
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 4,
+      overflow: 'hidden',
+  },
+  deleteActionButton: { // Renamed from actionButton to avoid conflict
+      padding: 8,
+      backgroundColor: '#FFEBEE',
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
   }
 });

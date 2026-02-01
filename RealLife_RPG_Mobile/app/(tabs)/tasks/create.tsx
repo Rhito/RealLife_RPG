@@ -20,7 +20,7 @@ export default function CreateTaskScreen() {
     const [type, setType] = useState<TaskType>(TaskType.HABIT);
     const [difficulty, setDifficulty] = useState<TaskDifficulty>(TaskDifficulty.EASY);
     
-    const [repeatDays, setRepeatDays] = useState<string[]>(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
+    const [repeatDays, setRepeatDays] = useState<string[]>(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
     
     // Date Picker State
     const [date, setDate] = useState(new Date());

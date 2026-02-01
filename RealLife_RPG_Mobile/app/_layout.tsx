@@ -34,7 +34,7 @@ const InitialLayout = () => {
     };
 
     const inTabsGroup = segments[0] === '(tabs)';
-    console.log('User state changed', { user: !!user, inTabsGroup, segment: segments[0] });
+
 
     if (user && !inTabsGroup) {
       if (!user.email_verified_at && segments[0] !== 'verify-email') {
@@ -87,8 +87,6 @@ const InitialLayout = () => {
   // Handle Onboarding Redirect
   useEffect(() => {
     if (user && !isLoading) {
-        // Debug: log the actual value
-        console.log('[Onboarding Check] is_onboarded:', user.is_onboarded, typeof user.is_onboarded);
         
         // Check if user is onboarded - handle boolean, number (0/1), AND string ("0"/"1")
         const isOnboarded = user.is_onboarded === true || 
