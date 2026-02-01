@@ -33,12 +33,17 @@ class TaskGenerationService
 
         $generatedCount = 0;
 
+        \Illuminate\Support\Facades\Log::info("Generating tasks for user {$user->id}. Today: {$dayOfWeek}");
+
         foreach ($tasks as $task) {
+            \Illuminate\Support\Facades\Log::info("Task {$task->id} ({$task->title}): " . json_encode($task->repeat_days));
+            
             // Check if task should repeat today
             // If repeat_days is null or empty, maybe it's a one-time task? 
             // Let's assume habit tracking implies repeats. If empty, maybe daily? Or never?
             // Let's assume explicit days.
             if (!is_array($task->repeat_days) || empty($task->repeat_days) || !in_array($dayOfWeek, $task->repeat_days)) {
+                \Illuminate\Support\Facades\Log::info("Skipping task {$task->id} - Not scheduled for today or invalid repeat_days");
                 continue;
             }
 
@@ -49,8 +54,11 @@ class TaskGenerationService
                 ->exists();
 
             if ($exists) {
+                \Illuminate\Support\Facades\Log::info("Skipping task {$task->id} - Instance already exists");
                 continue;
             }
+
+            \Illuminate\Support\Facades\Log::info("Creating instance for task {$task->id}");
 
             // Create Instance
             TaskInstance::create([
