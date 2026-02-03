@@ -141,7 +141,7 @@ export default function TasksScreen() {
                           loadTasks();
                           setSelectedTask(null); // Close modal if open
                       } catch (e: any) {
-                          showAlert('Error', e.message);
+                          showAlert('Error', e.message || 'Failed to delete task');
                       } finally {
                           setProcessing(false);
                       }
@@ -171,7 +171,7 @@ export default function TasksScreen() {
                           loadTasks();
                           setSelectedTask(null); // Close modal
                       } catch (e: any) {
-                          showAlert('Error', e.message);
+                          showAlert('Error', e.message || 'Failed to fail task');
                       } finally {
                           setProcessing(false);
                       }
@@ -207,7 +207,7 @@ export default function TasksScreen() {
         setSelectedTask(null);
 
     } catch (e: any) {
-        showAlert('Error', e.message);
+        showAlert('Error', e.message || 'Failed to pin task/instance');
     } finally {
         setProcessing(false);
     }

@@ -74,6 +74,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/tasks/{id}', [\App\Http\Controllers\User\TaskController::class, 'destroy']);
         Route::post('/tasks/{id}/fail', [\App\Http\Controllers\User\TaskController::class, 'fail']);
         Route::put('/tasks/{id}', [\App\Http\Controllers\User\TaskController::class, 'update']);
+        Route::post('/tasks/{id}/pin', [\App\Http\Controllers\User\TaskController::class, 'pin']);
         Route::post('/onboarding/seed', [\App\Http\Controllers\User\OnboardingController::class, 'seed']);
 
         // Item Shop

@@ -23,6 +23,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     // Suppress network errors as we have a dedicated banner
     if (
         newTitle === 'Error' && 
+        newMessage &&
         (newMessage === 'Network Error' || newMessage.includes('Network request failed'))
     ) {
         return;
