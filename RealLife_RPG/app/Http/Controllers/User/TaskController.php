@@ -311,10 +311,12 @@ class TaskController extends Controller
         ]);
     }
 
+    /*
     public function pin(string $id)
     {
         $user = Auth::user();
-        
+        \Illuminate\Support\Facades\Log::info("Pinning attempted for ID: $id by User: {$user->id}");
+
         // Check if $id is instance ID or Task ID depending on what frontend sends.
         // Frontend lists Habits (Task) and Dailies/Todos (TaskInstance).
         // BUT pinning should affect the parent Task so it persists for Dailies.
@@ -323,17 +325,34 @@ class TaskController extends Controller
         $task = Task::where('id', $id)->where('user_id', $user->id)->first();
         
         if (!$task) {
+            \Illuminate\Support\Facades\Log::info("ID $id not found as Task. Checking TaskInstance.");
             // Check if it's an instance, then get parent task
-            $instance = TaskInstance::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+            $instance = TaskInstance::where('id', $id)->where('user_id', $user->id)->first();
+            
+            if (!$instance) {
+                 \Illuminate\Support\Facades\Log::error("ID $id not found as Task OR Instance.");
+                 return response()->json(['message' => 'Task not found'], 404);
+            }
+
             $task = $instance->task;
+            
+            if (!$task) {
+                \Illuminate\Support\Facades\Log::error("Instance $id found but parent Task is missing (maybe soft deleted?).");
+                return response()->json(['message' => 'Parent task not found'], 404);
+            }
+        } else {
+             \Illuminate\Support\Facades\Log::info("ID $id found as Task directly.");
         }
 
         $task->is_pinned = !$task->is_pinned;
         $task->save();
+        
+        \Illuminate\Support\Facades\Log::info("Task {$task->id} pin status changed to: " . ($task->is_pinned ? 'true' : 'false'));
 
         return response()->json([
             'message' => $task->is_pinned ? 'Task pinned!' : 'Task unpinned!',
             'data' => $task
         ]);
     }
+    */
 }

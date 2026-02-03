@@ -181,6 +181,7 @@ export default function TasksScreen() {
       );
   };
 
+/*
   const handlePin = async (id: number, isInstance: boolean) => {
     if (processing) return;
     setProcessing(true);
@@ -212,6 +213,7 @@ export default function TasksScreen() {
         setProcessing(false);
     }
   };
+*/
 
   const updateUserStats = (rewards: any) => {
       if (user) {
@@ -252,11 +254,11 @@ export default function TasksScreen() {
                       <Text style={styles.habitCounterText}>{item.today_count}x today</Text>
                   </View>
               )}
-              {Boolean(item.is_pinned) && (
+              {/* {Boolean(item.is_pinned) && (
                  <View style={styles.pinnedBadge}>
                      <Ionicons name="push" size={12} color="#FF9800" />
                  </View>
-              )}
+              )} */}
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={() => handleScoreHabit(item.id)}>
               <Ionicons name="add" size={28} color="white" />
@@ -278,11 +280,11 @@ export default function TasksScreen() {
                   <View style={styles.tagContainer}>
                       <Text style={styles.tagText}>{item.task.difficulty.toUpperCase()}</Text>
                   </View>
-                  {Boolean(item.task.is_pinned) && (
+                  {/* {Boolean(item.task.is_pinned) && (
                     <View style={styles.pinnedBadge}>
                         <Ionicons name="push" size={12} color="#FF9800" />
                     </View>
-                  )}
+                  )} */}
               </View>
            </TouchableOpacity>
            <View style={styles.actionRow}>
@@ -379,7 +381,7 @@ export default function TasksScreen() {
 
                                <View style={{ flex: 1 }} />
                                
-                               <TouchableOpacity 
+                               {/* <TouchableOpacity 
                                     onPress={() => handlePin(selectedTask.id, isInstance)}
                                     style={styles.pinButtonModal}
                                 >
@@ -391,7 +393,7 @@ export default function TasksScreen() {
                                     <Text style={[styles.pinText, task.is_pinned && styles.pinTextActive]}>
                                         {task.is_pinned ? 'Pinned' : 'Pin'}
                                     </Text>
-                               </TouchableOpacity>
+                               </TouchableOpacity> */}
                           </View>
                           
                           <Text style={styles.sectionHeader}>Description</Text>
