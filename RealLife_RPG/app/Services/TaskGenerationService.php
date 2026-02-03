@@ -24,21 +24,25 @@ class TaskGenerationService
         $today = Carbon::now();
         $dayOfWeek = $today->format('D'); // Mon, Tue, Wed...
 
-        // 1. Get all active tasks for user
+        // 1. Get all active DAILY tasks for user (not habits or todos)
+        // Habits create instances on-the-fly when scored
+        // Todos are manually created with due dates
         // We filter by repeat_days in PHP because it is a JSON array or simple array casting.
         // Assuming repeat_days is stored like ["Mon", "Wed"]
         $tasks = Task::where('user_id', $user->id)
             ->where('is_active', true)
+            ->where('type', \App\Enums\TaskType::DAILY)
             ->get();
 
         $generatedCount = 0;
 
         foreach ($tasks as $task) {
             // Check if task should repeat today
-            // If repeat_days is null or empty, maybe it's a one-time task? 
-            // Let's assume habit tracking implies repeats. If empty, maybe daily? Or never?
-            // Let's assume explicit days.
-            if (!is_array($task->repeat_days) || empty($task->repeat_days) || !in_array($dayOfWeek, $task->repeat_days)) {
+            if (!is_array($task->repeat_days) || empty($task->repeat_days)) {
+                 continue;
+            }
+            
+            if (!in_array($dayOfWeek, $task->repeat_days)) {
                 continue;
             }
 

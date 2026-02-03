@@ -82,7 +82,7 @@ class TaskController extends Controller
 
         // 1. Get Habits (Definitions, not instances)
         $habits = Task::where('user_id', $user->id)
-            ->where('type', 'habit')
+            ->where('type', \App\Enums\TaskType::HABIT)
             ->where('is_active', true)
             ->get()
             ->map(function($habit) use ($user) {
@@ -101,7 +101,7 @@ class TaskController extends Controller
         $dailies = TaskInstance::where('user_id', $user->id)
             ->where('status', 'pending')
             ->whereHas('task', function($q) {
-                $q->where('type', 'daily');
+                $q->where('type', \App\Enums\TaskType::DAILY);
             })
             ->with('task')
             ->get();
@@ -110,7 +110,7 @@ class TaskController extends Controller
         $todos = TaskInstance::where('user_id', $user->id)
             ->where('status', 'pending')
             ->whereHas('task', function($q) {
-                 $q->whereIn('type', ['todo', 'once']);
+                 $q->whereIn('type', [\App\Enums\TaskType::TODO, \App\Enums\TaskType::ONCE]);
             })
             ->with('task')
             ->get();
@@ -121,7 +121,7 @@ class TaskController extends Controller
                 'dailies' => $dailies,
                 'todos' => $todos,
                 'daily_definitions' => Task::where('user_id', $user->id)
-                    ->where('type', 'daily')
+                    ->where('type', \App\Enums\TaskType::DAILY)
                     ->get()
             ]
         ]);
