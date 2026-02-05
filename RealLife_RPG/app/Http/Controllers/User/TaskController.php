@@ -250,6 +250,18 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task deleted successfully']);
     }
 
+    public function destroyInstance(string $id)
+    {
+        $user = Auth::user();
+        $instance = TaskInstance::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+        
+        $instance->delete();
+        
+        return response()->json(['message' => 'Task instance removed']);
+    }
+
     public function fail(Request $request, string $id)
     {
         $user = Auth::user();

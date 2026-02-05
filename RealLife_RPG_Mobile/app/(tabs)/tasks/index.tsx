@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshContr
 import { useAuth } from '../../../context/AuthContext';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, failTask, pinTask } from '../../../services/tasks';
+import { fetchTasks, completeTask, scoreHabit, generateDailyTasks, TaskInstance, deleteTask, deleteTaskInstance, failTask, pinTask } from '../../../services/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TourTarget } from '../../../components/TourTarget';
@@ -123,32 +123,80 @@ export default function TasksScreen() {
       }
   };
 
-  const handleDelete = (id: number, title: string) => {
+  const handleDelete = (id: number, title: string, type?: 'habit' | 'daily' | 'todo', instanceId?: number) => {
       if (processing) return;
-      showAlert(
-          'Delete Quest',
-          `Are you sure you want to delete "${title}" forever?`,
-          [
-              { text: 'Cancel', style: 'cancel' },
-              { 
-                  text: 'Delete', 
-                  style: 'destructive',
-                  onPress: async () => {
-                      if (processing) return;
-                      setProcessing(true);
-                      try {
-                          await deleteTask(id);
-                          loadTasks();
-                          setSelectedTask(null); // Close modal if open
-                      } catch (e: any) {
-                          showAlert('Error', e.message || 'Failed to delete task');
-                      } finally {
-                          setProcessing(false);
+      
+      // For daily tasks, show two options
+      if (type === 'daily' && instanceId) {
+          showAlert(
+              'Delete Daily Quest',
+              `"${title}" - Choose deletion type:`,
+              [
+                  { text: 'Cancel', style: 'cancel' },
+                  { 
+                      text: 'Today Only', 
+                      onPress: async () => {
+                          if (processing) return;
+                          setProcessing(true);
+                          try {
+                              await deleteTaskInstance(instanceId);
+                              loadTasks();
+                              setSelectedTask(null);
+                              showAlert('Removed', 'Today\'s task removed. It will reappear on scheduled days.');
+                          } catch (e: any) {
+                              showAlert('Error', e.message || 'Failed to delete task instance');
+                          } finally {
+                              setProcessing(false);
+                          }
+                      }
+                  },
+                  { 
+                      text: 'Forever', 
+                      style: 'destructive',
+                      onPress: async () => {
+                          if (processing) return;
+                          setProcessing(true);
+                          try {
+                              await deleteTask(id);
+                              loadTasks();
+                              setSelectedTask(null);
+                              showAlert('Deleted', 'Task deleted permanently. It will not reappear.');
+                          } catch (e: any) {
+                              showAlert('Error', e.message || 'Failed to delete task');
+                          } finally {
+                              setProcessing(false);
+                          }
                       }
                   }
-              }
-          ]
-      );
+              ]
+          );
+      } else {
+          // For habits and todos, show normal delete
+          showAlert(
+              'Delete Quest',
+              `Are you sure you want to delete "${title}" forever?`,
+              [
+                  { text: 'Cancel', style: 'cancel' },
+                  { 
+                      text: 'Delete', 
+                      style: 'destructive',
+                      onPress: async () => {
+                          if (processing) return;
+                          setProcessing(true);
+                          try {
+                              await deleteTask(id);
+                              loadTasks();
+                              setSelectedTask(null);
+                          } catch (e: any) {
+                              showAlert('Error', e.message || 'Failed to delete task');
+                          } finally {
+                              setProcessing(false);
+                          }
+                      }
+                  }
+              ]
+          );
+      }
   };
 
   const handleFail = (id: number, title: string) => {
@@ -238,7 +286,7 @@ export default function TasksScreen() {
       <View style={[styles.taskCard, styles.habitCard]}>
           <TouchableOpacity 
             style={styles.deleteButtonSmall} 
-            onPress={() => handleDelete(item.id, item.title)}
+            onPress={() => handleDelete(item.id, item.title, 'habit')}
           >
               <Ionicons name="trash-outline" size={16} color="#B0BEC5" />
           </TouchableOpacity>
@@ -521,7 +569,7 @@ export default function TasksScreen() {
                                 </View>
                                 <TouchableOpacity 
                                     style={styles.deleteActionButton} 
-                                    onPress={() => handleDelete(item.id, item.title)}
+                                    onPress={() => handleDelete(item.id, item.title, 'daily')}
                                     // Use actionButton style but red background maybe? Or just trash icon
                                 >
                                     <Ionicons name="trash-outline" size={20} color="#D32F2F" />

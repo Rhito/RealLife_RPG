@@ -102,6 +102,15 @@ export const deleteTask = async (taskId: number) => {
     }
 };
 
+export const deleteTaskInstance = async (instanceId: number) => {
+    try {
+        const response = await api.delete(`/task-instances/${instanceId}`);
+        return response.data;
+    } catch (error: any) {
+        throw error.response?.data || error.message;
+    }
+};
+
 export const failTask = async (instanceId: number) => {
     try {
         const response = await api.post(`/tasks/${instanceId}/fail`);
