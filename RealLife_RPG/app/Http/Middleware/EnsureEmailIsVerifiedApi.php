@@ -2,10 +2,6 @@
 
 namespace App\Http\Middleware;
 
-// app/Http/Middleware/EnsureEmailIsVerifiedApi.php
-
-namespace App\Http\Middleware;
-
 use Closure;
 use Illuminate\Http\Request;
 

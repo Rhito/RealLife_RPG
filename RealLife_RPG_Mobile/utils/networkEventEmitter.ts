@@ -1,19 +1,37 @@
 type NetworkListener = (isConnected: boolean) => void;
+type AuthListener = (error: any) => void;
 
-const listeners: NetworkListener[] = [];
+const networkListeners: NetworkListener[] = [];
+const authListeners: AuthListener[] = [];
 
 export const networkEvents = {
   addListener: (listener: NetworkListener) => {
-    listeners.push(listener);
+    networkListeners.push(listener);
     return () => {
-      const index = listeners.indexOf(listener);
+      const index = networkListeners.indexOf(listener);
       if (index > -1) {
-        listeners.splice(index, 1);
+        networkListeners.splice(index, 1);
       }
     };
   },
 
   emitStatus: (isConnected: boolean) => {
-    listeners.forEach((listener) => listener(isConnected));
+    networkListeners.forEach((listener) => listener(isConnected));
+  },
+};
+
+export const authEvents = {
+  addListener: (listener: AuthListener) => {
+    authListeners.push(listener);
+    return () => {
+      const index = authListeners.indexOf(listener);
+      if (index > -1) {
+        authListeners.splice(index, 1);
+      }
+    };
+  },
+
+  emitSessionExpired: (error: any) => {
+    authListeners.forEach((listener) => listener(error));
   },
 };

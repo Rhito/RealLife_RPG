@@ -43,7 +43,7 @@ api.interceptors.response.use(
       networkEvents.emitStatus(true);
       return response;
   },
-  (error) => {
+  async (error) => {
     const { networkEvents } = require('../utils/networkEventEmitter');
     
     // Check for network error
@@ -51,6 +51,33 @@ api.interceptors.response.use(
          networkEvents.emitStatus(false);
          // Reject with a special flag so AlertContext can ignore it
          error.isNetworkError = true; 
+         return Promise.reject(error);
+    }
+    
+    // Handle 401 Unauthorized (expired/invalid token)
+    // Don't logout if this is a login attempt itself
+    if (error.response?.status === 401 && !error.config.url?.includes('/login')) {
+      console.log('[API] 401 Unauthorized - Session expired, logging out user');
+      
+      // Clear auth data from storage
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        } else {
+          await SecureStore.deleteItemAsync('token');
+          await SecureStore.deleteItemAsync('user');
+        }
+      } catch (e) {
+        console.error('[API] Error clearing auth data:', e);
+      }
+      
+      // Mark error as session expired so UI can handle it
+      error.isSessionExpired = true;
+      
+      // Emit auth error event using our emitter
+      const { authEvents } = require('../utils/networkEventEmitter');
+      authEvents.emitSessionExpired(error);
     }
     
     return Promise.reject(error);

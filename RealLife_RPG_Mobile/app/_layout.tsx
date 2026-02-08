@@ -5,76 +5,107 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { syncPushToken } from '../services/notifications';
 import * as SecureStore from 'expo-secure-store';
+import { useAlert } from '../context/AlertContext';
 
 const InitialLayout = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, setUser } = useAuth();
   const router = useRouter();
   const segments = useSegments();
   const rootNavigationState = useRootNavigationState();
+  const { showAlert } = useAlert();
+
+  // Handle session expiry from API interceptor
+  useEffect(() => {
+    const { authEvents } = require('../utils/networkEventEmitter');
+    
+    const handleSessionExpiry = (error: any) => {
+      if (error?.isSessionExpired) {
+        // Clear user state
+        setUser(null);
+        
+        // Show alert to user
+        showAlert(
+          'Session Expired',
+          'Your session has expired. Please log in again.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.replace('/login')
+            }
+          ]
+        );
+      }
+    };
+
+    // Listen for auth errors using our emitter
+    const removeListener = authEvents.addListener(handleSessionExpiry);
+    return removeListener;
+  }, [showAlert, router, setUser]);
 
   useEffect(() => {
     if (isLoading || !rootNavigationState?.key) return;
 
-    const checkTutorial = async () => {
-        try {
-             // Only check for logged in users
-             if (user) {
-                 const hasSeen = await SecureStore.getItemAsync('HAS_SEEN_TUTORIAL');
-                 if (hasSeen !== 'true') {
-                     // Check if we are already there to avoid loop (though replace works fine)
-                     if (segments[0] !== 'tutorial') {
-                         router.replace('/tutorial');
-                     }
-                     return; 
-                 }
-             }
-        } catch (e) {
-            console.error(e);
+    const currentRoute = segments[0] || '';
+    const inTabsGroup = currentRoute === '(tabs)';
+
+    // Priority 1: No user - redirect to auth screens
+    if (!user) {
+      const publicRoutes = ['login', 'register', 'index', 'forgot-password', 'reset-password'];
+      if (!publicRoutes.includes(currentRoute)) {
+        router.replace('/login');
+      }
+      return;
+    }
+
+    // Priority 2: Email verification required
+    if (!user.email_verified_at) {
+      if (currentRoute !== 'verify-email') {
+        router.replace('/verify-email');
+      }
+      return;
+    }
+
+    // Priority 3: Onboarding required
+    const isOnboarded = user.is_onboarded === true || 
+                        user.is_onboarded === 1 || 
+                        user.is_onboarded === '1' ||
+                        user.is_onboarded === 'true';
+    
+    if (!isOnboarded) {
+      if (currentRoute !== 'onboarding') {
+        router.replace('/onboarding' as any);
+      }
+      return;
+    }
+
+    // Priority 4: Tutorial required (async check)
+    const handleTutorialCheck = async () => {
+      try {
+        const hasSeen = await SecureStore.getItemAsync('HAS_SEEN_TUTORIAL');
+        if (hasSeen !== 'true') {
+          if (currentRoute !== 'tutorial') {
+            router.replace('/tutorial');
+          }
+          return true; // Tutorial needed
         }
+        return false; // Tutorial done
+      } catch (e) {
+        console.error('Tutorial check error:', e);
+        return false;
+      }
     };
 
-    const inTabsGroup = segments[0] === '(tabs)';
-
-
-    if (user && !inTabsGroup) {
-      if (!user.email_verified_at && segments[0] !== 'verify-email') {
-          router.replace('/verify-email');
-      } else if (user.email_verified_at) {
-          // Check tutorial ONLY if we are heading to tabs/index from a Public route
-          // OR if we are explicitly checking on mount.
-          // BUT, we need to allow 'tutorial' to be a valid route.
-          
-          if (segments[0] === 'tutorial') return; // Stay on tutorial
-          if (segments[0] === 'onboarding') return; // Stay on onboarding
-
-          const ispublicRoute = ['login', 'register', 'index', ''].includes(segments[0] || '');
-          if (ispublicRoute) {
-               checkTutorial().then(() => {
-                   // If checkTutorial didn't redirect, we go to tabs
-                   // Wait, checkTutorial is async. We might have a race condition.
-                   // Let's rely on the checkTutorial inside the effect for "first load" logic.
-                   // But here we are redirecting to tabs immediately.
-                   
-                   // Better logic: Always go to tabs, let tabs/index check? 
-                   // No, global layout is better.
-                   
-                   // Let's do:
-                   SecureStore.getItemAsync('HAS_SEEN_TUTORIAL').then(hasSeen => {
-                       if (hasSeen !== 'true') {
-                           router.replace('/tutorial');
-                       } else {
-                           router.replace('/(tabs)');
-                       }
-                   });
-               });
-          }
-      }
-    } else if (!user && !['login', 'register', 'index', 'forgot-password', 'reset-password'].includes(segments[0] || '')) {
-         router.replace('/login');
-    } else if (user && inTabsGroup && !user.email_verified_at) {
-        router.replace('/verify-email');
-    } else if (!user && inTabsGroup) {
-      router.replace('/login');
+    // Priority 5: Navigate authenticated users to tabs
+    const publicRoutes = ['login', 'register', 'index', ''];
+    if (publicRoutes.includes(currentRoute)) {
+      handleTutorialCheck().then((tutorialNeeded) => {
+        if (!tutorialNeeded && currentRoute !== '(tabs)') {
+          router.replace('/(tabs)');
+        }
+      });
+    } else if (currentRoute === 'onboarding') {
+      // Onboarded users shouldn't be on onboarding screen
+      router.replace('/(tabs)');
     }
   }, [user, isLoading, segments, rootNavigationState?.key]);
 
@@ -83,28 +114,6 @@ const InitialLayout = () => {
           syncPushToken();
       }
   }, [user]);
-
-  // Handle Onboarding Redirect
-  useEffect(() => {
-    if (user && !isLoading) {
-        
-        // Check if user is onboarded - handle boolean, number (0/1), AND string ("0"/"1")
-        const isOnboarded = user.is_onboarded === true || 
-                            user.is_onboarded === 1 || 
-                            user.is_onboarded === '1' ||
-                            user.is_onboarded === 'true';
-        
-        if (!isOnboarded) { 
-             // Check if we are already in onboarding to avoid loop
-             if (segments[0] !== 'onboarding') {
-                 router.replace('/onboarding' as any);
-             }
-        } else if (segments[0] === 'onboarding') {
-            // User is onboarded but stuck on onboarding screen - redirect to tabs
-            router.replace('/(tabs)');
-        }
-    }
-  }, [user, isLoading, segments]);
 
   if (isLoading) {
     return (

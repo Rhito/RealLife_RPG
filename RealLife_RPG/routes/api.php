@@ -50,7 +50,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/verify-reset-token', [\App\Http\Controllers\Auth\PasswordResetController::class, 'verifyResetToken'])->name('password.verify');
 
         // Xác thực email bằng link
-        Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'submitEmailVerification'])->middleware(['signed'])->name('verification.verify');
+        Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'submitEmailVerification'])->middleware(['signed', 'throttle:10,1'])->name('verification.verify');
     });
 
 

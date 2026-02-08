@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -6,8 +6,7 @@ import { seedOnboarding } from '../../services/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/theme';
 import { useAlert } from '../../context/AlertContext';
-
-const { width } = Dimensions.get('window');
+import { scaleFont, spacing } from '../../utils/responsive';
 
 const PLANS = [
     {
@@ -134,32 +133,32 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#342056',
-        paddingTop: 60,
+        paddingTop: spacing.xxl * 2,
     },
     header: {
-        paddingHorizontal: 20,
-        marginBottom: 20,
+        paddingHorizontal: spacing.lg,
+        marginBottom: spacing.lg,
     },
     title: {
-        fontSize: 28,
+        fontSize: scaleFont(28),
         fontWeight: 'bold',
         color: 'white',
-        marginBottom: 10,
+        marginBottom: spacing.sm,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: scaleFont(16),
         color: '#BBAADD',
-        lineHeight: 22,
+        lineHeight: scaleFont(22),
     },
     scrollContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: spacing.lg,
         paddingBottom: 100,
     },
     card: {
         backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 16,
+        borderRadius: spacing.md,
+        padding: spacing.md,
+        marginBottom: spacing.md,
         flexDirection: 'row',
         borderWidth: 2,
         borderColor: 'transparent',
@@ -169,45 +168,45 @@ const styles = StyleSheet.create({
         borderColor: '#FFC107',
     },
     iconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: spacing.xxl * 2,
+        height: spacing.xxl * 2,
+        borderRadius: spacing.xxl,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16,
+        marginRight: spacing.md,
     },
     cardContent: {
         flex: 1,
     },
     cardTitle: {
-        fontSize: 18,
+        fontSize: scaleFont(18),
         fontWeight: 'bold',
         color: 'white',
-        marginBottom: 4,
+        marginBottom: spacing.xs,
     },
     cardDesc: {
-        fontSize: 14,
+        fontSize: scaleFont(14),
         color: '#ccc',
-        marginBottom: 8,
+        marginBottom: spacing.sm,
     },
     taskList: {
-        marginTop: 4,
+        marginTop: spacing.xs,
     },
     taskItem: {
-        fontSize: 12,
+        fontSize: scaleFont(12),
         color: '#BBAADD',
     },
     footer: {
-        padding: 20,
+        padding: spacing.lg,
         backgroundColor: '#342056',
         borderTopWidth: 1,
         borderTopColor: 'rgba(255,255,255,0.1)',
     },
     button: {
-        padding: 16,
-        borderRadius: 12,
+        padding: spacing.md,
+        borderRadius: spacing.sm,
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: spacing.sm,
     },
     primaryButton: {
         backgroundColor: '#FFC107',
@@ -218,16 +217,16 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#342056',
-        fontSize: 18,
+        fontSize: scaleFont(18),
         fontWeight: 'bold',
     },
     skipButton: {
-        padding: 12,
+        padding: spacing.sm,
         alignItems: 'center',
     },
     skipText: {
         color: '#ccc',
-        fontSize: 14,
+        fontSize: scaleFont(14),
         textDecorationLine: 'underline',
     },
 });

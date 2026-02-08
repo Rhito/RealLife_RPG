@@ -7,9 +7,10 @@ import api from '../services/api';
 
 export default function VerifyEmailScreen() {
     const router = useRouter();
-    const { user, logout } = useAuth();
+    const { user, logout, updateUser } = useAuth();
     const [sending, setSending] = useState(false);
     const [sent, setSent] = useState(false);
+    const [checking, setChecking] = useState(false);
 
     const handleResend = async () => {
         setSending(true);
@@ -24,13 +25,19 @@ export default function VerifyEmailScreen() {
     };
 
     const handleCheckStatus = async () => {
+        setChecking(true);
         try {
             const response = await api.get('/email/verify-status');
             if (response.data.verified) {
-                router.replace('/(tabs)');
+                // Update user context with verified status
+                const updatedUser = { ...user, email_verified_at: new Date().toISOString() };
+                await updateUser(updatedUser);
+                // Navigation will happen automatically via _layout.tsx
             }
         } catch (error) {
             console.error('Failed to check status', error);
+        } finally {
+            setChecking(false);
         }
     };
 
@@ -66,8 +73,13 @@ export default function VerifyEmailScreen() {
             <TouchableOpacity 
                 style={styles.secondaryButton} 
                 onPress={handleCheckStatus}
+                disabled={checking}
             >
-                <Text style={styles.secondaryButtonText}>I've Verified, Continue</Text>
+                {checking ? (
+                    <ActivityIndicator color="#FF9800" />
+                ) : (
+                    <Text style={styles.secondaryButtonText}>I've Verified, Continue</Text>
+                )}
             </TouchableOpacity>
 
             <TouchableOpacity 

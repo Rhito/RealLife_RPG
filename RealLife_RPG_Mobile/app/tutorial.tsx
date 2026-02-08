@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
-
-const { width, height } = Dimensions.get('window');
+import { wp, hp, scaleFont, spacing } from '../utils/responsive';
 
 const SLIDES = [
     {
@@ -39,6 +39,7 @@ const SLIDES = [
 
 export default function TutorialScreen() {
     const router = useRouter();
+    const { width } = useWindowDimensions();
     const [activeIndex, setActiveIndex] = useState(0);
     const scrollRef = useRef<ScrollView>(null);
 
@@ -131,10 +132,10 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        padding: 20,
+        padding: spacing.lg,
     },
     skipText: {
-        fontSize: 16,
+        fontSize: scaleFont(16),
         color: '#999',
         fontWeight: '600',
     },
@@ -142,18 +143,18 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     slide: {
-        width: width,
+        width: wp(100),
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 40,
+        paddingHorizontal: spacing.xxl,
     },
     iconContainer: {
-        width: 160,
-        height: 160,
-        borderRadius: 80,
+        width: wp(35),
+        height: wp(35),
+        borderRadius: wp(17.5),
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 40,
+        marginBottom: spacing.xxl,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.2,
@@ -161,39 +162,40 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     title: {
-        fontSize: 28,
+        fontSize: scaleFont(28),
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 16,
+        marginBottom: spacing.md,
         textAlign: 'center',
     },
     description: {
-        fontSize: 16,
+        fontSize: scaleFont(16),
         color: '#666',
         textAlign: 'center',
-        lineHeight: 24,
+        lineHeight: scaleFont(24),
+        paddingHorizontal: spacing.md,
     },
     footer: {
-        padding: 40,
+        padding: spacing.xxl,
         alignItems: 'center',
     },
     pagination: {
         flexDirection: 'row',
-        marginBottom: 30,
+        marginBottom: spacing.xl,
     },
     dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        marginHorizontal: 5,
+        width: wp(2.5),
+        height: wp(2.5),
+        borderRadius: wp(1.25),
+        marginHorizontal: spacing.xs,
     },
     activeDot: {
-        width: 20,
+        width: wp(5),
     },
     button: {
         width: '100%',
-        paddingVertical: 18,
-        borderRadius: 16,
+        paddingVertical: spacing.lg,
+        borderRadius: spacing.md,
         alignItems: 'center',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 5 },
@@ -203,7 +205,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'white',
-        fontSize: 18,
+        fontSize: scaleFont(18),
         fontWeight: 'bold',
     }
 });
