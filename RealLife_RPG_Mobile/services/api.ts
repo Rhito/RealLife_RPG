@@ -55,9 +55,13 @@ api.interceptors.response.use(
     }
     
     // Handle 401 Unauthorized (expired/invalid token)
-    // Don't logout if this is a login attempt itself
-    if (error.response?.status === 401 && !error.config.url?.includes('/login')) {
+    // Don't logout if this is an authentication attempt (login, register, password reset, etc.)
+    const authEndpoints = ['/login', '/register', '/password', '/email/verify'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => error.config.url?.includes(endpoint));
+    
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       console.log('[API] 401 Unauthorized - Session expired, logging out user');
+      console.log('[API] Request URL:', error.config.url);
       
       // Clear auth data from storage
       try {
