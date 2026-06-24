@@ -35,7 +35,7 @@ class UserService extends BaseService
     public function create(array $data): Model
     {
         if (isset($data['avatar'])  && $data['avatar'] instanceof UploadedFile)
-            $data['avatar'] = $this->uploadToS3($data['avatar']);
+            $data['avatar'] = $this->uploadFile($data['avatar']);
         return parent::create($data);
     }
 
@@ -48,26 +48,26 @@ class UserService extends BaseService
 
         if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
             if ($item->avatar) {
-                $this->deleteFromS3($item->avatar);
+                $this->deleteFile($item->avatar);
             }
-            $data['avatar'] = $this->uploadToS3($data['avatar']);
+            $data['avatar'] = $this->uploadFile($data['avatar']);
         }
         return parent::update($id, $data);
     }
 
     // --- Helper functions (private) ---
-    private function uploadToS3(UploadedFile $file): string
+    private function uploadFile(UploadedFile $file): string
     {
-        /** @var FileSystemAdapter $disk */
-        $disk = Storage::disk('s3');
-        $path = $file->store('avatars', 's3');
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        $path = $file->store('avatars', 'public');
         return $disk->url($path);
     }
 
-    private function deleteFromS3(string $url): void
+    private function deleteFile(string $url): void
     {
         $path = parse_url($url, PHP_URL_PATH);
-        $cleanPath = ltrim($path, '/');
-        Storage::disk('s3')->delete($cleanPath);
+        $cleanPath = str_replace('/storage/', '', $path);
+        Storage::disk('public')->delete($cleanPath);
     }
 }

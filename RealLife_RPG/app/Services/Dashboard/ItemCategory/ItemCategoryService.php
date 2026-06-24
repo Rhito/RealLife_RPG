@@ -36,7 +36,7 @@ class ItemCategoryService extends BaseService
     public function create(array $data) : Model
     {
         if (isset($data['icon'])  && $data['icon'] instanceof UploadedFile)
-            $data['icon'] = $this->uploadToS3($data['icon']);
+            $data['icon'] = $this->uploadFile($data['icon']);
         return parent::create($data);
     }
 
@@ -50,27 +50,27 @@ class ItemCategoryService extends BaseService
             $itemCate = $this->repo->findOrFail($id);
 
             if ($itemCate->icon) {
-                $this->deleteFromS3($itemCate->icon);
+                $this->deleteFile($itemCate->icon);
             }
 
-            $data['icon'] = $this->uploadToS3($data['icon']);
+            $data['icon'] = $this->uploadFile($data['icon']);
         }
         return parent::update($id, $data);
     }
 
     // --- Helper functions (private) ---
-    private function uploadToS3(UploadedFile $file): string
+    private function uploadFile(UploadedFile $file): string
     {
-        /** @var FileSystemAdapter $disk */
-        $disk = Storage::disk('s3');
-        $path = $file->store('item-categories', 's3');
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        $path = $file->store('item-categories', 'public');
         return $disk->url($path);
     }
 
-    private function deleteFromS3(string $url): void
+    private function deleteFile(string $url): void
     {
         $path = parse_url($url, PHP_URL_PATH);
-        $cleanPath = ltrim($path, '/');
-        Storage::disk('s3')->delete($cleanPath);
+        $cleanPath = str_replace('/storage/', '', $path);
+        Storage::disk('public')->delete($cleanPath);
     }
 }
