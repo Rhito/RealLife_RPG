@@ -29,8 +29,8 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'type' => 'required|string', // habit, daily, todo/once
             'difficulty' => 'required|in:easy,medium,hard',
-            // repeat_days required only if NOT 'once' or 'todo'
-            'repeat_days' => 'required_unless:type,once,todo|array',
+            // repeat_days required only if type is daily
+            'repeat_days' => 'required_if:type,daily|array',
             'due_date' => 'required_if:type,once,todo|date',
         ]);
 
@@ -171,6 +171,29 @@ class TaskController extends Controller
                 'achievements' => $alerts
             ]
         ]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $user = Auth::user();
+        $task = Task::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+        
+        $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'difficulty' => 'sometimes|in:easy,medium,hard',
+            'repeat_days' => 'nullable|array',
+            'due_date' => 'nullable|date',
+        ]);
+        
+        $data = $request->only(['title', 'description', 'difficulty', 'repeat_days']);
+        if ($request->has('due_date')) {
+            $data['due_date'] = $request->due_date ? \Carbon\Carbon::parse($request->due_date) : null;
+        }
+
+        $task->update($data);
+        
+        return response()->json(['message' => 'Task updated successfully', 'data' => $task]);
     }
 
     public function complete(Request $request, string $id)

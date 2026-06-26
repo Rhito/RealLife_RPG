@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\AdminLogEvent;
 use App\Http\Controllers\Controller;
-use App\Traits\HttpResposeTrait;
+use App\Traits\HttpResponseTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ApiController extends Controller
 {
-    use HttpResposeTrait, DispatchesJobs, ValidatesRequests, AuthorizesRequests;
+    use HttpResponseTrait, DispatchesJobs, ValidatesRequests, AuthorizesRequests;
 
     public function authorize($ability, $arguments = [])
     {

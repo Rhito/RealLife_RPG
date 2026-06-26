@@ -42,7 +42,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('throttle:8,1')->group(function () {
         Route::post('/login', [AuthenticatedController::class, 'login'])->name('v1.login');
         Route::post('/register', [AuthenticatedController::class, 'register'])->name('v1.register');
-        Route::post('/loginAdmin', [AuthController::class, 'login'])->name('v1.login');
+        Route::post('/loginAdmin', [AuthController::class, 'login'])->name('v1.admin.login');
 
         // Password Reset Routes
         Route::post('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'forgotPassword'])->name('password.email');
@@ -111,7 +111,7 @@ Route::prefix('v1')->group(function () {
         // AI Chat
         Route::post('/ai/chat', [\App\Http\Controllers\User\AiChatController::class, 'chat']);
         
-        Route::get('/logout', [AuthenticatedController::class, 'logout'])->name('v1.logout');
+        Route::post('/logout', [AuthenticatedController::class, 'logout'])->name('v1.logout');
 
         // Leaderboard
         Route::get('/leaderboard', [\App\Http\Controllers\User\LeaderboardController::class, 'index']);

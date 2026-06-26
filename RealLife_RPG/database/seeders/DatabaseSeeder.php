@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(TaskSeeder::class);
         $this->call(AchievementSeeder::class);
+        $this->call(AdminSeeder::class);
         // Optionally create some random users for testing with larger datasets
         // User::factory(10)->create();
     }

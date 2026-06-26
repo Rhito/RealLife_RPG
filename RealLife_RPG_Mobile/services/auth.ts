@@ -21,7 +21,7 @@ export const register = async (name: string, email: string, password: string, pa
 
 export const logout = async () => {
     try {
-        await api.get('/logout');
+        await api.post('/logout');
     } catch (e) {
         // ignore
     } finally {

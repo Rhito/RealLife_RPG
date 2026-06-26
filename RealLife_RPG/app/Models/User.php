@@ -148,7 +148,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return $this->hasMany(NotificationPreference::class, 'user_id', 'id');
     }
 
-    public function pushSubsciptions()
+    public function pushSubscriptions()
     {
         return $this->hasMany(PushSubscription::class, 'user_id', 'id');
     }

@@ -22,13 +22,13 @@ class AuthenticatedController extends ApiController
         if (!Auth::attempt($credentials))
             return $this->error('Credentials do not match', null, 401);
 
-        // Retrive the user
+        // Retrieve the user
         $user = Auth::user();
 
         // Generate API token access
         $token = $user->createToken('API Token of ' . $user->email, ['*'], now()->addWeek())->plainTextToken;
 
-        // Return success respose
+        // Return success response
         return $this->success('Login successful', ['user' => $user, 'token' => $token]);
     }
 
@@ -62,9 +62,9 @@ class AuthenticatedController extends ApiController
             // Create token
             $token = $newUser->createToken('API Token of ' . $newUser->email, ['*'], now()->addWeek())->plainTextToken;
 
-            // Commit databsae change
+            // Commit database change
             DB::commit();
-            return $this->success('User created successfuly', ['user' => $newUser, 'token' => $token]);
+            return $this->success('User created successfully', ['user' => $newUser, 'token' => $token]);
         } catch (\Exception $error) {
             DB::rollBack();
             // Return actual error for debugging

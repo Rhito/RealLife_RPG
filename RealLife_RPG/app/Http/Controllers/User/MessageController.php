@@ -57,7 +57,11 @@ class MessageController extends Controller
         ]);
 
         // Broadcast the message to the receiver's private channel
-        event(new \App\Events\MessageSent($message));
+        try {
+            event(new \App\Events\MessageSent($message));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Pusher/Reverb error: ' . $e->getMessage());
+        }
 
         return response()->json($message, 201);
     }

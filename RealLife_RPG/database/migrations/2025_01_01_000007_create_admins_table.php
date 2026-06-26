@@ -14,8 +14,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role')->default('moderator'); 
+            $table->boolean('not_allowed')->default(false);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('admin_log_events', function (Blueprint $table) {

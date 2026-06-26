@@ -15,7 +15,7 @@ class AiChatController extends Controller
         ]);
 
         $message = $request->input('content');
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.api_key');
 
         if (!$apiKey) {
             return response()->json([

@@ -60,6 +60,16 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 405);
         });
 
+        // 422 Unprocessable Entity
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
+            return response()->json([
+                'error' => 'Validation error',
+                'code'  => 422,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], 422);
+        });
+
         // 500 Internal Server Error (catch app exceptions only)
         $exceptions->render(function (Throwable $e, $request) {
             // Let HTTP exceptions be handled by Laravel's default handler

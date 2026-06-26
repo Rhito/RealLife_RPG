@@ -18,7 +18,7 @@ class PushSubscriptionController extends ApiController
         $user = Auth::user();
 
         // Register the token
-        $subscription = $user->pushSubsciptions()->updateOrCreate(
+        $subscription = $user->pushSubscriptions()->updateOrCreate(
             ['endpoint' => $request->endpoint], // Expo Push Token
             [
                 'device_name' => $request->device_name,
@@ -36,7 +36,7 @@ class PushSubscriptionController extends ApiController
         ]);
 
         $user = Auth::user();
-        $user->pushSubsciptions()->where('endpoint', $request->endpoint)->delete();
+        $user->pushSubscriptions()->where('endpoint', $request->endpoint)->delete();
 
         return $this->success('Device unsubscribed');
     }
